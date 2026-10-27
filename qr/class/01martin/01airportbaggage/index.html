@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your Suitcase's Secret Journey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#fbfaf7; --paper:#ffffff; --ink:#1d1d1b; --muted:#6b6a64; --rule:#e5e2d9;
+    --accent:#8a2a1b; --accent-soft:#f6ece8; --ok:#2f6b3a; --ok-soft:#e8f2ea; --bad:#a33a2a; --bad-soft:#f8e9e6;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Source Serif 4",Georgia,"Times New Roman",serif;font-size:18px;line-height:1.6}
+  main{max-width:780px;margin:0 auto;padding:48px 16px 96px}
+  header{border-bottom:2px solid var(--ink);padding-bottom:20px;margin-bottom:8px}
+  .kicker{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600}
+  h1{font-size:40px;line-height:1.15;margin:8px 0 10px;font-weight:700}
+  .dek{color:var(--muted);font-style:italic;margin:0}
+  .plan{display:flex;flex-wrap:wrap;gap:0;margin:18px 0 0;border:1px solid var(--rule);background:var(--paper)}
+  .plan div{flex:1 1 140px;padding:10px 14px;border-right:1px solid var(--rule);font-size:15px}
+  .plan div:last-child{border-right:0}
+  .plan b{display:block;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  section{margin-top:52px}
+  h2{font-size:28px;margin:0 0 4px;display:flex;align-items:baseline;gap:12px}
+  h2 .n{color:var(--accent);font-size:22px}
+  h3{font-size:20px;margin:32px 0 6px}
+  .meta{font-size:14px;color:var(--muted);margin:0 0 18px}
+  .meta span+span::before{content:" · "}
+  ol.warm li,ol.disc li{margin:0 0 10px}
+  .box{background:var(--paper);border:1px solid var(--rule);padding:18px 20px;margin:18px 0}
+  .box h4{margin:0 0 8px;font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:0;padding:0;list-style:none}
+  .chips li{border:1px solid var(--rule);padding:3px 12px;border-radius:999px;font-size:16px;background:var(--bg)}
+  dl.gloss{margin:0;display:grid;grid-template-columns:max-content 1fr;gap:4px 16px;font-size:16px}
+  dl.gloss dt{font-weight:600}
+  dl.gloss dd{margin:0;color:var(--muted)}
+
+  /* player */
+  .clip{background:var(--paper);border:1px solid var(--rule);margin:18px 0}
+  .frame{position:relative;aspect-ratio:16/9;background:#eceae4}
+  .frame .yt, .frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+  .shield{position:absolute;inset:0;cursor:pointer}
+  .clip .err{display:none;padding:10px 14px;font-size:15px;color:var(--bad);background:var(--bad-soft)}
+  .clip.error .err{display:block}
+  .controls{display:flex;align-items:center;gap:8px;padding:10px 12px;border-top:1px solid var(--rule);flex-wrap:wrap}
+  .controls button{font:inherit;font-size:15px;border:1px solid var(--rule);background:var(--bg);color:var(--ink);padding:5px 12px;cursor:pointer;border-radius:3px}
+  .controls button:hover:not(:disabled){border-color:var(--ink)}
+  .controls button:disabled{opacity:.45;cursor:default}
+  .controls .play{background:var(--ink);color:#fff;border-color:var(--ink);min-width:86px}
+  .bar{flex:1 1 140px;height:6px;background:var(--rule);cursor:pointer;position:relative;border-radius:3px}
+  .bar i{position:absolute;left:0;top:0;bottom:0;background:var(--accent);width:0;border-radius:3px}
+  .time{font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums;min-width:86px;text-align:right}
+  .yt-link{font-size:13px;color:var(--muted);padding:0 12px 10px;display:block}
+  .yt-link a{color:var(--muted)}
+
+  /* gap fill */
+  .gaptext{font-size:19px;line-height:2.1}
+  input.gap{font:inherit;font-size:17px;border:0;border-bottom:1.5px solid var(--ink);background:transparent;width:8.5em;padding:0 4px;text-align:center;color:var(--accent)}
+  input.gap.sm{width:5.5em}
+  input.gap:focus{outline:none;background:var(--accent-soft)}
+  input.gap.ok{border-color:var(--ok);color:var(--ok);background:var(--ok-soft)}
+  input.gap.bad{border-color:var(--bad);color:var(--bad);background:var(--bad-soft)}
+
+  /* quiz */
+  .q{padding:14px 0;border-top:1px solid var(--rule)}
+  .q:first-child{border-top:0}
+  .q p{margin:0 0 8px;font-weight:600}
+  .q label{display:block;padding:4px 10px;margin:2px 0;cursor:pointer;border-radius:3px;font-size:17px}
+  .q label:hover{background:var(--bg)}
+  .q input{margin-right:8px;accent-color:var(--accent)}
+  .q label.ok{background:var(--ok-soft);color:var(--ok)}
+  .q label.bad{background:var(--bad-soft);color:var(--bad);text-decoration:line-through}
+  .q.unanswered p::after{content:" — choose an answer";font-weight:400;color:var(--bad);font-size:15px}
+
+  .actions{display:flex;gap:10px;align-items:center;margin-top:16px;flex-wrap:wrap}
+  .actions button{font:inherit;font-size:16px;padding:7px 16px;border:1px solid var(--ink);background:var(--ink);color:#fff;cursor:pointer;border-radius:3px}
+  .actions button.ghost{background:transparent;color:var(--ink)}
+  .score{font-size:16px;color:var(--muted)}
+  .score b{color:var(--ink)}
+
+  details.key{margin-top:18px;border-top:1px dashed var(--rule);padding-top:10px}
+  details.key summary{cursor:pointer;font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  details.key ol{font-size:16px;margin:10px 0 0}
+  details.key p{font-size:16px}
+
+  footer{margin-top:64px;padding-top:16px;border-top:1px solid var(--rule);font-size:14px;color:var(--muted)}
+  @media (max-width:560px){ body{font-size:17px} h1{font-size:31px} h2{font-size:24px} .gaptext{font-size:17px} input.gap{width:7em} }
+</style>
+</head>
+<body>
+<main>
+
+<header>
+  <div class="kicker">English · B1–B2 · Travel &amp; Tech</div>
+  <h1>Your Suitcase's Secret Journey</h1>
+  <p class="dek">What happens to your bag after check-in at Dubai Airport — and how a giant automated system keeps track of 57 million items a year.</p>
+  <div class="plan">
+    <div><b>1 · Warm-up</b>8 min</div>
+    <div><b>2 · Gap-fill</b>12 min</div>
+    <div><b>3 · Listening</b>25 min</div>
+    <div><b>4 · Discussion</b>15 min</div>
+  </div>
+  <p class="meta" style="margin-top:10px">Video: <i>This Is What Happens To Your Suitcase After Check-In</i> — BBC Earth Science. Accents: British (narrator), Scottish, Indian.</p>
+</header>
+
+<!-- 1 WARM-UP -->
+<section id="warmup">
+  <h2><span class="n">1</span>Warm-up</h2>
+  <p class="meta"><span>Pairs, then share</span><span>8 minutes</span></p>
+  <ol class="warm">
+    <li>When did you last fly? Walk your partner through your routine from arriving at the airport to sitting on the plane.</li>
+    <li>Carry-on only, or do you check a bag? Why?</li>
+    <li>Has an airline ever lost or delayed your luggage? What happened?</li>
+    <li>What do you think happens to your suitcase after you check in? Who — or what — moves it?</li>
+    <li><b>Guess:</b> Dubai Airport's morning rush lasts about 3 hours. How many bags do you think it processes in that time? Write your number down — you'll check it later.</li>
+  </ol>
+</section>
+
+<!-- 2 GAP-FILL -->
+<section id="gapfill">
+  <h2><span class="n">2</span>Gap-fill: airport vocabulary</h2>
+  <p class="meta"><span>00:00–01:08 of the video</span><span>12 minutes</span></p>
+  <p>Before listening, try to complete the text with the words in the box. Then listen and check.</p>
+
+  <div class="box">
+    <h4>Word bank</h4>
+    <ul class="chips">
+      <li>behind</li><li>board</li><li>boarding pass</li><li>checked</li><li>desk</li><li>duty-free</li>
+      <li>gate</li><li>on board</li><li>security</li><li>suitcase</li><li>tag</li><li>takeoff</li>
+    </ul>
+  </div>
+
+  <div class="clip" data-id="gap" data-start="0" data-end="68">
+    <div class="frame"><div class="yt"></div><div class="shield" title="Play / pause"></div></div>
+    <div class="err">The video couldn't load here. Try the YouTube link below, or open this page from a website instead of directly from your computer.</div>
+    <div class="controls">
+      <button class="play" disabled>▶ Play</button>
+      <button class="back" disabled title="Back 5 seconds">−5 s</button>
+      <button class="restart" disabled title="Back to the start of this section">⟲</button>
+      <button class="speed" disabled title="Playback speed">1×</button>
+      <div class="bar"><i></i></div>
+      <span class="time">0:00 / 1:08</span>
+    </div>
+    <span class="yt-link">Plays 0:00–1:08 only · <a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=_4w9jFDV3Do&t=0s">open on YouTube</a></span>
+  </div>
+
+  <div class="box gaptext" id="gaptext">
+    We all know the drill. Arrive at the
+    <input class="gap sm" data-a="desk" aria-label="gap 1">,
+    <input class="gap sm" data-a="tag" aria-label="gap 2"> your bag, print your
+    <input class="gap" data-a="boarding pass" aria-label="gap 3">, and head through
+    <input class="gap" data-a="security" aria-label="gap 4">.
+    Finally, you make it through. Get the obligatory super-sized chocolate bar and
+    <input class="gap" data-a="duty-free|duty free|dutyfree" aria-label="gap 5">, and then time to find the
+    <input class="gap sm" data-a="gate" aria-label="gap 6">,
+    <input class="gap sm" data-a="board" aria-label="gap 7"> the plane, and get ready for
+    <input class="gap" data-a="takeoff|take-off|take off" aria-label="gap 8">.
+    That's all there is to it. It's all very familiar. But
+    <input class="gap sm" data-a="behind" aria-label="gap 9"> the scenes, there's a hidden world of complexity.
+    Take your <input class="gap" data-a="suitcase" aria-label="gap 10">.
+    Once you've <input class="gap sm" data-a="checked" aria-label="gap 11"> in, your baggage sets sail on its own long and secret journey before eventually joining you
+    <input class="gap" data-a="on board|onboard|on-board" aria-label="gap 12">.
+  </div>
+
+  <div class="actions">
+    <button id="gapCheck">Check answers</button>
+    <button class="ghost" id="gapShow">Show answers</button>
+    <button class="ghost" id="gapReset">Reset</button>
+    <span class="score" id="gapScore"></span>
+  </div>
+
+  <div class="box" style="margin-top:28px">
+    <h4>Talk about it</h4>
+    <p style="margin:0;font-size:17px">What do these expressions mean? <i>know the drill</i> · <i>make it through</i> · <i>that's all there is to it</i> · <i>behind the scenes</i>. Make one true sentence about your job with each.</p>
+  </div>
+
+  <details class="key">
+    <summary>Answer key</summary>
+    <ol>
+      <li>desk</li><li>tag</li><li>boarding pass</li><li>security</li><li>duty-free</li><li>gate</li>
+      <li>board</li><li>takeoff</li><li>behind</li><li>suitcase</li><li>checked</li><li>on board</li>
+    </ol>
+    <p><b>Expressions:</b> <i>know the drill</i> = know the usual routine · <i>make it through</i> = succeed in getting past something difficult · <i>that's all there is to it</i> = it's that simple · <i>behind the scenes</i> = hidden from the public.</p>
+  </details>
+</section>
+
+<!-- 3 LISTENING -->
+<section id="listening">
+  <h2><span class="n">3</span>Listening: the hidden system</h2>
+  <p class="meta"><span>01:08–06:36 in three parts</span><span>25 minutes</span></p>
+  <p>Read the questions for each part first. Listen once for the general idea, then again to answer. Click <b>Check</b> after each part.</p>
+
+  <div class="box">
+    <h4>Words to know</h4>
+    <dl class="gloss">
+      <dt>subterranean</dt><dd>underground</dd>
+      <dt>conveyor belt</dt><dd>a moving belt that carries objects</dd>
+      <dt>tray</dt><dd>a flat container the bag sits in</dd>
+      <dt>chipped</dt><dd>fitted with a microchip</dd>
+      <dt>whiz along</dt><dd>move very fast</dd>
+      <dt>sheer volume</dt><dd>the enormous amount</dd>
+      <dt>timekeeping</dt><dd>being on time</dd>
+      <dt>queuing</dt><dd>waiting in a line</dd>
+    </dl>
+  </div>
+
+  <h3>Part 1 · Numbers and the bag tag</h3>
+  <p class="meta"><span>01:08–03:00</span></p>
+  <div class="clip" data-id="p1" data-start="68" data-end="180">
+    <div class="frame"><div class="yt"></div><div class="shield" title="Play / pause"></div></div>
+    <div class="err">The video couldn't load here. Try the YouTube link below, or open this page from a website instead of directly from your computer.</div>
+    <div class="controls">
+      <button class="play" disabled>▶ Play</button>
+      <button class="back" disabled title="Back 5 seconds">−5 s</button>
+      <button class="restart" disabled title="Back to the start of this section">⟲</button>
+      <button class="speed" disabled title="Playback speed">1×</button>
+      <div class="bar"><i></i></div>
+      <span class="time">0:00 / 1:52</span>
+    </div>
+    <span class="yt-link">Plays 1:08–3:00 only · <a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=_4w9jFDV3Do&t=68s">open on YouTube</a></span>
+  </div>
+  <div class="quiz" data-part="p1"></div>
+
+  <h3>Part 2 · Under the airport</h3>
+  <p class="meta"><span>03:00–04:53</span></p>
+  <div class="clip" data-id="p2" data-start="180" data-end="293">
+    <div class="frame"><div class="yt"></div><div class="shield" title="Play / pause"></div></div>
+    <div class="err">The video couldn't load here. Try the YouTube link below, or open this page from a website instead of directly from your computer.</div>
+    <div class="controls">
+      <button class="play" disabled>▶ Play</button>
+      <button class="back" disabled title="Back 5 seconds">−5 s</button>
+      <button class="restart" disabled title="Back to the start of this section">⟲</button>
+      <button class="speed" disabled title="Playback speed">1×</button>
+      <div class="bar"><i></i></div>
+      <span class="time">0:00 / 1:53</span>
+    </div>
+    <span class="yt-link">Plays 3:00–4:53 only · <a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=_4w9jFDV3Do&t=180s">open on YouTube</a></span>
+  </div>
+  <div class="quiz" data-part="p2"></div>
+
+  <h3>Part 3 · Early bags and the control room</h3>
+  <p class="meta"><span>04:53–06:37</span></p>
+  <div class="clip" data-id="p3" data-start="293" data-end="397">
+    <div class="frame"><div class="yt"></div><div class="shield" title="Play / pause"></div></div>
+    <div class="err">The video couldn't load here. Try the YouTube link below, or open this page from a website instead of directly from your computer.</div>
+    <div class="controls">
+      <button class="play" disabled>▶ Play</button>
+      <button class="back" disabled title="Back 5 seconds">−5 s</button>
+      <button class="restart" disabled title="Back to the start of this section">⟲</button>
+      <button class="speed" disabled title="Playback speed">1×</button>
+      <div class="bar"><i></i></div>
+      <span class="time">0:00 / 1:44</span>
+    </div>
+    <span class="yt-link">Plays 4:53–6:37 only · <a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=_4w9jFDV3Do&t=293s">open on YouTube</a></span>
+  </div>
+  <div class="quiz" data-part="p3"></div>
+
+  <div class="box" style="margin-top:28px">
+    <h4>Bonus: spot the mistake</h4>
+    <p style="margin:0;font-size:17px">In Part 1 the narrator calls <b>DXB</b> "a three-digit code". Is that the right word? What would you call it? And how close was your guess from the warm-up?</p>
+  </div>
+
+  <details class="key">
+    <summary>Answer key</summary>
+    <div id="quizKey"></div>
+    <p><b>Bonus:</b> DXB is made of letters, not digits — it's a <i>three-letter</i> airport code (an IATA code). The morning rush figure is about 50,000 bags.</p>
+  </details>
+</section>
+
+<!-- 4 DISCUSSION -->
+<section id="discussion">
+  <h2><span class="n">4</span>Discussion</h2>
+  <p class="meta"><span>Small groups</span><span>15 minutes</span></p>
+
+  <h3>Thinking like an engineer</h3>
+  <ol class="disc">
+    <li>The system doesn't track the bag — it tracks the <i>tray</i>. Why is that a smart design? Can you think of a similar idea in software (IDs, references, keys)?</li>
+    <li>The narrator says the system "simply can't be allowed to fail". If you were in charge, how would you monitor it? What would trigger an alert?</li>
+    <li>Green = normal, yellow = queuing, red = fault. Do your dashboards or status pages work like this? Is three colours enough?</li>
+    <li>Bags that arrive early wait in storage until it's "their time". Where have you seen queues or scheduling like this in your work?</li>
+    <li>"It's like the robots have taken over." Where should humans stay in the loop in a system like this — and where are they just in the way?</li>
+  </ol>
+
+  <h3>Thinking like a traveller</h3>
+  <ol class="disc" start="6">
+    <li>Do you put a tracker (like an AirTag) in your luggage? Would you trust the airline's system or your own device more?</li>
+    <li>Which airport has impressed you most — and which one was a nightmare?</li>
+    <li>Where's the next place you want to travel? What piece of tech would make that trip easier?</li>
+  </ol>
+
+  <div class="box">
+    <h4>Useful language</h4>
+    <ul class="chips">
+      <li>If I were designing it, I'd…</li>
+      <li>The bottleneck is probably…</li>
+      <li>What happens if… goes down?</li>
+      <li>It's a single point of failure.</li>
+      <li>I'd rather… than…</li>
+      <li>That reminds me of…</li>
+    </ul>
+  </div>
+</section>
+
+<footer>Video © BBC Earth Science, embedded from YouTube for classroom use. Players play only the section shown.</footer>
+</main>
+
+<script>
+const VIDEO = "_4w9jFDV3Do";
+
+/* ---------- Comprehension data ---------- */
+const QUIZ = {
+  p1: [
+    {q:"In the morning rush, how many bags does Dubai Airport process in about three hours?", o:["5,000","15,000","50,000","500,000"], a:2},
+    {q:"How many items does the airport handle every year?", o:["5.7 million","57 million","570 million"], a:1},
+    {q:"Why does the narrator mention the Burj Khalifa?", o:["To show how high the bags would be if you stacked them","To show where the baggage system is","To explain where the passengers are going"], a:0},
+    {q:"On the bag tag, “DXB” tells you…", o:["the passenger's name","the airport the bag is going to","the airline"], a:1},
+    {q:"Which of these is NOT part of the 10-digit number?", o:["the airline","the bag's ID number","a digit for priority or other messages","the passenger's seat number"], a:3},
+    {q:"The narrator compares the 10-digit number to…", o:["a phone number","a passport number","a credit card number"], a:1}
+  ],
+  p2: [
+    {q:"How far below the airport is the baggage system?", o:["5 metres","25 metres","85 metres"], a:1},
+    {q:"How long is the network?", o:["8.5 miles","58 miles","85 miles"], a:2},
+    {q:"Roughly how much did it cost to build?", o:["£50 million","£500 million","£5 billion"], a:1},
+    {q:"What surprises the narrator most?", o:["How noisy it is","That there are no people","That the trays are yellow"], a:1},
+    {q:"What does the computer actually track?", o:["The bag's weight","The tray's unique ID","The passenger's phone"], a:1},
+    {q:"What does a “read station” do?", o:["It weighs the bag","It reads the tray and sends it to the right place","It prints a new tag"], a:1}
+  ],
+  p3: [
+    {q:"If your flight leaves within an hour, your bag goes…", o:["to early storage","straight to the loading area","to the control room"], a:1},
+    {q:"If you check in very early, your bag…", o:["waits in the early baggage storage system","goes on an earlier flight","goes back to the check-in desk"], a:0},
+    {q:"What takes the tray out of storage when it's time?", o:["A worker with a trolley","A little red robot shuttle","The passenger"], a:1},
+    {q:"Where do more people work?", o:["On the conveyor system","In the control room","The number is the same"], a:1},
+    {q:"On the control screens, green means…", o:["normal","queuing","a fault"], a:0},
+    {q:"…yellow means…", o:["normal","queuing (bags are waiting)","a fault"], a:1},
+    {q:"…and red means…", o:["normal","queuing","a fault"], a:2}
+  ]
+};
+
+/* ---------- Render quizzes + key ---------- */
+const letters = "abcd";
+const keyEl = document.getElementById("quizKey");
+let qn = 0;
+document.querySelectorAll(".quiz").forEach(wrap => {
+  const part = wrap.dataset.part, items = QUIZ[part];
+  const box = document.createElement("div"); box.className = "box";
+  const keyList = document.createElement("ol"); keyList.start = qn + 1;
+  items.forEach((it, i) => {
+    qn++;
+    const d = document.createElement("div"); d.className = "q"; d.dataset.a = it.a;
+    const p = document.createElement("p"); p.textContent = qn + ". " + it.q; d.appendChild(p);
+    it.o.forEach((opt, j) => {
+      const l = document.createElement("label");
+      const r = document.createElement("input"); r.type = "radio"; r.name = part + "_" + i; r.value = j;
+      l.appendChild(r); l.appendChild(document.createTextNode(letters[j] + ") " + opt));
+      d.appendChild(l);
+    });
+    box.appendChild(d);
+    const li = document.createElement("li"); li.textContent = letters[it.a] + ") " + it.o[it.a]; keyList.appendChild(li);
+  });
+  const act = document.createElement("div"); act.className = "actions";
+  act.innerHTML = '<button>Check</button><button class="ghost">Reset</button><span class="score"></span>';
+  box.appendChild(act);
+  wrap.appendChild(box);
+  const h = document.createElement("p"); h.innerHTML = "<b>" + wrap.previousElementSibling.previousElementSibling.previousElementSibling.textContent + "</b>";
+  keyEl.appendChild(h); keyEl.appendChild(keyList);
+
+  const [checkBtn, resetBtn] = act.querySelectorAll("button"), score = act.querySelector(".score");
+  checkBtn.onclick = () => {
+    let right = 0, missing = 0;
+    box.querySelectorAll(".q").forEach(q => {
+      q.querySelectorAll("label").forEach(l => l.classList.remove("ok", "bad"));
+      const sel = q.querySelector("input:checked");
+      q.classList.toggle("unanswered", !sel);
+      if (!sel) { missing++; return; }
+      const ok = +sel.value === +q.dataset.a;
+      sel.parentNode.classList.add(ok ? "ok" : "bad");
+      if (ok) right++;
+    });
+    score.innerHTML = "<b>" + right + "/" + items.length + "</b>" + (missing ? " · " + missing + " unanswered" : right === items.length ? " · perfect!" : " · listen again for the red ones");
+  };
+  resetBtn.onclick = () => {
+    box.querySelectorAll("input").forEach(r => r.checked = false);
+    box.querySelectorAll("label").forEach(l => l.classList.remove("ok", "bad"));
+    box.querySelectorAll(".q").forEach(q => q.classList.remove("unanswered"));
+    score.textContent = "";
+  };
+});
+
+/* ---------- Gap-fill ---------- */
+const norm = s => s.toLowerCase().replace(/[’']/g, "'").replace(/[.,!?;:]/g, "").replace(/\s+/g, " ").trim();
+const gaps = [...document.querySelectorAll("input.gap")];
+const gapScore = document.getElementById("gapScore");
+document.getElementById("gapCheck").onclick = () => {
+  let right = 0;
+  gaps.forEach(g => {
+    const ok = g.dataset.a.split("|").some(a => norm(a) === norm(g.value));
+    g.classList.remove("ok", "bad");
+    if (g.value.trim()) g.classList.add(ok ? "ok" : "bad");
+    if (ok) right++;
+  });
+  gapScore.innerHTML = "<b>" + right + "/" + gaps.length + "</b>" + (right === gaps.length ? " · perfect!" : "");
+};
+document.getElementById("gapShow").onclick = () => {
+  gaps.forEach(g => { g.value = g.dataset.a.split("|")[0]; g.classList.remove("bad"); g.classList.add("ok"); });
+  gapScore.textContent = "";
+};
+document.getElementById("gapReset").onclick = () => {
+  gaps.forEach(g => { g.value = ""; g.classList.remove("ok", "bad"); });
+  gapScore.textContent = "";
+};
+gaps.forEach(g => g.addEventListener("input", () => g.classList.remove("ok", "bad")));
+
+/* ---------- Section-locked YouTube players ---------- */
+const clips = [];
+const fmt = s => { s = Math.max(0, Math.round(s)); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); };
+
+function onYouTubeIframeAPIReady() {
+  document.querySelectorAll(".clip").forEach(el => {
+    const start = +el.dataset.start, end = +el.dataset.end;
+    const c = { el, start, end, ready: false, rate: 1 };
+    const vars = { start, end, controls: 0, rel: 0, modestbranding: 1, playsinline: 1, disablekb: 1, iv_load_policy: 3, fs: 0 };
+    if (location.protocol.indexOf("http") === 0) vars.origin = location.origin;
+    c.player = new YT.Player(el.querySelector(".yt"), {
+      videoId: VIDEO, playerVars: vars,
+      events: {
+        onReady: () => { c.ready = true; el.querySelectorAll(".controls button").forEach(b => b.disabled = false); },
+        onStateChange: e => {
+          const playing = e.data === YT.PlayerState.PLAYING;
+          el.querySelector(".play").textContent = playing ? "❚❚ Pause" : "▶ Play";
+          if (playing) clips.forEach(o => { if (o !== c && o.ready && o.player.getPlayerState() === YT.PlayerState.PLAYING) o.player.pauseVideo(); });
+          if (e.data === YT.PlayerState.ENDED) { c.player.seekTo(start, true); c.player.pauseVideo(); }
+        },
+        onError: () => el.classList.add("error")
+      }
+    });
+    const toggle = () => {
+      if (!c.ready) return;
+      if (c.player.getPlayerState() === YT.PlayerState.PLAYING) { c.player.pauseVideo(); return; }
+      const t = c.player.getCurrentTime();
+      if (t < start - 0.5 || t >= end - 0.3) c.player.seekTo(start, true);
+      c.player.playVideo();
+    };
+    el.querySelector(".play").onclick = toggle;
+    el.querySelector(".shield").onclick = toggle;
+    el.querySelector(".back").onclick = () => c.player.seekTo(Math.max(start, c.player.getCurrentTime() - 5), true);
+    el.querySelector(".restart").onclick = () => { c.player.seekTo(start, true); c.player.playVideo(); };
+    el.querySelector(".speed").onclick = e => {
+      c.rate = c.rate === 1 ? 0.75 : 1;
+      c.player.setPlaybackRate(c.rate);
+      e.target.textContent = c.rate + "×";
+    };
+    el.querySelector(".bar").onclick = e => {
+      if (!c.ready) return;
+      const r = e.currentTarget.getBoundingClientRect();
+      const f = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+      c.player.seekTo(start + f * (end - start), true);
+    };
+    clips.push(c);
+  });
+  setInterval(tick, 200);
+}
+
+function tick() {
+  clips.forEach(c => {
+    if (!c.ready || typeof c.player.getCurrentTime !== "function") return;
+    const t = c.player.getCurrentTime(), playing = c.player.getPlayerState() === YT.PlayerState.PLAYING;
+    if (playing && t >= c.end - 0.1) { c.player.pauseVideo(); c.player.seekTo(c.start, true); }
+    else if (playing && t < c.start - 0.5) { c.player.seekTo(c.start, true); }
+    const rel = Math.min(Math.max(t - c.start, 0), c.end - c.start);
+    c.el.querySelector(".bar i").style.width = (100 * rel / (c.end - c.start)) + "%";
+    c.el.querySelector(".time").textContent = fmt(rel) + " / " + fmt(c.end - c.start);
+  });
+}
+
+const tag = document.createElement("script");
+tag.src = "https://www.youtube.com/iframe_api";
+tag.onerror = () => document.querySelectorAll(".clip").forEach(el => el.classList.add("error"));
+document.head.appendChild(tag);
+</script>
+</body>
+</html>
