@@ -1,0 +1,840 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The incredible engineering of Venice – a video listening lesson</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,700;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ffffff;
+  --lagoon:#e9f0f1;
+  --lagoon-deep:#bfd0d3;
+  --ink:#15222b;
+  --muted:#58656d;
+  --rule:#d8dfe0;
+  --accent:#0d5f66;
+  --accent-soft:#e1f0f1;
+  --wood:#7a5a3a;
+  --ok:#17683c;
+  --ok-soft:#e5f3ea;
+  --no:#a8261d;
+  --no-soft:#fbe9e7;
+  --serif:"Newsreader",Georgia,"Times New Roman",serif;
+  --ui:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:19px;line-height:1.62}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+.topbar{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.96);backdrop-filter:blur(6px);border-bottom:1px solid var(--rule)}
+.topbar nav{max-width:980px;margin:0 auto;padding:0 24px;display:flex;gap:4px;overflow-x:auto;font-family:var(--ui);font-size:14px}
+.topbar a{display:block;padding:15px 14px;text-decoration:none;color:var(--muted);white-space:nowrap;border-bottom:3px solid transparent}
+.topbar a:hover{color:var(--ink);border-bottom-color:var(--lagoon-deep)}
+.topbar b{font-family:var(--serif);font-weight:600;color:var(--ink);margin-right:6px}
+
+.hero{background:var(--lagoon);background-image:repeating-linear-gradient(0deg,rgba(13,95,102,.06) 0 1px,transparent 1px 24px);border-bottom:1px solid var(--lagoon-deep)}
+.hero-inner{max-width:980px;margin:0 auto;padding:60px 24px 54px;display:grid;grid-template-columns:1.5fr 1fr;gap:40px;align-items:center}
+.hero h1{font-weight:700;font-size:clamp(40px,6.6vw,76px);line-height:1;letter-spacing:-.02em;margin:0 0 22px}
+.hero p{margin:0 0 10px;max-width:34em;color:#2d3a42}
+.hero .meta{font-family:var(--ui);font-size:14px;color:var(--muted);margin-top:22px}
+.hero figure{margin:0}
+.hero svg{width:100%;height:auto;display:block}
+.hero figcaption{font-family:var(--ui);font-size:12.5px;color:var(--muted);margin-top:8px;line-height:1.4}
+@media (max-width:720px){.hero-inner{grid-template-columns:1fr;padding-top:40px}.hero figure{max-width:280px}}
+
+main{max-width:980px;margin:0 auto;padding:0 24px 80px}
+.exercise{padding-top:72px}
+.ex-head{display:grid;grid-template-columns:96px 1fr;gap:8px 24px;align-items:baseline;border-top:3px solid var(--ink);padding-top:22px;margin-bottom:28px}
+.ex-num{font-size:84px;line-height:.9;font-weight:300;color:var(--lagoon-deep);font-variant-numeric:lining-nums}
+.ex-head h2{margin:0;font-size:clamp(28px,4vw,40px);line-height:1.1;font-weight:600;letter-spacing:-.01em}
+.ex-head .how{grid-column:2;margin:0;color:var(--muted);font-family:var(--ui);font-size:14.5px}
+@media (max-width:640px){.ex-head{grid-template-columns:1fr}.ex-num{font-size:56px}.ex-head .how{grid-column:1}}
+.body{max-width:780px;margin-left:120px}
+@media (max-width:640px){.body{margin-left:0}}
+h3{font-size:23px;margin:36px 0 10px;font-weight:600}
+p{margin:0 0 14px}
+.task{font-family:var(--ui);font-size:15.5px;background:var(--accent-soft);border-left:4px solid var(--accent);padding:12px 16px;margin:0 0 22px}
+
+ol.plain{margin:0 0 20px;padding:0;list-style:none;counter-reset:wu}
+ol.plain>li{counter-increment:wu;padding:14px 0 14px 44px;position:relative;border-bottom:1px solid var(--rule)}
+ol.plain>li::before{content:counter(wu);position:absolute;left:0;top:14px;width:30px;height:30px;border-radius:50%;background:var(--ink);color:#fff;font-family:var(--ui);font-size:14px;display:grid;place-items:center}
+.fact{border:1px solid var(--lagoon-deep);background:var(--lagoon);padding:14px 18px;margin:8px 0 24px;font-size:17px}
+
+/* video player */
+.player{background:var(--lagoon);border-top:3px solid var(--ink);padding:16px 18px 10px;margin:18px 0 20px;font-family:var(--ui)}
+.player .label{font-family:var(--serif);font-size:18px;font-weight:600;margin:0 0 10px}
+.player .label span{font-family:var(--ui);font-weight:400;font-size:13px;color:var(--muted);margin-left:8px}
+.frame{position:relative;width:100%;aspect-ratio:16/9;background:#0e1a21;margin:0 0 12px;overflow:hidden}
+.frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.frame .poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.85}
+.frame .shield{position:absolute;inset:0;width:100%;height:100%;background:transparent;border:0;cursor:pointer;z-index:2}
+.frame .bigplay{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.92);display:grid;place-items:center;z-index:1;pointer-events:none}
+.frame .bigplay svg{width:30px;height:30px;fill:var(--ink)}
+.player.started .bigplay,.player.started .poster{display:none}
+.pl-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.play{width:48px;height:48px;border-radius:50%;border:0;background:var(--ink);color:#fff;cursor:pointer;display:grid;place-items:center;flex:none}
+.play:hover{background:var(--accent)}
+.play svg{width:20px;height:20px;fill:#fff}
+.play .ic-pause{display:none}
+.player.playing .ic-play{display:none}
+.player.playing .ic-pause{display:block}
+.scrub{flex:1 1 180px;min-width:140px;accent-color:var(--accent);height:28px;cursor:pointer}
+.time{font-variant-numeric:tabular-nums;font-size:14px;min-width:84px;text-align:right}
+.mini{font-family:var(--ui);font-size:13.5px;border:1px solid var(--lagoon-deep);background:#fff;color:var(--ink);padding:7px 10px;border-radius:4px;cursor:pointer}
+.mini:hover{border-color:var(--ink)}
+.msg{font-size:13.5px;color:var(--no);margin:8px 0 0}
+.alt{font-size:13px;margin:8px 0 0;color:var(--muted)}
+details.tr{margin-top:10px;border-top:1px solid var(--lagoon-deep);padding-top:8px}
+details.tr summary,details.key summary{cursor:pointer;font-size:14px;color:var(--accent);padding:4px 0}
+details.tr .tx{font-family:var(--serif);font-size:16.5px;line-height:1.55;padding:8px 0 4px;max-width:70ch}
+details.tr .tx p{margin:0 0 9px}
+
+/* gap-fill */
+.gapfill{background:#fff;border:1px solid var(--rule);padding:22px 24px;margin:0 0 14px;line-height:2.05}
+.gapfill p{margin:0}
+.gap input{font:inherit;font-size:17px;border:0;border-bottom:2px solid var(--ink);background:var(--lagoon);padding:1px 6px;margin:0 2px;text-align:center;border-radius:0;color:var(--ink)}
+.gap input::placeholder{color:#8a969c;font-family:var(--ui);font-size:13px}
+.gap input:focus{outline:none;background:var(--accent-soft);border-bottom-color:var(--accent)}
+.gap input.ok{background:var(--ok-soft);border-bottom-color:var(--ok);color:var(--ok);font-weight:600}
+.gap input.no{background:var(--no-soft);border-bottom-color:var(--no);color:var(--no);text-decoration:underline wavy}
+.gap input.shown{background:var(--accent-soft);border-bottom-color:var(--accent);color:var(--accent)}
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:14px 0 6px;font-family:var(--ui)}
+.btn{font-family:var(--ui);font-size:15px;padding:9px 16px;border:2px solid var(--ink);background:var(--ink);color:#fff;cursor:pointer;border-radius:3px}
+.btn:hover{background:var(--accent);border-color:var(--accent)}
+.btn.ghost{background:#fff;color:var(--ink)}
+.btn.ghost:hover{background:var(--lagoon);color:var(--ink);border-color:var(--ink)}
+.score{font-family:var(--ui);font-size:15px;font-weight:600}
+.bank{font-family:var(--ui);font-size:15px;margin:10px 0}
+.bank ul{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.bank li{background:var(--lagoon);padding:4px 11px;border:1px solid var(--lagoon-deep)}
+.note{font-size:16.5px;color:#34424a;border-left:3px solid var(--lagoon-deep);padding-left:14px;margin:18px 0}
+
+/* questions */
+.quiz{counter-reset:q}
+.part{margin:42px 0 0}
+.part:first-child{margin-top:0}
+.part h3{margin-top:0}
+.q{counter-increment:q;padding:16px 0;border-bottom:1px solid var(--rule)}
+.q .stem{display:flex;gap:12px;margin:0 0 8px}
+.q .stem::before{content:counter(q);flex:none;width:30px;height:30px;border-radius:50%;background:var(--ink);color:#fff;font-family:var(--ui);font-size:14px;display:grid;place-items:center;margin-top:1px}
+.q .opts{margin:0 0 0 42px;font-family:var(--ui);font-size:16px}
+.q .opts label{display:flex;gap:10px;align-items:flex-start;padding:5px 0;cursor:pointer}
+.q .opts input{margin-top:5px;accent-color:var(--accent)}
+.q textarea{display:block;margin:4px 0 0 42px;width:calc(100% - 42px);font-family:var(--serif);font-size:17px;padding:8px 10px;border:1px solid var(--lagoon-deep);background:#fff;min-height:64px;resize:vertical}
+.q details.key{margin:6px 0 0 42px}
+.q details.key p{font-family:var(--serif);font-size:16.5px;background:var(--lagoon);padding:10px 14px;margin:6px 0 0}
+.q .why{margin:8px 0 0 42px;font-family:var(--ui);font-size:14.5px;display:none}
+.q.ok .why,.q.no .why{display:block}
+.q.ok{background:linear-gradient(90deg,var(--ok-soft) 0 5px,transparent 5px)}
+.q.no{background:linear-gradient(90deg,var(--no-soft) 0 5px,transparent 5px)}
+.q.ok .why{color:var(--ok)}
+.q.no .why{color:var(--no)}
+.q.ok .opts label:has(input:checked){color:var(--ok);font-weight:600}
+.q.no .opts label:has(input:checked){color:var(--no);text-decoration:line-through}
+
+/* discussion */
+.dq{padding:20px 0;border-bottom:1px solid var(--rule)}
+.dq h4{margin:0 0 6px;font-size:20px;font-weight:600}
+.dq p{margin:0 0 8px}
+.dq .push{font-family:var(--ui);font-size:15px;color:var(--muted)}
+.lang{background:var(--lagoon);padding:18px 22px;margin:28px 0;border-top:3px solid var(--ink)}
+.lang h4{margin:0 0 8px;font-size:19px}
+.lang ul{margin:0;padding-left:20px;columns:2;column-gap:32px;font-size:17px}
+.lang li{margin-bottom:4px;break-inside:avoid}
+@media (max-width:640px){.lang ul{columns:1}}
+.roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));border:1px solid var(--lagoon-deep);margin:12px 0 0}
+.roles div{padding:12px 14px;border-right:1px solid var(--lagoon-deep);border-bottom:1px solid var(--lagoon-deep);font-size:16px}
+.roles b{display:block;font-family:var(--ui);font-size:14.5px;margin-bottom:3px}
+
+footer{max-width:980px;margin:0 auto;padding:0 24px 64px;font-family:var(--ui);font-size:13.5px;color:var(--muted)}
+footer details{border-top:1px solid var(--rule);padding-top:12px}
+footer table{border-collapse:collapse;margin:10px 0;font-size:13.5px}
+footer td,footer th{padding:5px 14px 5px 0;text-align:left;border-bottom:1px solid var(--rule)}
+footer input.t{width:70px;font:inherit;padding:4px 6px;border:1px solid var(--lagoon-deep)}
+footer code{background:var(--lagoon);padding:1px 5px}
+
+@media print{
+  .topbar,.player,.actions,.hero svg,.btn{display:none!important}
+  body{font-size:12pt}
+  .hero{background:none;border-bottom:1px solid #999}
+  .exercise{page-break-before:always;padding-top:0}
+  .body,.q .opts{margin-left:0}
+  details.key,details.tr{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <nav aria-label="Exercises">
+    <a href="#ex1"><b>1</b>Warm-up</a>
+    <a href="#ex2"><b>2</b>Watch and fill the gaps</a>
+    <a href="#ex3"><b>3</b>Watching for detail</a>
+    <a href="#ex4"><b>4</b>Discussion</a>
+  </nav>
+</div>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div>
+      <h1>The incredible engineering of Venice</h1>
+      <p>Venice was built on mud, wood and water, and it has stood for about 1,500 years. What holds it up, how did it grow rich, and what threatens it now?</p>
+      <p class="meta">90 minutes · Video: TED-Ed, “The incredible engineering of Venice” by Stephanie H. Smith</p>
+    </div>
+    <figure>
+      <svg viewBox="0 0 320 320" role="img" aria-label="Cross-section of a building on a stone platform, resting on wooden piles driven into mud beneath the water">
+        <title>Cross-section: building, stone platform, wooden piles, mud</title>
+        <rect x="0" y="136" width="320" height="64" fill="#0d5f66" opacity=".14"/>
+        <path d="M0 136 q20 -7 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0" fill="none" stroke="#0d5f66" stroke-width="2" opacity=".5"/>
+        <rect x="0" y="200" width="320" height="120" fill="#d9d0c1"/>
+        <g fill="#b9ad98"><circle cx="30" cy="230" r="2"/><circle cx="90" cy="290" r="2"/><circle cx="150" cy="250" r="2"/><circle cx="210" cy="300" r="2"/><circle cx="280" cy="240" r="2"/><circle cx="50" cy="280" r="2"/><circle cx="250" cy="275" r="2"/></g>
+        <g stroke="#7a5a3a" stroke-width="7" stroke-linecap="round">
+          <line x1="66" y1="152" x2="66" y2="262"/><line x1="82" y1="152" x2="82" y2="282"/><line x1="98" y1="152" x2="98" y2="256"/><line x1="114" y1="152" x2="114" y2="276"/><line x1="130" y1="152" x2="130" y2="260"/><line x1="146" y1="152" x2="146" y2="284"/><line x1="162" y1="152" x2="162" y2="258"/><line x1="178" y1="152" x2="178" y2="278"/><line x1="194" y1="152" x2="194" y2="262"/><line x1="210" y1="152" x2="210" y2="282"/><line x1="226" y1="152" x2="226" y2="256"/><line x1="242" y1="152" x2="242" y2="274"/>
+        </g>
+        <rect x="52" y="140" width="204" height="12" fill="#7a5a3a"/>
+        <rect x="46" y="116" width="216" height="24" fill="#c8cdcf" stroke="#15222b" stroke-width="2"/>
+        <rect x="70" y="30" width="168" height="86" fill="#eef1f1" stroke="#15222b" stroke-width="2"/>
+        <g fill="#15222b"><path d="M92 116 v-34 a14 14 0 0 1 28 0 v34z"/><path d="M147 116 v-34 a14 14 0 0 1 28 0 v34z"/><path d="M202 116 v-34 a14 14 0 0 1 28 0 v34z"/></g>
+      </svg>
+      <figcaption>Section through a Venetian foundation: building, stone platform, wooden beams, and piles driven into the lagoon mud.</figcaption>
+    </figure>
+  </div>
+</header>
+
+<main>
+
+<!-- ======================= EXERCISE 1 ======================= -->
+<section class="exercise" id="ex1">
+  <div class="ex-head">
+    <div class="ex-num">1</div>
+    <h2>Warm-up</h2>
+    <p class="how">Pairs or small groups · about 10 minutes</p>
+  </div>
+  <div class="body">
+    <p class="task">Discuss these questions with a partner. You are about to watch a short video about a city built in a lagoon.</p>
+    <ol class="plain">
+      <li>What do you already know about Venice? What makes building a city on a lagoon, with soft mud and water everywhere, so difficult?</li>
+      <li>What are the main ways of building foundations on weak or waterlogged ground today? How might someone 1,500 years ago have solved the same problem using only wood and stone?</li>
+      <li>Which other cities or regions are threatened by water, through rising sea levels, flooding or sinking ground? What solutions have you heard of?</li>
+    </ol>
+    <h3>Predict</h3>
+    <p>The video is called <b>“The incredible engineering of Venice”</b>. In your group, write down <b>three things</b> you expect it to explain. You will check your predictions in Exercises 2 and 3.</p>
+  </div>
+</section>
+
+<!-- ======================= EXERCISE 2 ======================= -->
+<section class="exercise" id="ex2">
+  <div class="ex-head">
+    <div class="ex-num">2</div>
+    <h2>Watch and fill the gaps</h2>
+    <p class="how">Individual, then compare · about 1 minute of video · about 15 minutes</p>
+  </div>
+  <div class="body">
+    <p class="task">Watch the extract and write the missing word in each gap. All the words describe how the first settlers built the foundations. You will watch two or three times.</p>
+
+    <div class="player" data-start="47" data-end="106" data-label="Extract 1">
+      <p class="label">Extract 1 <span>about 1 minute</span></p>
+      <div class="ctl"></div>
+      <details class="tr"><summary>Transcript (after you have finished)</summary>
+        <div class="tx">
+          <p>While some fishermen already inhabited the region in stilted huts, the settlers wanted to build a foundation to support heavier, longer-lasting structures. Little did they know their work would support Venice to this very day. They drove clusters of 1-to-3-meter-long wooden piles into the ground in a process that squeezed out groundwater and compacted mud around the piles. This created an oxygen-free environment that protected the wood from insects and fungi. The piles were still vulnerable to minor bacterial damage, but otherwise impervious to rot. And this sealed system of wood, water, and mud is still supporting Venice 1,500 years later. Wooden beams and stone platforms above the piles provided the basis for buildings, and sometime around 697, the settlers formally declared their new home the Republic of Venice.</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="gapfill" id="gapfill">
+      <p>While some fishermen already inhabited the region in <span class="gap" data-a="stilted"></span> huts, the settlers wanted to build a <span class="gap" data-a="foundation"></span> to support heavier, longer-lasting structures. Little did they know their work would support Venice to this very day. They drove clusters of 1-to-3-meter-long wooden <span class="gap" data-a="piles"></span> into the ground in a process that <span class="gap" data-a="squeezed"></span> out <span class="gap" data-a="groundwater"></span> and <span class="gap" data-a="compacted"></span> mud around the piles. This created an <span class="gap" data-a="oxygen-free|oxygen free"></span> environment that protected the wood from insects and <span class="gap" data-a="fungi"></span>. The piles were still <span class="gap" data-a="vulnerable"></span> to minor bacterial damage, but otherwise <span class="gap" data-a="impervious"></span> to rot. And this <span class="gap" data-a="sealed"></span> system of wood, water, and mud is still supporting Venice 1,500 years later. Wooden <span class="gap" data-a="beams"></span> and stone <span class="gap" data-a="platforms"></span> above the piles provided the basis for buildings, and sometime around 697, the settlers formally declared their new home the Republic of Venice.</p>
+    </div>
+
+    <div class="actions">
+      <button class="btn" type="button" id="gf-check">Check answers</button>
+      <button class="btn ghost" type="button" id="gf-show">Show answers</button>
+      <button class="btn ghost" type="button" id="gf-reset">Clear</button>
+      <span class="score" id="gf-score" aria-live="polite"></span>
+    </div>
+    <details class="bank"><summary style="cursor:pointer;color:var(--accent)">Need help? Word bank</summary>
+      <ul>
+        <li>beams</li><li>compacted</li><li>foundation</li><li>fungi</li><li>groundwater</li><li>impervious</li><li>oxygen-free</li><li>piles</li><li>platforms</li><li>sealed</li><li>squeezed</li><li>stilted</li><li>vulnerable</li>
+      </ul>
+    </details>
+    <p class="note"><b>Follow-up.</b> In your own words, explain to your partner why the wooden piles did not rot. Use at least three of the words from the gaps.</p>
+  </div>
+</section>
+
+<!-- ======================= EXERCISE 3 ======================= -->
+<section class="exercise" id="ex3">
+  <div class="ex-head">
+    <div class="ex-num">3</div>
+    <h2>Watching for detail</h2>
+    <p class="how">Individual, then check in pairs · about 4 minutes of video in three parts · about 35 minutes</p>
+  </div>
+  <div class="body">
+    <p class="task">You will watch the rest of the story in three parts. Read the questions for each part first, then watch. Answer in your own words where there are text boxes. You can watch each part as many times as you need.</p>
+
+    <div class="quiz" id="quiz">
+
+      <!-- PART A -->
+      <div class="part">
+        <h3>Part A: a city of canals</h3>
+        <div class="player" data-start="118" data-end="189" data-label="Part A">
+          <p class="label">Part A <span>about 1 min 10 s</span></p>
+          <div class="ctl"></div>
+          <details class="tr"><summary>Transcript (after you have finished)</summary>
+            <div class="tx">
+              <p>Initially, footbridges were built to connect the islands, but these were prone to decay, collapse, and fire. Many, like the famed Rialto Bridge, had to be regularly rebuilt, each time incorporating new materials and techniques to improve their longevity.</p>
+              <p>By the 11th century, the channels between islands had been reinforced into stone-lined canals, navigated by slender gondolas. And unlike the rest of Europe, where nobles typically rode above commoners, the city’s layout necessitated foot travel for all classes.</p>
+              <p>Yet, despite this clever engineering, the Republic still had no land for farming, so Venetians were heavily dependent on trade. Fortunately, Venice’s location made it the perfect port city to connect markets from Europe to the Silk Road.</p>
+              <p>Its canal network allowed boats to dock close to warehouses, and the challenge of navigating its narrow waterways protected the city from outsiders.</p>
+            </div>
+          </details>
+        </div>
+
+        <div class="q">
+          <p class="stem">The first footbridges between the islands had three weaknesses. What were they?</p>
+          <textarea aria-label="Answer to question 1" style="min-height:44px"></textarea>
+          <details class="key"><summary>Suggested answer</summary><p>They were prone to decay, collapse and fire.</p></details>
+        </div>
+
+        <div class="q" data-correct="f">
+          <p class="stem">True or false? The Rialto Bridge was built once and never needed to be rebuilt.</p>
+          <div class="opts">
+            <label><input type="radio" name="q2" value="t"> True</label>
+            <label><input type="radio" name="q2" value="f"> False</label>
+          </div>
+          <p class="why">The Rialto Bridge, like many others, had to be regularly rebuilt, each time with new materials and techniques to make it last longer.</p>
+        </div>
+
+        <div class="q" data-correct="b">
+          <p class="stem">By the 11th century, what had happened to the channels between the islands?</p>
+          <div class="opts">
+            <label><input type="radio" name="q3" value="a"> They had been filled in with earth</label>
+            <label><input type="radio" name="q3" value="b"> They had been reinforced into stone-lined canals</label>
+            <label><input type="radio" name="q3" value="c"> They had been covered by wooden bridges</label>
+            <label><input type="radio" name="q3" value="d"> They had been drained</label>
+          </div>
+          <p class="why">They had been “reinforced into stone-lined canals, navigated by slender gondolas”.</p>
+        </div>
+
+        <div class="q">
+          <p class="stem">How was movement around Venice different from the rest of Europe?</p>
+          <textarea aria-label="Answer to question 4"></textarea>
+          <details class="key"><summary>Suggested answer</summary><p>Elsewhere nobles rode above commoners, but in Venice the layout of the city meant that everyone, whatever their class, had to travel on foot.</p></details>
+        </div>
+
+        <div class="q" data-correct="b">
+          <p class="stem">Why were Venetians heavily dependent on trade?</p>
+          <div class="opts">
+            <label><input type="radio" name="q5" value="a"> Foreign armies stole their crops</label>
+            <label><input type="radio" name="q5" value="b"> The Republic had no land for farming</label>
+            <label><input type="radio" name="q5" value="c"> Farming was forbidden by law</label>
+            <label><input type="radio" name="q5" value="d"> The soil was too salty</label>
+          </div>
+          <p class="why">The speaker says the Republic “still had no land for farming”.</p>
+        </div>
+
+        <div class="q">
+          <p class="stem">Give two ways in which the canal network helped Venice.</p>
+          <textarea aria-label="Answer to question 6"></textarea>
+          <details class="key"><summary>Suggested answer</summary><p>Boats could dock close to the warehouses, and the difficulty of navigating the narrow waterways protected the city from outsiders.</p></details>
+        </div>
+      </div>
+
+      <!-- PART B -->
+      <div class="part">
+        <h3>Part B: trade, war and innovation</h3>
+        <div class="player" data-start="189" data-end="289" data-label="Part B">
+          <p class="label">Part B <span>about 1 min 40 s</span></p>
+          <div class="ctl"></div>
+          <details class="tr"><summary>Transcript (after you have finished)</summary>
+            <div class="tx">
+              <p>These advantages helped make Venice a major maritime power, and the 1200s began with their biggest business deal yet. The Pope brokered an arrangement with Venice’s elected leader, Enrico Dandolo, to produce ships and arms for the Fourth Crusade’s anticipated 33,000 soldiers.</p>
+              <p>Dandolo agreed, investing huge amounts of the Republic’s money and resources. But when it was time to set sail, only one third of the soldiers arrived, with less than half of the promised payment. Furious, Dandolo redirected the crusading army against Venice’s Christian rivals, including Constantinople.</p>
+              <p>This campaign laid the foundation for Venice’s overseas empire, and over the following centuries, Venetian merchants like Marco Polo ventured as far as China.</p>
+              <p>During the Renaissance, the Republic became a hub of art and intellectual life. Its sail-making looms were repurposed to create vast canvases, its craftsmen pioneered various printing techniques, and the silica-rich sands from the Ticino and Adige Rivers fueled extravagant glassworks.</p>
+              <p>However, in addition to art, silks, and spices, the Venetians also traded enslaved peoples to work in private homes or on ships. Once freed, some stayed in the city, even finding work as gondoliers.</p>
+            </div>
+          </details>
+        </div>
+
+        <div class="q" data-correct="b">
+          <p class="stem">What was Venice’s “biggest business deal yet” at the start of the 1200s?</p>
+          <div class="opts">
+            <label><input type="radio" name="q7" value="a"> Selling silk along the Silk Road</label>
+            <label><input type="radio" name="q7" value="b"> Producing ships and arms for the Fourth Crusade</label>
+            <label><input type="radio" name="q7" value="c"> Building a new fleet for Constantinople</label>
+            <label><input type="radio" name="q7" value="d"> Lending money to the Pope</label>
+          </div>
+          <p class="why">The Pope brokered an arrangement for Venice to produce ships and arms for the Fourth Crusade’s anticipated 33,000 soldiers.</p>
+        </div>
+
+        <div class="q">
+          <p class="stem">What went wrong when it was time to set sail?</p>
+          <textarea aria-label="Answer to question 8" style="min-height:44px"></textarea>
+          <details class="key"><summary>Suggested answer</summary><p>Only a third of the soldiers arrived, and they brought less than half of the promised payment.</p></details>
+        </div>
+
+        <div class="q" data-correct="c">
+          <p class="stem">How did Dandolo react?</p>
+          <div class="opts">
+            <label><input type="radio" name="q9" value="a"> He cancelled the deal and sent the ships home</label>
+            <label><input type="radio" name="q9" value="b"> He asked the Pope for more money</label>
+            <label><input type="radio" name="q9" value="c"> He redirected the army against Venice’s Christian rivals, including Constantinople</label>
+            <label><input type="radio" name="q9" value="d"> He resigned as leader of the Republic</label>
+          </div>
+          <p class="why">Furious, he “redirected the crusading army against Venice’s Christian rivals, including Constantinople”.</p>
+        </div>
+
+        <div class="q" data-correct="t">
+          <p class="stem">True or false? Venetian merchants such as Marco Polo travelled as far as China.</p>
+          <div class="opts">
+            <label><input type="radio" name="q10" value="t"> True</label>
+            <label><input type="radio" name="q10" value="f"> False</label>
+          </div>
+          <p class="why">Merchants like Marco Polo “ventured as far as China”.</p>
+        </div>
+
+        <div class="q">
+          <p class="stem">Give three examples of how Renaissance Venice became a hub of art and innovation.</p>
+          <textarea aria-label="Answer to question 11"></textarea>
+          <details class="key"><summary>Suggested answer</summary><p>Its sail-making looms were reused to make huge canvases for painting; its craftsmen pioneered printing techniques; and the silica-rich sands from nearby rivers fuelled a glassmaking industry.</p></details>
+        </div>
+
+        <div class="q" data-correct="f">
+          <p class="stem">True or false? Venetians traded only in art, silks and spices.</p>
+          <div class="opts">
+            <label><input type="radio" name="q12" value="t"> True</label>
+            <label><input type="radio" name="q12" value="f"> False</label>
+          </div>
+          <p class="why">They also traded enslaved peoples, who worked in private homes or on ships. Some stayed in the city after being freed and found work as gondoliers.</p>
+        </div>
+      </div>
+
+      <!-- PART C -->
+      <div class="part">
+        <h3>Part C: decline and new threats</h3>
+        <div class="player" data-start="289" data-end="364" data-label="Part C">
+          <p class="label">Part C <span>about 1 min 15 s</span></p>
+          <div class="ctl"></div>
+          <details class="tr"><summary>Transcript (after you have finished)</summary>
+            <div class="tx">
+              <p>Venice’s dominance over the Mediterranean remained unchallenged until the mid-15th century, when the Ottomans conquered Constantinople. In the following centuries, the Ottomans used their navy to interfere with Venice’s business, all while new transoceanic trade routes excluded Venetians.</p>
+              <p>The Republic soldiered on until French attacks forced it to dissolve in 1797, at which point Venice traded hands between Austria and France several times before finally being ceded to Italy in 1866. No longer able to compete commercially, Venice was reinvented as a tourist destination.</p>
+              <p>But today, rising sea levels are threatening to sink the so-called floating city. In 1900, the then 900-year-old Basilica di San Marco flooded about seven times a year; now it experiences roughly 250 annual floods. And tourists are perhaps just as dangerous: as millions of annual visitors speed along in motorboats, they erode the muddy barrier protecting Venice’s foundations. Left unaddressed, these modern advances could destroy one of the world’s most remarkable cities.</p>
+            </div>
+          </details>
+        </div>
+
+        <div class="q" data-correct="b">
+          <p class="stem">What happened in the mid-15th century to end Venice’s dominance of the Mediterranean?</p>
+          <div class="opts">
+            <label><input type="radio" name="q13" value="a"> France attacked the Republic</label>
+            <label><input type="radio" name="q13" value="b"> The Ottomans conquered Constantinople</label>
+            <label><input type="radio" name="q13" value="c"> A great flood destroyed the port</label>
+            <label><input type="radio" name="q13" value="d"> The Silk Road was closed</label>
+          </div>
+          <p class="why">Dominance remained unchallenged “until the mid-15th century, when the Ottomans conquered Constantinople”.</p>
+        </div>
+
+        <div class="q">
+          <p class="stem">In the following centuries, which two things damaged Venetian trade?</p>
+          <textarea aria-label="Answer to question 14"></textarea>
+          <details class="key"><summary>Suggested answer</summary><p>The Ottomans used their navy to interfere with Venice’s business, and new transoceanic trade routes excluded the Venetians.</p></details>
+        </div>
+
+        <div class="q" data-correct="f">
+          <p class="stem">True or false? The Republic of Venice was dissolved in 1797 after attacks by the Ottomans.</p>
+          <div class="opts">
+            <label><input type="radio" name="q15" value="t"> True</label>
+            <label><input type="radio" name="q15" value="f"> False</label>
+          </div>
+          <p class="why">It was French attacks that forced the Republic to dissolve in 1797. Venice was ceded to Italy in 1866.</p>
+        </div>
+
+        <div class="q">
+          <p class="stem">How did Venice make a living after it became part of Italy?</p>
+          <textarea aria-label="Answer to question 16" style="min-height:44px"></textarea>
+          <details class="key"><summary>Suggested answer</summary><p>It could no longer compete commercially, so it was reinvented as a tourist destination.</p></details>
+        </div>
+
+        <div class="q" data-correct="c">
+          <p class="stem">In 1900 the Basilica di San Marco flooded about seven times a year. Roughly how often does it flood today?</p>
+          <div class="opts">
+            <label><input type="radio" name="q17" value="a"> About 15 times a year</label>
+            <label><input type="radio" name="q17" value="b"> About 70 times a year</label>
+            <label><input type="radio" name="q17" value="c"> About 250 times a year</label>
+            <label><input type="radio" name="q17" value="d"> About 2,500 times a year</label>
+          </div>
+          <p class="why">It now experiences “roughly 250 annual floods”.</p>
+        </div>
+
+        <div class="q">
+          <p class="stem">Why does the speaker say tourists are “perhaps just as dangerous” as rising sea levels?</p>
+          <textarea aria-label="Answer to question 18"></textarea>
+          <details class="key"><summary>Suggested answer</summary><p>Millions of visitors speed along in motorboats, and the waves they create erode the muddy barrier that protects the foundations of the city.</p></details>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn" type="button" id="quiz-check">Check multiple-choice and true/false</button>
+        <button class="btn ghost" type="button" id="quiz-key">Show all suggested answers</button>
+        <button class="btn ghost" type="button" id="quiz-reset">Clear</button>
+        <span class="score" id="quiz-score" aria-live="polite"></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= EXERCISE 4 ======================= -->
+<section class="exercise" id="ex4">
+  <div class="ex-head">
+    <div class="ex-num">4</div>
+    <h2>Discussion</h2>
+    <p class="how">Small groups, then whole class · about 30 minutes</p>
+  </div>
+  <div class="body">
+    <p class="task">Choose three or four questions that interest your group and discuss them for about five minutes each. Then take part in the final task. Be ready to report your most interesting ideas to the class.</p>
+
+    <div class="dq">
+      <h4>Old methods, lasting results</h4>
+      <p>The piles survived for 1,500 years because they were sealed in mud, water and an oxygen-free environment. What does this tell us about the relationship between a material and its surroundings? Can you think of other old building methods that work better than we might expect?</p>
+    </div>
+    <div class="dq">
+      <h4>How a layout shapes a society</h4>
+      <p>In Venice everyone had to walk, so nobles could not ride above commoners. How much does the design of a city shape the way people live together? Think of cities designed around walking, public transport or cars.</p>
+    </div>
+    <div class="dq">
+      <h4>Riches built on a single advantage</h4>
+      <p>Venice prospered because of its location and trade, then declined when the trade routes changed. How safe is a city, or a region, that depends heavily on one industry? What examples of successful reinvention do you know?</p>
+    </div>
+    <div class="dq">
+      <h4>Saved by tourists, threatened by tourists?</h4>
+      <p>The video suggests that visitors may be as dangerous as the rising sea. Should cities limit tourism through entry fees, visitor caps or speed limits? What would be fair, and who should decide?</p>
+    </div>
+    <div class="dq">
+      <h4>Defend, adapt or retreat?</h4>
+      <p>When sea levels rise, should we defend historic cities at any cost? How would you balance heritage, safety and public money, and where would you draw the line?</p>
+    </div>
+    <div class="dq">
+      <h4>Beauty and its price</h4>
+      <p>Venetian art and wealth also depended on trading enslaved people. How should we think about the legacy of beautiful historic places that were paid for in morally troubling ways? Should that change how they are presented to visitors?</p>
+    </div>
+
+    <div class="lang">
+      <h4>Useful language</h4>
+      <ul>
+        <li>It could be argued that…</li>
+        <li>What strikes me is…</li>
+        <li>I’d go along with that up to a point, but…</li>
+        <li>That’s a fair point; on the other hand…</li>
+        <li>A case in point is…</li>
+        <li>It comes down to a question of…</li>
+        <li>Surely the real issue is…</li>
+        <li>I’m not convinced that…</li>
+      </ul>
+    </div>
+
+    <h3>Final task: the city council meeting</h3>
+    <p>Venice’s council must decide whether to ban fast motorboats from the lagoon’s smaller canals to protect the foundations. Work in groups of five. Each person takes a role, prepares two arguments for two minutes, and then the group debates and votes.</p>
+    <div class="roles">
+      <div><b>Long-term resident</b>Suffers from floods and noise, and wants the city to stay liveable.</div>
+      <div><b>Water-taxi owner</b>Depends on fast boats to earn a living.</div>
+      <div><b>Hotel owner</b>Worries that restrictions will drive visitors away.</div>
+      <div><b>Conservation officer</b>Presents the evidence on erosion and the risk to historic buildings.</div>
+      <div><b>City budget officer</b>Has to weigh the costs of enforcement and repairs.</div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <details>
+    <summary style="cursor:pointer;color:var(--accent)">Teacher’s notes</summary>
+
+    <p><b>Important: open this page from a web address, not by double-clicking the file.</b> YouTube refuses to play embedded videos on pages opened straight from a computer folder (it may show “Error 153”). Either upload the HTML file to any web host, or run a local server: open a terminal in the folder and type <code>python3 -m http.server 8000</code>, then visit <code>http://localhost:8000/venice-lesson.html</code>. The video plays from YouTube, so students need an internet connection.</p>
+
+    <p><b>Suggested timing (90 minutes).</b> Warm-up 10 · Watch and fill the gaps 15 · Watching for detail 35 · Discussion and final task 30.</p>
+
+    <p><b>Clip timings.</b> Each player shows only a section of the video (in seconds, shown here as m:ss). The timings come from a timestamped transcript, so they may be a second or two out. Adjust them below and press <i>Test</i>; changes are saved in this browser only. To make them permanent for everyone, edit the <code>data-start</code> and <code>data-end</code> values (in seconds) in the HTML.</p>
+    <table id="timing"><thead><tr><th>Clip</th><th>Start</th><th>End</th><th></th></tr></thead><tbody></tbody></table>
+    <button class="mini" type="button" id="time-reset">Restore default timings</button>
+
+    <p style="margin-top:14px">The video’s introduction (first seconds), closing message and credits are not used. Video: TED-Ed, “The incredible engineering of Venice” by Stephanie H. Smith, <a href="https://www.youtube.com/watch?v=uBwkMc1llmM" target="_blank" rel="noopener">watch on YouTube</a>.</p>
+  </details>
+</footer>
+
+<script>
+(() => {
+  const VIDEO_ID = 'uBwkMc1llmM';
+  const STORE = 'venice-lesson-timings-v1';
+  const fmt = s => { s = Math.max(0, Math.round(s)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+  const parseTime = v => {
+    v = String(v).trim();
+    if (/^\d+(\.\d+)?$/.test(v)) return parseFloat(v);
+    const m = v.match(/^(\d+):(\d{1,2}(\.\d+)?)$/);
+    return m ? parseInt(m[1], 10) * 60 + parseFloat(m[2]) : NaN;
+  };
+
+  /* ---------- YouTube API loader ---------- */
+  const queue = [];
+  const apiReady = () => window.YT && YT.Player;
+  window.onYouTubeIframeAPIReady = () => { queue.splice(0).forEach(f => f()); };
+  function whenYT(f, onFail) {
+    if (apiReady()) { f(); return; }
+    queue.push(f);
+    if (!document.getElementById('yt-api')) {
+      const s = document.createElement('script');
+      s.id = 'yt-api';
+      s.src = 'https://www.youtube.com/iframe_api';
+      s.onerror = () => { queue.length = 0; onFail && onFail(); players.forEach(p => p.fail('Cannot reach YouTube. Check your internet connection.')); };
+      document.head.appendChild(s);
+    }
+  }
+
+  const players = [];
+  let active = null;
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem(STORE) || '{}'); } catch (e) { saved = {}; }
+
+  const svgPlay = '<svg class="ic-play" viewBox="0 0 24 24"><path d="M7 4.5v15l13-7.5z"/></svg>';
+  const svgPause = '<svg class="ic-pause" viewBox="0 0 24 24"><path d="M6 4h4.5v16H6zM13.5 4H18v16h-4.5z"/></svg>';
+
+  document.querySelectorAll('.player').forEach((el, idx) => {
+    const label = el.dataset.label;
+    const def = { start: parseFloat(el.dataset.start), end: parseFloat(el.dataset.end) };
+    let start = def.start, end = def.end;
+    if (saved[label]) { start = saved[label].start; end = saved[label].end; }
+    let dur = end - start, pos = 0, yt = null, ytReady = false, wantPlay = false, timer = 0;
+
+    el.querySelector('.ctl').innerHTML =
+      '<div class="frame">' +
+        '<img class="poster" src="https://i.ytimg.com/vi/' + VIDEO_ID + '/hqdefault.jpg" alt="" onerror="this.style.display=\'none\'">' +
+        '<div class="bigplay">' + svgPlay + '</div>' +
+        '<div class="yt-host"></div>' +
+        '<button class="shield" type="button" aria-label="Play or pause ' + label + '"></button>' +
+      '</div>' +
+      '<div class="pl-row">' +
+        '<button class="play" type="button" aria-label="Play or pause ' + label + '">' + svgPlay + svgPause + '</button>' +
+        '<input class="scrub" type="range" min="0" step="0.1" value="0" aria-label="Position in ' + label + '">' +
+        '<span class="time"></span>' +
+        '<button class="mini restart" type="button">Restart</button>' +
+        '<select class="mini speed" aria-label="Playback speed"><option value="0.75">0.75×</option><option value="1" selected>1×</option></select>' +
+      '</div>' +
+      '<p class="msg" hidden></p>' +
+      '<p class="alt">Video not playing? <a class="yt-link" target="_blank" rel="noopener">Watch this clip on YouTube</a></p>';
+
+    const btn = el.querySelector('.play');
+    const shield = el.querySelector('.shield');
+    const range = el.querySelector('.scrub');
+    const time = el.querySelector('.time');
+    const speed = el.querySelector('.speed');
+    const restart = el.querySelector('.restart');
+    const msg = el.querySelector('.msg');
+    const link = el.querySelector('.yt-link');
+
+    const refresh = () => {
+      range.max = dur;
+      range.value = pos;
+      time.textContent = fmt(pos) + ' / ' + fmt(dur);
+      link.href = 'https://www.youtube.com/watch?v=' + VIDEO_ID + '&t=' + Math.floor(start) + 's';
+    };
+    const setPlaying = on => el.classList.toggle('playing', on);
+
+    const p = {
+      label, def, el,
+      get start() { return start; }, get end() { return end; },
+      setTimes(s, e) {
+        p.stop(true);
+        start = s; end = e; dur = end - start; pos = 0; refresh();
+        saved[label] = { start, end };
+        try { localStorage.setItem(STORE, JSON.stringify(saved)); } catch (err) {}
+      },
+      resetTimes() {
+        p.stop(true);
+        start = def.start; end = def.end; dur = end - start; pos = 0; refresh();
+        delete saved[label];
+        try { localStorage.setItem(STORE, JSON.stringify(saved)); } catch (err) {}
+      },
+      fail(text) { msg.textContent = text; msg.hidden = false; setPlaying(false); wantPlay = false; },
+      pause() {
+        clearInterval(timer); setPlaying(false); wantPlay = false;
+        if (yt && ytReady) { try { yt.pauseVideo(); } catch (e) {} }
+      },
+      stop(silent) {
+        clearInterval(timer); setPlaying(false); wantPlay = false;
+        if (yt && ytReady) { try { yt.pauseVideo(); yt.seekTo(start, true); } catch (e) {} }
+        pos = 0; if (active === p) active = null; if (!silent) refresh();
+      },
+      play() { toggle(true); }
+    };
+    players.push(p);
+
+    const poll = () => {
+      if (!yt || !ytReady) return;
+      let t;
+      try { t = yt.getCurrentTime(); } catch (e) { return; }
+      pos = Math.max(0, t - start);
+      if (t >= end - 0.05) { p.stop(); return; }
+      range.value = pos;
+      time.textContent = fmt(pos) + ' / ' + fmt(dur);
+    };
+
+    const startPlayback = () => {
+      if (active && active !== p) active.pause();
+      active = p;
+      msg.hidden = true;
+      el.classList.add('started');
+      try {
+        yt.seekTo(start + pos, true);
+        yt.playVideo();
+        yt.setPlaybackRate(parseFloat(speed.value));
+      } catch (e) { p.fail('The video player could not start. Try the YouTube link below.'); return; }
+      setPlaying(true);
+      clearInterval(timer);
+      timer = setInterval(poll, 100);
+    };
+
+    const create = () => {
+      yt = new YT.Player(el.querySelector('.yt-host'), {
+        videoId: VIDEO_ID,
+        width: '100%', height: '100%',
+        playerVars: { controls: 0, disablekb: 1, rel: 0, modestbranding: 1, playsinline: 1, iv_load_policy: 3, fs: 0, start: Math.floor(start) },
+        events: {
+          onReady: () => { ytReady = true; if (wantPlay) startPlayback(); },
+          onStateChange: e => {
+            if (e.data === 0) p.stop();            // ended before the clip's end time
+            if (e.data === 1 && active === p) setPlaying(true);
+            if (e.data === 2 && active === p) setPlaying(false);
+          },
+          onError: e => {
+            const c = e.data;
+            const text = (c === 101 || c === 150) ? 'The video owner does not allow embedding. Use the YouTube link below.'
+              : c === 153 ? 'YouTube blocked the player (Error 153). Open this page from a web address, not from a file on your computer. See the teacher’s notes at the bottom of the page.'
+              : 'The video could not be played (error ' + c + '). Use the YouTube link below.';
+            p.fail(text);
+          }
+        }
+      });
+    };
+
+    function toggle(forcePlay) {
+      const playing = el.classList.contains('playing');
+      if (playing && !forcePlay) { p.pause(); return; }
+      wantPlay = true;
+      if (active && active !== p) active.pause();
+      el.classList.add('started');
+      if (yt && ytReady) { startPlayback(); return; }
+      if (!yt) whenYT(create);
+    }
+
+    btn.addEventListener('click', () => toggle());
+    shield.addEventListener('click', () => toggle());
+    restart.addEventListener('click', () => { pos = 0; refresh(); if (yt && ytReady) { yt.seekTo(start, true); } if (!el.classList.contains('playing')) toggle(true); });
+    range.addEventListener('input', () => {
+      pos = parseFloat(range.value);
+      time.textContent = fmt(pos) + ' / ' + fmt(dur);
+      if (yt && ytReady) yt.seekTo(start + pos, true);
+    });
+    speed.addEventListener('change', () => { if (yt && ytReady) { try { yt.setPlaybackRate(parseFloat(speed.value)); } catch (e) {} } });
+
+    refresh();
+  });
+
+  /* ---------- teacher timing table ---------- */
+  const tbody = document.querySelector('#timing tbody');
+  players.forEach(p => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = '<td>' + p.label + '</td><td><input class="t s" aria-label="' + p.label + ' start"></td><td><input class="t e" aria-label="' + p.label + ' end"></td><td><button class="mini test" type="button">Test</button></td>';
+    const s = tr.querySelector('.s'), e = tr.querySelector('.e');
+    s.value = fmt(p.start); e.value = fmt(p.end);
+    const apply = () => {
+      const a = parseTime(s.value), b = parseTime(e.value);
+      if (isNaN(a) || isNaN(b) || b < a + 5) { s.value = fmt(p.start); e.value = fmt(p.end); return false; }
+      p.setTimes(a, b); return true;
+    };
+    s.addEventListener('change', apply); e.addEventListener('change', apply);
+    tr.querySelector('.test').addEventListener('click', () => {
+      if (!apply()) return;
+      p.el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      p.play();
+    });
+    tbody.appendChild(tr);
+  });
+  document.getElementById('time-reset').addEventListener('click', () => {
+    players.forEach(p => p.resetTimes());
+    tbody.querySelectorAll('tr').forEach((tr, i) => { tr.querySelector('.s').value = fmt(players[i].start); tr.querySelector('.e').value = fmt(players[i].end); });
+  });
+
+  /* ---------- gap-fill ---------- */
+  const gaps = [...document.querySelectorAll('.gap')];
+  gaps.forEach((g, i) => {
+    const inp = document.createElement('input');
+    inp.type = 'text'; inp.autocomplete = 'off'; inp.spellcheck = false; inp.autocapitalize = 'off';
+    inp.placeholder = String(i + 1);
+    inp.setAttribute('aria-label', 'Gap ' + (i + 1));
+    inp.size = Math.max(7, g.dataset.a.split('|')[0].length + 1);
+    g.appendChild(inp);
+  });
+  const gfScore = document.getElementById('gf-score');
+  const answers = g => g.dataset.a.split('|');
+  const norm = s => s.trim().toLowerCase();
+  document.getElementById('gf-check').addEventListener('click', () => {
+    let right = 0;
+    gaps.forEach(g => {
+      const i = g.querySelector('input');
+      i.classList.remove('ok', 'no', 'shown');
+      if (!i.value.trim()) return;
+      if (answers(g).includes(norm(i.value))) { i.classList.add('ok'); right++; } else i.classList.add('no');
+    });
+    gfScore.textContent = right + ' / ' + gaps.length + ' correct' + (right === gaps.length ? ' – well done!' : '');
+  });
+  document.getElementById('gf-show').addEventListener('click', () => {
+    gaps.forEach(g => { const i = g.querySelector('input'); i.value = answers(g)[0]; i.classList.remove('ok', 'no'); i.classList.add('shown'); });
+    gfScore.textContent = '';
+  });
+  document.getElementById('gf-reset').addEventListener('click', () => {
+    gaps.forEach(g => { const i = g.querySelector('input'); i.value = ''; i.classList.remove('ok', 'no', 'shown'); });
+    gfScore.textContent = '';
+  });
+
+  /* ---------- multiple-choice and true/false ---------- */
+  const marked = [...document.querySelectorAll('.q[data-correct]')];
+  const qScore = document.getElementById('quiz-score');
+  document.getElementById('quiz-check').addEventListener('click', () => {
+    let right = 0;
+    marked.forEach(q => {
+      q.classList.remove('ok', 'no');
+      const picked = q.querySelector('input:checked');
+      const why = q.querySelector('.why');
+      const base = why.dataset.base || (why.dataset.base = why.textContent);
+      if (!picked) return;
+      if (picked.value === q.dataset.correct) { q.classList.add('ok'); right++; why.textContent = '✓ Correct. ' + base; }
+      else { q.classList.add('no'); why.textContent = '✗ Not quite. ' + base; }
+    });
+    qScore.textContent = right + ' / ' + marked.length + ' correct';
+  });
+  document.getElementById('quiz-key').addEventListener('click', e => {
+    const keys = [...document.querySelectorAll('#quiz details.key')];
+    const open = keys.some(k => !k.open);
+    keys.forEach(k => k.open = open);
+    e.target.textContent = open ? 'Hide suggested answers' : 'Show all suggested answers';
+  });
+  document.getElementById('quiz-reset').addEventListener('click', () => {
+    marked.forEach(q => {
+      q.classList.remove('ok', 'no');
+      q.querySelectorAll('input').forEach(i => i.checked = false);
+      const why = q.querySelector('.why');
+      if (why.dataset.base) why.textContent = why.dataset.base;
+    });
+    qScore.textContent = '';
+  });
+})();
+</script>
+</body>
+</html>
