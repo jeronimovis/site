@@ -3,6 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<script defer src="https://cloud.umami.is/script.js" data-website-id="3b6162e0-f244-4a9e-94c4-9623dac773ef"></script>
 <title>Jerónimo Visñovezky | English Teacher</title>
 <script>(function(){try{var t=localStorage.getItem('jv-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -174,7 +177,9 @@ h1 svg.scribble{position:absolute;left:-2%;bottom:-.22em;width:104%;height:.36em
 .contact h3{font-family:"Fraunces",serif;font-weight:300;font-size:clamp(2.3rem,5.4vw,4.4rem);line-height:.98;letter-spacing:-.035em;margin:0 0 22px;font-variation-settings:"opsz" 144}
 .contact h3 strong{font-weight:900;font-variation-settings:"opsz" 144,"SOFT" 100,"WONK" 1;display:block}
 .contact address{font-style:normal;font-family:"Kalam",cursive;font-size:1.45rem;line-height:1.5}
-.contact address span{display:block}
+.contact address span,.contact address a{display:block}
+.contact address a{text-decoration:none;width:fit-content}
+.contact address a:hover{color:var(--pen)}
 .contact .right{justify-self:end;text-align:right}
 
 footer{padding:40px 0 60px;border-top:2px dashed var(--card-edge);display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:12px;font-size:.95rem;color:var(--ink-2)}
@@ -217,14 +222,14 @@ footer h4{margin:0;font-family:"Kalam",cursive;font-weight:400;font-size:1.5rem;
   <div class="wrap">
     <a class="logo" href="#">JV</a>
     <nav class="nav" aria-label="Main">
-      <a href="https://jeronimov.org/redirect/form_schedule.html">Schedule a class</a>
+      <a data-umami-event="Schedule" target="_blank" rel="noopener" href="https://jeronimov.org/redirect/form_schedule.html">Schedule a class</a>
       <details class="drop">
         <summary>CV ▾</summary>
         <div class="drop-menu">
-          <a href="https://docs.google.com/document/d/1Nqs2lof7cx8Dw82UAc5VBzGAI7doiuDKvOBf-bq5CwA/edit?usp=sharing">Full CV</a>
-          <a href="https://drive.google.com/file/d/12yhzCm8efOlckhkmGt0ceENzO-s9-cdC/view?usp=sharing">Qualifications</a>
+          <a data-umami-event="CV" target="_blank" rel="noopener" href="https://docs.google.com/document/d/1Nqs2lof7cx8Dw82UAc5VBzGAI7doiuDKvOBf-bq5CwA/edit?usp=sharing">Full CV</a>
+          <a data-umami-event="Quaifications" target="_blank" rel="noopener" href="https://drive.google.com/file/d/12yhzCm8efOlckhkmGt0ceENzO-s9-cdC/view?usp=sharing">Qualifications</a>
           <hr>
-          <a href="https://www.deviantart.com/jeronimov/gallery">Hobby</a>
+          <a data-umami-event="Hobbyf" target="_blank" rel="noopener" href="https://www.deviantart.com/jeronimov/gallery">Hobby</a>
         </div>
       </details>
       <button class="switch" id="themeBtn" type="button" aria-label="Switch between notebook (light) and chalkboard (dark)">
@@ -240,9 +245,9 @@ footer h4{margin:0;font-family:"Kalam",cursive;font-weight:400;font-size:1.5rem;
     <div>
       <p class="zoom"><strong>1-hr</strong> online English classes with <strong>Zoom®</strong></p>
       <h1><span>Jerónimo</span><span class="under">Visñovezky<svg class="scribble draw" viewBox="0 0 400 40" preserveAspectRatio="none" aria-hidden="true"><path d="M4 26 C 70 14, 150 12, 230 18 S 360 30, 396 14"/></svg></span></h1>
-      <p class="intro"><strong>20+ years of experience</strong> and an actual English teaching degree. I have taught in institutes and secondary schools. <strong>I switched to Zoom®</strong> full time in 2021, and never looked back. <a href="https://www.youtube.com/watch?v=HTwsN0M3Ds4">Hear me talk</a>.</p>
+      <p class="intro"><strong>20+ years of experience</strong> and an actual English teaching degree. I have taught in institutes and secondary schools. <strong>I switched to Zoom®</strong> full time in 2021, and never looked back. <a data-umami-event="Youtube" target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=HTwsN0M3Ds4">Hear me talk</a>.</p>
       <div class="cta-row">
-        <a class="stamp solid" href="https://jeronimov.org/redirect/form_schedule.html">Schedule classes NOW</a>
+        <a data-umami-event="Schedule" class="stamp solid" href="https://jeronimov.org/redirect/form_schedule.html">Schedule classes NOW</a>
       </div>
     </div>
     <figure class="polaroid">
@@ -254,9 +259,9 @@ footer h4{margin:0;font-family:"Kalam",cursive;font-weight:400;font-size:1.5rem;
   <section class="mastery">
     <div>
       <h2>English mastery without the <span class="strike">misery.<svg class="scribble draw d2" viewBox="0 0 200 60" preserveAspectRatio="none" aria-hidden="true"><path d="M4 44 L 196 14 M 10 20 L 190 50"/></svg></span></h2>
-      <p>If you don't like the first class you don't have to pay. It's <span class="free">FREE!</span> <a href="https://docs.google.com/document/d/1zF2tUZwt8pTgh9Vel0tj1ipGquh0S_mnUvkj4mhegcQ/edit?usp=sharing">See pricing</a>.</p>
+      <p>If you don't like the first class you don't have to pay. It's <span class="free">FREE!</span> <a data-umami-event="Pricing" target="_blank" rel="noopener" href="https://docs.google.com/document/d/1zF2tUZwt8pTgh9Vel0tj1ipGquh0S_mnUvkj4mhegcQ/edit?usp=sharing">See pricing</a>.</p>
     </div>
-    <a class="sketch" href="https://www.deviantart.com/jeronimov/gallery"><img src="https://jeronimov.org/images/idraw4.png" alt="Drawing by Jerónimo" loading="lazy"></a>
+    <a data-umami-event="Deviant" target="_blank" rel="noopener" class="sketch" href="https://www.deviantart.com/jeronimov/gallery"><img src="https://jeronimov.org/images/idraw4.png" alt="Drawing by Jerónimo" loading="lazy"></a>
   </section>
 
   <section>
@@ -284,7 +289,7 @@ footer h4{margin:0;font-family:"Kalam",cursive;font-weight:400;font-size:1.5rem;
         <span class="grade" aria-hidden="true">✓</span>
       </blockquote>
     </div>
-    <p class="aside">At least they would say that if they were not an Ai representation of <a href="https://docs.google.com/document/d/1Rm4cUvpRENsC4hn2yYxsdOtVvr5MmeYo/edit?usp=sharing&amp;ouid=118090423259105730154&amp;rtpof=true&amp;sd=true">this actual feedback.</a></p>
+    <p class="aside">At least they would say that if they were not an Ai representation of <a data-umami-event="Feedback" target="_blank" rel="noopener" href="https://docs.google.com/document/d/1Rm4cUvpRENsC4hn2yYxsdOtVvr5MmeYo/edit?usp=sharing&amp;ouid=118090423259105730154&amp;rtpof=true&amp;sd=true">this actual feedback.</a></p>
   </section>
 
   <section class="section res">
@@ -297,8 +302,8 @@ footer h4{margin:0;font-family:"Kalam",cursive;font-weight:400;font-size:1.5rem;
         <h4>Gramática inglesa para desesperados</h4>
         <p>A 240 pages book explaining grammar in Spanish for students who struggle to pass exams.</p>
         <div class="btns">
-          <a class="stamp solid" href="https://drive.google.com/file/d/1UY_aQ7iqJ_Bp4QRIwwM8pNvAZ0Jgzby0/view?usp=sharing">Free PDF Download</a>
-          <a class="stamp" href="https://open.spotify.com/show/1I3lXN95XZpCFCKB4TBtuu?si=f82683ecc59642d7">Listen on Spotify</a>
+          <a data-umami-event="Grammar_pdf" target="_blank" rel="noopener" class="stamp solid" href="https://drive.google.com/file/d/1UY_aQ7iqJ_Bp4QRIwwM8pNvAZ0Jgzby0/view?usp=sharing">Free PDF Download</a>
+          <a data-umami-event="grammar_spoty" target="_blank" rel="noopener" class="stamp" href="https://open.spotify.com/show/1I3lXN95XZpCFCKB4TBtuu?si=f82683ecc59642d7">Listen on Spotify</a>
         </div>
       </div>
     </article>
@@ -310,8 +315,8 @@ footer h4{margin:0;font-family:"Kalam",cursive;font-weight:400;font-size:1.5rem;
         <h6>Códoba, Santiago del Estero, now online</h6>
         <p>I wasn't always a teacher. I also worked for a call center, for a couple of architectural companies and distance learning departments.</p>
         <div class="btns">
-          <a class="stamp solid" href="https://docs.google.com/document/d/1Nqs2lof7cx8Dw82UAc5VBzGAI7doiuDKvOBf-bq5CwA/edit?usp=sharing">Full CV</a>
-          <a class="stamp" href="https://www.youtube.com/watch?v=HTwsN0M3Ds4">Video</a>
+          <a data-umami-event="CV" target="_blank" rel="noopener" class="stamp solid" href="https://docs.google.com/document/d/1Nqs2lof7cx8Dw82UAc5VBzGAI7doiuDKvOBf-bq5CwA/edit?usp=sharing">Full CV</a>
+          <a data-umami-event="video" target="_blank" rel="noopener" class="stamp" href="https://www.youtube.com/watch?v=HTwsN0M3Ds4">Video</a>
         </div>
       </div>
     </article>
@@ -321,10 +326,10 @@ footer h4{margin:0;font-family:"Kalam",cursive;font-weight:400;font-size:1.5rem;
       <div>
         <h4>Books and handouts</h4>
         <ul class="books">
-          <li><strong>Essay writing ruined</strong>. A structuralist approach on how to pass essay writing tasks. <a href="https://drive.google.com/file/d/13f4jQQDdnFBUZmBgbtpcRdwfgO02GB85/view?usp=sharing">Download</a></li>
-          <li><strong>Ways: vocabulary for life</strong>. Advanced vocabulary separated in categories. <a href="https://drive.google.com/file/d/13oBbZ6X01eeS1K2cZCRu-EkqTPGCLl2S/view?usp=sharing">Download</a></li>
-          <li><strong>Irregular verbs</strong>. A list with audio and activities to help you learn irregular verbs. <a href="https://drive.google.com/file/d/1x_f6rGe4lMfE9G1rGjvybQO3ofGmoz7U/view?usp=sharing">Download</a></li>
-          <li><strong>Distancia cercana</strong>. Tools other teachers can use to improve their Zoom classes. <a href="https://drive.google.com/file/d/1GD0QB-ao9MrPn6Z39UzQjiE6X7eLS18-/view?usp=sharing">Download</a></li>
+          <li><strong>Essay writing ruined</strong>. A structuralist approach on how to pass essay writing tasks. <a data-umami-event="essay_pdf" target="_blank" rel="noopener" href="https://drive.google.com/file/d/13f4jQQDdnFBUZmBgbtpcRdwfgO02GB85/view?usp=sharing">Download</a></li>
+          <li><strong>Ways: vocabulary for life</strong>. Advanced vocabulary separated in categories. <a data-umami-event="ways_pdf" target="_blank" rel="noopener" href="https://drive.google.com/file/d/13oBbZ6X01eeS1K2cZCRu-EkqTPGCLl2S/view?usp=sharing">Download</a></li>
+          <li><strong>Irregular verbs</strong>. A list with audio and activities to help you learn irregular verbs. <a data-umami-event="irregular_pdf" target="_blank" rel="noopener" href="https://drive.google.com/file/d/1x_f6rGe4lMfE9G1rGjvybQO3ofGmoz7U/view?usp=sharing">Download</a></li>
+          <li><strong>Distancia cercana</strong>. Tools other teachers can use to improve their Zoom classes. <a data-umami-event="distancia_pdf" target="_blank" rel="noopener" href="https://drive.google.com/file/d/1GD0QB-ao9MrPn6Z39UzQjiE6X7eLS18-/view?usp=sharing">Download</a></li>
         </ul>
       </div>
     </article>
@@ -333,11 +338,11 @@ footer h4{margin:0;font-family:"Kalam",cursive;font-weight:400;font-size:1.5rem;
   <section class="contact">
     <div>
       <h3>Not sure? <strong>Hit me up!</strong></h3>
-      <address><span>jeronimov [at] gmail [dot] com</span><span>+54 9 3855309501</span></address>
+      <address><span>jeronimov [at] gmail [dot] com</span><a data-umami-event="whatsapp" target="_blank" rel="noopener" href="https://wa.me/543855309501?text=I%20want%20to%20schedule%20a%20class!">+54 9 3855309501</a></address>
     </div>
     <div class="right">
       <h3>Real English. Real fast. <strong>Zero boredom.</strong></h3>
-      <a class="stamp solid" href="https://jeronimov.org/redirect/form_schedule.html">Ask me anything</a>
+      <a data-umami-event="ask_anything" class="stamp solid" href="https://jeronimov.org/redirect/form_schedule.html">Ask me anything</a>
     </div>
   </section>
 
