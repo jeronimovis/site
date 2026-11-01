@@ -20,9 +20,6 @@
   --serif:'Newsreader',Georgia,'Times New Roman',serif;
   --lh:2rem; --art:none;
 }
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --paper:#24332c; --rule:#ffffff12; --margin:#ffffff14; --ink:#eef0ea; --pencil:#b9c4bc;
-  --pen:#ffe08a; --hi:#ffe08a40; --card:#2c3d35d9; --line:#ffffff2a; --art:invert(1) opacity(.9); color-scheme:dark}}
 :root[data-theme="dark"]{
   --paper:#24332c; --rule:#ffffff12; --margin:#ffffff14; --ink:#eef0ea; --pencil:#b9c4bc;
   --pen:#ffe08a; --hi:#ffe08a40; --card:#2c3d35d9; --line:#ffffff2a; --art:invert(1) opacity(.9); color-scheme:dark}
@@ -115,16 +112,16 @@ section{padding-block:clamp(2.5rem,6vw,4rem);display:grid;gap:1.4rem}
 @media (max-width:760px){.about{grid-template-columns:1fr}}
 
 /* LessonMark */
-.lm{display:grid;padding-block:clamp(1.5rem,4vw,2.5rem);color:var(--ink);text-decoration:none;transition:transform .2s;position:relative;background:var(--hi);border:2.5px solid var(--ink);border-radius:255px 15px 225px 15px/15px 225px 15px 255px;padding:clamp(1.5rem,4vw,2.5rem);grid-template-columns:1fr 1fr;gap:1.5rem 2.5rem;align-items:start;margin-top:1.5rem}
-.lm:hover{transform:rotate(-.6deg) translateY(-3px)}
+.tools{gap:1rem}
+.tools .eyebrow{font-family:var(--hand);font-size:1.4rem;color:var(--pen);margin:0}
+.tool-row{display:grid;grid-template-columns:1fr 1fr;gap:1.75rem}
+.lm{display:flex;flex-direction:column;gap:.8rem;min-width:0;padding:clamp(1.4rem,3.5vw,2.2rem);color:var(--ink);text-decoration:none;background:var(--hi);border:2.5px solid var(--ink);border-radius:255px 15px 225px 15px/15px 225px 15px 255px;transition:transform .2s}
+.lm:nth-child(1){transform:rotate(-.5deg)}
+.lm:nth-child(2){transform:rotate(.6deg)}
+.lm:hover{transform:rotate(0) translateY(-3px)}
+.lm .visit{font-family:var(--hand);font-size:1.35rem;margin-top:auto;padding-top:.4rem}
 .lm:hover .visit{text-decoration:underline wavy}
-.lm .visit{font-family:var(--hand);font-size:1.4rem;margin-top:.8rem;display:inline-block}
-.lm .copy{display:grid;gap:1rem;min-width:0}
-.lm .eyebrow{font-family:var(--hand);font-size:1.3rem;color:var(--pen)}
-.lm ul{margin:0;padding:0;list-style:none;display:grid;gap:.15rem}
-.lm li{padding-left:1.6rem;position:relative}
-.lm li::before{content:"✓";position:absolute;left:0;font-family:var(--hand);color:var(--pen);font-size:1.3rem}
-@media (max-width:760px){.lm{grid-template-columns:1fr}}
+@media (max-width:760px){.tool-row{grid-template-columns:1fr}}
 
 /* contact */
 .contact{position:relative;text-align:center;border:2.5px solid var(--ink);border-radius:255px 25px 225px 25px/25px 225px 25px 255px;padding:2.5rem 1.5rem;justify-items:center;background:var(--card);margin-block:2rem 3rem}
@@ -214,31 +211,28 @@ footer{padding-block:1rem 3rem;font-family:var(--hand);font-size:1.2rem;color:va
     <div class="copy">
       <p>I wasn't always a teacher. I also worked in a call center, for a couple of architectural companies and in distance learning departments.</p>
       <div class="row">
-        <a data-umami-event="CV" target="_blank" rel="noopener" class="btn plain" href="https://docs.google.com/document/d/1Nqs2lof7cx8Dw82UAc5VBzGAI7doiuDKvOBf-bq5CwA/edit?usp=sharing">Full CV</a>
+        <a data-umami-event="CV" target="_blank" rel="noopener" class="btn plain" href="https://docs.google.com/document/d/1LOux9OzlGmzYIQIRkbmVBb-1BNDmwvR9/edit">Full CV</a>
         <a data-umami-event="Quaifications" target="_blank" rel="noopener" class="btn plain" href="https://drive.google.com/file/d/12yhzCm8efOlckhkmGt0ceENzO-s9-cdC/view?usp=sharing">Qualifications</a>
         <a data-umami-event="video" target="_blank" rel="noopener" class="btn plain" href="https://www.youtube.com/watch?v=MvpQcAqhafM">Video</a>
       </div>
     </div>
   </section>
 
-  <a id="lessonmark" class="lm" data-umami-event="lessonmark" target="_blank" rel="noopener" href="https://github.com/jeronimovis/lessonmark">
-    <div class="copy">
-      <p class="eyebrow">A project I'm building</p>
-      <h2>LessonMark</h2>
-      <p>Write an English lesson in a plain text file, and LessonMark turns it into an interactive class page. It's designed to be easy for a teacher to write by hand, and easy for an AI to generate.</p>
+  <section id="tools" class="tools">
+    <p class="eyebrow">Things I built</p>
+    <div class="tool-row">
+      <a class="lm" data-umami-event="lessonrender" target="_blank" rel="noopener" href="https://jeronimovis.github.io/lessonrender/">
+        <h2>LessonRender</h2>
+        <p>LessonRender is a tool for teachers to create interactive English lessons from a simple text file.</p>
+        <span class="visit">Visit LessonRender →</span>
+      </a>
+      <a class="lm" data-umami-event="txtworm" target="_blank" rel="noopener" href="https://github.com/jeronimovis/txtworm">
+        <h2>txtWorm</h2>
+        <p>txtWorm is a reader that turns plain text files into pages that read like a book.</p>
+        <span class="visit">See txtWorm on GitHub →</span>
+      </a>
     </div>
-    <div class="copy">
-      <ul>
-        <li>Timed clips from YouTube, mp3 or mp4</li>
-        <li>Fill in the gaps</li>
-        <li>True or false</li>
-        <li>Multiple choice</li>
-        <li>Long answers with suggested answers</li>
-        <li>A hidden answer key at the end</li>
-      </ul>
-      <span class="visit">Visit LessonMark on GitHub →</span>
-    </div>
-  </a>
+  </section>
 
   <section class="contact">
     <h2>Not sure? Hit me up.</h2>
@@ -253,7 +247,7 @@ footer{padding-block:1rem 3rem;font-family:var(--hand);font-size:1.2rem;color:va
 <script>
 (function(){
   var root=document.documentElement, t=document.getElementById('theme');
-  function isDark(){var d=root.getAttribute('data-theme');return d?d==='dark':matchMedia('(prefers-color-scheme: dark)').matches}
+  function isDark(){return root.getAttribute('data-theme')==='dark'}
   function label(){t.textContent=isDark()?'Notebook':'Chalkboard'}
   try{var s=localStorage.getItem('jv-theme');if(s)root.setAttribute('data-theme',s)}catch(e){}
   label();
