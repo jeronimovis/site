@@ -7,7 +7,7 @@
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 <script defer src="https://cloud.umami.is/script.js" data-website-id="3b6162e0-f244-4a9e-94c4-9623dac773ef"></script>
 <title>Jerónimo Visñovezky | English Teacher</title>
-<meta name="description" content="Online English classes on Zoom with Jerónimo Visñovezky. 20+ years of experience, free first class, free books and handouts.">
+<meta name="description" content="Speak English with confidence. One-to-one online classes on Zoom with Jerónimo Visñovezky: 20+ years of experience, no charge if you don't like the first class, free books and handouts.">
 <script>(function(){try{var t=localStorage.getItem('jv-theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -92,6 +92,13 @@ h2{font-size:clamp(2rem,4.6vw,3.25rem);line-height:1.06}
 .hero .row{justify-content:center;margin-top:2rem}
 .hero .small{margin-top:1.1rem}
 
+/* problem */
+.problem-grid{display:grid;grid-template-columns:1fr 1.15fr;gap:clamp(2rem,5vw,4rem)}
+.problem-grid .copy{display:grid;gap:1.25rem;align-content:start}
+.problem-grid .copy p{font-size:1.2rem;color:var(--ink-2)}
+.problem-grid .copy p.turn{color:var(--ink);font-weight:500}
+@media (max-width:760px){.problem-grid{grid-template-columns:1fr}}
+
 /* pitch */
 .pitch{border-block:1px solid var(--rule);text-align:center;display:grid;justify-items:center;gap:1.1rem;padding-block:clamp(3rem,6vw,4.5rem)}
 .pitch h2{font-style:italic;font-weight:400;font-size:clamp(2.1rem,5.4vw,3.8rem);max-width:18ch}
@@ -100,6 +107,23 @@ h2{font-size:clamp(2rem,4.6vw,3.25rem);line-height:1.06}
 .pitch h2::after{content:"”"}
 .pitch p{color:var(--ink-2);font-size:1.2rem}
 .pitch .row{justify-content:center;margin-top:.4rem}
+
+/* plan */
+.steps{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(3,1fr);counter-reset:step}
+.steps li{counter-increment:step;display:grid;gap:.7rem;align-content:start;padding-inline:clamp(1.25rem,2.5vw,2rem)}
+.steps li:first-child{padding-left:0}
+.steps li:last-child{padding-right:0}
+.steps li+li{border-left:1px solid var(--rule)}
+.steps li::before{content:counter(step);font:400 clamp(2.6rem,5vw,3.6rem)/1 var(--serif);color:var(--accent);letter-spacing:-.03em}
+.steps h3{font-size:clamp(1.45rem,2.6vw,1.8rem);line-height:1.15}
+.steps p{color:var(--ink-2);font-size:1.08rem}
+.plan .row{margin-top:clamp(2rem,4vw,2.75rem)}
+@media (max-width:860px){
+  .steps{grid-template-columns:1fr}
+  .steps li,.steps li:first-child,.steps li:last-child{padding:1.5rem 0}
+  .steps li+li{border-left:0;border-top:1px solid var(--rule)}
+  .steps li:first-child{padding-top:0}
+}
 
 /* feedback */
 .quotes{display:grid;grid-template-columns:repeat(3,1fr)}
@@ -149,7 +173,7 @@ h2{font-size:clamp(2rem,4.6vw,3.25rem);line-height:1.06}
 .about-grid{display:grid;grid-template-columns:1fr 1.15fr;gap:clamp(2rem,5vw,4rem)}
 .about-grid .place{font:italic 400 1.3rem/1.4 var(--serif);color:var(--muted);margin-top:1rem}
 .about-grid .copy{display:grid;gap:1.5rem;align-content:start}
-.dropcap{font-size:1.2rem;color:var(--ink-2)}
+.about-grid .copy p{font-size:1.2rem;color:var(--ink-2)}
 .dropcap::first-letter{float:left;font:500 4.1em/.82 var(--serif);color:var(--ink);margin:.08em .1em 0 0}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);margin:clamp(2.5rem,5vw,3.5rem) 0 0;border-top:1px solid var(--rule)}
 .stats div{display:flex;flex-direction:column-reverse;gap:.3rem;padding:1.5rem clamp(1rem,2.5vw,2rem) 0}
@@ -176,8 +200,9 @@ h2{font-size:clamp(2rem,4.6vw,3.25rem);line-height:1.06}
 
 /* contact */
 .contact{background:var(--box);color:var(--on-box);border-top:4px solid var(--accent);text-align:center;display:grid;justify-items:center;gap:1.1rem;padding:clamp(3rem,7vw,5rem) 1.25rem;margin-block:clamp(1rem,3vw,2rem) clamp(3rem,6vw,4.5rem)}
-.contact h2{font-size:clamp(2.2rem,5.5vw,3.6rem)}
+.contact h2{font-size:clamp(2.2rem,5.5vw,3.6rem);max-width:20ch}
 .contact .kicker{color:var(--on-box);opacity:.7}
+.contact .stake{font:italic 400 1.25rem/1.45 var(--serif);color:var(--on-box);opacity:.85;max-width:34rem}
 .contact .addr{font-size:1.2rem;color:var(--on-box);opacity:.9;line-height:1.7}
 .contact .addr a{color:var(--on-box);text-underline-offset:4px;text-decoration-color:var(--on-box)}
 .contact .btn{margin-top:.6rem;background:var(--on-box);border-color:var(--on-box);color:var(--box)}
@@ -198,6 +223,7 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.5rem
   <div class="wrap">
     <a class="brand" href="#top" aria-label="Top of page">Jerónimo <em>V.</em></a>
     <nav class="nav" aria-label="Main">
+      <a href="#how">How it works</a>
       <a href="#feedback">Reviews</a>
       <a href="#books">Books</a>
       <a href="#about">CV</a>
@@ -213,28 +239,66 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.5rem
 
 <main id="top" class="wrap">
 
+  <!-- HERO: the student and what they want -->
   <section class="hero">
     <img class="portrait" src="images/jero2.png" alt="Portrait of Jerónimo Visñovezky" width="400" height="400">
-    <p class="kicker">English teacher · Online classes on Zoom®</p>
-    <h1>Jerónimo Visñovezky</h1>
-    <p class="dek">Real English. Real fast. Zero boredom.</p>
+    <p class="kicker">Jerónimo Visñovezky · Online English classes on Zoom®</p>
+    <h1>Speak English with confidence.</h1>
+    <p class="dek">You already know more than you think. Let's get it talking.</p>
     <div class="rule" aria-hidden="true"></div>
-    <p class="lede"><span class="hl">20+ years of experience</span> and an actual English teaching degree. I’ll help you speak English with confidence. You’ll talk a lot in my classes, practise real situations and work on what you actually need.</p>
+    <p class="lede">One-to-one classes where <span class="hl">you do most of the talking</span>, practise the situations you actually face, and stop translating in your head. If you don't like your first class, you don't pay.</p>
     <div class="row">
-      <a data-umami-event="Schedule" class="btn" href="https://jeronimov.org/redirect/form_schedule.html">Schedule classes now <span class="arr" aria-hidden="true">→</span></a>
+      <a data-umami-event="Schedule" class="btn" href="https://jeronimov.org/redirect/form_schedule.html">Book your first class <span class="arr" aria-hidden="true">→</span></a>
       <a data-umami-event="Youtube" target="_blank" rel="noopener" class="btn ghost" href="https://www.youtube.com/watch?v=9wqy0wSQ_u0">Hear me talk</a>
     </div>
     <p class="small">1 hr online English classes with Zoom®</p>
   </section>
 
+  <!-- PROBLEM: what's in the student's way -->
+  <section id="problem">
+    <div class="label"><span>Sound familiar?</span><i>You're not alone</i></div>
+    <div class="problem-grid">
+      <div>
+        <h2>You understand English. Speaking it is another story.</h2>
+      </div>
+      <div class="copy">
+        <p>You've studied for years. You follow series, read articles, get most of what people say. But when it's your turn to speak, the words don't come out the way you want.</p>
+        <p>So you say less than you know. You let someone else talk. And afterwards you think of everything you <em>could</em> have said.</p>
+        <p class="turn">It isn't a lack of talent. You just haven't had enough real practice, with someone who corrects you and keeps you talking.</p>
+      </div>
+    </div>
+  </section>
+
   <section class="pitch">
     <h2>English mastery without the misery.</h2>
-    <p>If you don't like the first class, you don't have to pay. It's free.</p>
+    <p>If you don't like the first class, you don't have to pay.</p>
     <div class="row"><a data-umami-event="Pricing" target="_blank" rel="noopener" class="btn ghost" href="https://docs.google.com/document/d/1zF2tUZwt8pTgh9Vel0tj1ipGquh0S_mnUvkj4mhegcQ/edit?usp=sharing">See pricing</a></div>
   </section>
 
+  <!-- PLAN: three steps -->
+  <section id="how" class="plan">
+    <div class="label"><span>How it works</span><i>Three steps</i></div>
+    <ol class="steps">
+      <li>
+        <h3>Book your first class</h3>
+        <p>We talk about your goals and the moments where English gets in your way. If it's not for you, you don't pay.</p>
+      </li>
+      <li>
+        <h3>Get classes built around you</h3>
+        <p>Work meetings, travel, an exam, a job interview: we practise what you actually need.</p>
+      </li>
+      <li>
+        <h3>Hear the difference</h3>
+        <p>Week by week, you speak more and hesitate less. The English you already have starts working for you.</p>
+      </li>
+    </ol>
+    <div class="row">
+      <a data-umami-event="Schedule_steps" class="btn" href="https://jeronimov.org/redirect/form_schedule.html">Book your first class <span class="arr" aria-hidden="true">→</span></a>
+    </div>
+  </section>
+
   <section id="feedback">
-    <div class="label"><span>Feedback from my students</span><i>Rated five stars</i></div>
+    <div class="label"><span>Students who got there</span><i>Rated five stars</i></div>
     <div class="quotes">
       <figure class="quote">
         <div class="who"><img src="images/person1.png" alt="" width="74" height="98"><div class="stars" aria-label="5 stars">★★★★★</div></div>
@@ -253,13 +317,13 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.5rem
   </section>
 
   <section id="books">
-    <div class="label"><span>Books and handouts</span><i>Free to download</i></div>
+    <div class="label"><span>Start today, for free</span><i>Books and handouts to download</i></div>
     <div class="feature">
       <a class="cover-link" data-umami-event="Grammar_pdf" target="_blank" rel="noopener" href="https://drive.google.com/file/d/1UY_aQ7iqJ_Bp4QRIwwM8pNvAZ0Jgzby0/view?usp=sharing"><img class="cover" src="images/gramatica-cover.jpg" alt="Cover of Gramática inglesa para desesperados by Jerónimo Visñovezky" width="564" height="824"></a>
       <div class="copy">
         <p class="kicker">Featured book</p>
         <h2>Gramática inglesa para desesperados</h2>
-        <p class="body">A 240-page book that explains English grammar in Spanish, for students who struggle to pass exams. Free to download, and there is a podcast too.</p>
+        <p class="body">Struggling to pass an English exam? This 240-page book explains English grammar in Spanish, step by step. Download it free, or listen to the podcast on the way to work.</p>
         <div class="row">
           <a data-umami-event="Grammar_pdf" target="_blank" rel="noopener" class="btn" href="https://drive.google.com/file/d/1UY_aQ7iqJ_Bp4QRIwwM8pNvAZ0Jgzby0/view?usp=sharing">Free PDF download</a>
           <a data-umami-event="grammar_spoty" target="_blank" rel="noopener" class="btn ghost" href="https://open.spotify.com/show/1I3lXN95XZpCFCKB4TBtuu?si=f82683ecc59642d7">Listen on Spotify</a>
@@ -269,22 +333,25 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.5rem
 
     <h3 class="sub">More from the shelf</h3>
     <ul class="shelf">
-      <li><a data-umami-event="essay_pdf" target="_blank" rel="noopener" class="thumb" href="https://drive.google.com/file/d/13f4jQQDdnFBUZmBgbtpcRdwfgO02GB85/view?usp=sharing"><img src="images/essay-cover.jpg" alt="Cover of Essay writing ruined" width="600" height="788" loading="lazy"></a><h3><a data-umami-event="essay_pdf" target="_blank" rel="noopener" href="https://drive.google.com/file/d/13f4jQQDdnFBUZmBgbtpcRdwfgO02GB85/view?usp=sharing">Essay writing ruined</a></h3><p>A structuralist approach to passing essay writing tasks.</p></li>
-      <li><a data-umami-event="ways_pdf" target="_blank" rel="noopener" class="thumb" href="https://drive.google.com/file/d/13oBbZ6X01eeS1K2cZCRu-EkqTPGCLl2S/view?usp=sharing"><img src="images/ways-cover.jpg" alt="Cover of Ways: vocabulary for life" width="600" height="839" loading="lazy"></a><h3><a data-umami-event="ways_pdf" target="_blank" rel="noopener" href="https://drive.google.com/file/d/13oBbZ6X01eeS1K2cZCRu-EkqTPGCLl2S/view?usp=sharing">Ways: vocabulary for life</a></h3><p>Advanced vocabulary separated into categories.</p></li>
-      <li><a data-umami-event="irregular_pdf" target="_blank" rel="noopener" class="thumb" href="https://drive.google.com/file/d/1x_f6rGe4lMfE9G1rGjvybQO3ofGmoz7U/view?usp=sharing"><img src="images/irregular-cover.jpg" alt="Cover of Irregular verbs" width="600" height="852" loading="lazy"></a><h3><a data-umami-event="irregular_pdf" target="_blank" rel="noopener" href="https://drive.google.com/file/d/1x_f6rGe4lMfE9G1rGjvybQO3ofGmoz7U/view?usp=sharing">Irregular verbs</a></h3><p>A list with audio and activities to help you learn irregular verbs.</p></li>
-      <li><a data-umami-event="distancia_pdf" target="_blank" rel="noopener" class="thumb" href="https://drive.google.com/file/d/1GD0QB-ao9MrPn6Z39UzQjiE6X7eLS18-/view?usp=sharing"><img src="images/distancia-cover.jpg" alt="Cover of Distancia cercana" width="563" height="800" loading="lazy"></a><h3><a data-umami-event="distancia_pdf" target="_blank" rel="noopener" href="https://drive.google.com/file/d/1GD0QB-ao9MrPn6Z39UzQjiE6X7eLS18-/view?usp=sharing">Distancia cercana</a></h3><p>Tools other teachers can use to improve their Zoom classes.</p></li>
+      <li><a data-umami-event="essay_pdf" target="_blank" rel="noopener" class="thumb" href="https://drive.google.com/file/d/13f4jQQDdnFBUZmBgbtpcRdwfgO02GB85/view?usp=sharing"><img src="images/essay-cover.jpg" alt="Cover of Essay writing ruined" width="600" height="788" loading="lazy"></a><h3><a data-umami-event="essay_pdf" target="_blank" rel="noopener" href="https://drive.google.com/file/d/13f4jQQDdnFBUZmBgbtpcRdwfgO02GB85/view?usp=sharing">Essay writing ruined</a></h3><p>Pass your essay writing tasks with a clear, structured method.</p></li>
+      <li><a data-umami-event="ways_pdf" target="_blank" rel="noopener" class="thumb" href="https://drive.google.com/file/d/13oBbZ6X01eeS1K2cZCRu-EkqTPGCLl2S/view?usp=sharing"><img src="images/ways-cover.jpg" alt="Cover of Ways: vocabulary for life" width="600" height="839" loading="lazy"></a><h3><a data-umami-event="ways_pdf" target="_blank" rel="noopener" href="https://drive.google.com/file/d/13oBbZ6X01eeS1K2cZCRu-EkqTPGCLl2S/view?usp=sharing">Ways: vocabulary for life</a></h3><p>Grow your advanced vocabulary, one category at a time.</p></li>
+      <li><a data-umami-event="irregular_pdf" target="_blank" rel="noopener" class="thumb" href="https://drive.google.com/file/d/1x_f6rGe4lMfE9G1rGjvybQO3ofGmoz7U/view?usp=sharing"><img src="images/irregular-cover.jpg" alt="Cover of Irregular verbs" width="600" height="852" loading="lazy"></a><h3><a data-umami-event="irregular_pdf" target="_blank" rel="noopener" href="https://drive.google.com/file/d/1x_f6rGe4lMfE9G1rGjvybQO3ofGmoz7U/view?usp=sharing">Irregular verbs</a></h3><p>Finally learn them, with a list, audio and activities.</p></li>
+      <li><a data-umami-event="distancia_pdf" target="_blank" rel="noopener" class="thumb" href="https://drive.google.com/file/d/1GD0QB-ao9MrPn6Z39UzQjiE6X7eLS18-/view?usp=sharing"><img src="images/distancia-cover.jpg" alt="Cover of Distancia cercana" width="563" height="800" loading="lazy"></a><h3><a data-umami-event="distancia_pdf" target="_blank" rel="noopener" href="https://drive.google.com/file/d/1GD0QB-ao9MrPn6Z39UzQjiE6X7eLS18-/view?usp=sharing">Distancia cercana</a></h3><p>For teachers: tools to make your Zoom classes better.</p></li>
     </ul>
   </section>
 
+  <!-- GUIDE: empathy + authority -->
   <section id="about">
-    <div class="label"><span>About &amp; CV</span><i>Córdoba · Santiago del Estero · Online</i></div>
+    <div class="label"><span>Your guide &amp; CV</span><i>Córdoba · Santiago del Estero · Online</i></div>
     <div class="about-grid">
       <div>
-        <h2>Teaching for more than 20 years</h2>
+        <h2>20+ years helping people speak up in English</h2>
         <p class="place">Córdoba, Santiago del Estero, now online</p>
       </div>
       <div class="copy">
-        <p class="dropcap">At Facultad de Lenguas, UNC, I taught intensive courses and later trained other teachers to work in virtual classrooms. Later, I taught in institutes and secondary schools. I moved to Zoom® full-time in 2021 and never looked back.</p>
+        <p class="dropcap">I've met many capable students who go quiet in English, not because they don't know enough, but because no one gave them the chance to use it. Getting them talking is my job.</p>
+        <p>I have a degree in English teaching. At Facultad de Lenguas, UNC, I taught intensive courses and later trained other teachers to work in virtual classrooms. Then came institutes and secondary schools, and in 2021 I moved to Zoom® full-time. Today I teach adults and professionals from all over Argentina.</p>
+        <p>Run an institute? My full CV and qualifications are below.</p>
         <div class="row">
           <a data-umami-event="CV" target="_blank" rel="noopener" class="btn" href="https://docs.google.com/document/d/1LOux9OzlGmzYIQIRkbmVBb-1BNDmwvR9/edit">Full CV</a>
           <a data-umami-event="Quaifications" target="_blank" rel="noopener" class="btn ghost" href="https://drive.google.com/file/d/12yhzCm8efOlckhkmGt0ceENzO-s9-cdC/view?usp=sharing">Qualifications</a>
@@ -305,23 +372,25 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.5rem
       <a class="tool pop" data-umami-event="lessonrender" target="_blank" rel="noopener" href="https://jeronimovis.github.io/lessonrender/">
         <p class="kicker">Teaching tool</p>
         <h3>LessonRender</h3>
-        <p>LessonRender is a tool for teachers to create interactive English lessons from a simple text file.</p>
+        <p>Teachers: turn a simple text file into an interactive English lesson your students can use right away.</p>
         <span class="visit">Visit LessonRender →</span>
       </a>
       <a class="tool" data-umami-event="txtworm" target="_blank" rel="noopener" href="https://github.com/jeronimovis/txtworm">
         <p class="kicker">Reading tool</p>
         <h3>txtWorm</h3>
-        <p>txtWorm is a reader that turns plain text files into pages that read like a book.</p>
+        <p>Readers: open any plain text file and read it like a real book.</p>
         <span class="visit">See txtWorm on GitHub →</span>
       </a>
     </div>
   </section>
 
+  <!-- CALL TO ACTION + stakes -->
   <section class="contact">
-    <p class="kicker">Contact</p>
-    <h2>Not sure? Hit me up.</h2>
-    <p class="addr">jeronimov [at] gmail<br><a data-umami-event="whatsapp" target="_blank" rel="noopener" href="https://wa.me/543855309501?text=I%20want%20to%20schedule%20a%20class!">+54 9 3855309501</a></p>
-    <a data-umami-event="ask_anything" class="btn" href="https://jeronimov.org/redirect/form_schedule.html">Ask me anything <span class="arr" aria-hidden="true">→</span></a>
+    <p class="kicker">Your next step</p>
+    <h2>Your next conversation in English can feel different.</h2>
+    <p class="stake">Every month you wait is another meeting, trip or interview where you say less than you know. If the first class isn't for you, you don't pay.</p>
+    <a data-umami-event="ask_anything" class="btn" href="https://jeronimov.org/redirect/form_schedule.html">Book your first class <span class="arr" aria-hidden="true">→</span></a>
+    <p class="addr">Not sure yet? Ask me anything.<br>jeronimov [at] gmail<br><a data-umami-event="whatsapp" target="_blank" rel="noopener" href="https://wa.me/543855309501?text=I%20want%20to%20schedule%20a%20class!">+54 9 3855309501</a></p>
   </section>
 </main>
 
