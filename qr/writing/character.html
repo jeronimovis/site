@@ -100,6 +100,8 @@ nav.sections a:hover{border-color:var(--accent);color:var(--accent)}
 .namelink:hover{text-decoration:underline}
 .ghost{font-family:var(--sans);font-size:12.5px;font-weight:600;background:transparent;color:var(--ink);border:1px solid var(--rule);border-radius:3px;padding:6px 10px;cursor:pointer}
 .ghost:hover{border-color:var(--ink)}
+#rollBtn2{display:inline-flex;align-items:center;gap:6px}
+#rollBtn2 svg{width:16px;height:16px;flex:none}
 
 .builder{display:grid;grid-template-columns:minmax(0,1fr) 390px;grid-template-areas:"fields slip";gap:32px;margin-top:26px}
 .fields{grid-area:fields;min-width:0}
@@ -267,7 +269,7 @@ footer{margin-top:60px;border-top:1px solid var(--rule);padding-top:12px;font-fa
       <div id="prompt" aria-live="polite"></div>
       <div class="slip-btns">
         <button class="btn" type="button" id="copyBtn"><span class="en">Copy prompt</span><span class="es">Copiar consigna</span></button>
-        <button class="ghost" type="button" id="rollBtn2"><span class="en">Roll unlocked</span><span class="es">Sortear lo no bloqueado</span></button>
+        <button class="ghost" type="button" id="rollBtn2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.4" fill="currentColor"/><circle cx="16" cy="16" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/></svg><span class="en">Roll unlocked</span><span class="es">Sortear lo no bloqueado</span></button>
       </div>
       <div class="toast" id="toast"></div>
     </div>
