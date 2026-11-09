@@ -1,0 +1,1144 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Character Workbench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Libre+Franklin:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap">
+<style id="desk-shared">
+/* Shared design language for the writing desk: one palette, three typefaces, one top bar. */
+:root{
+  --dk-bg:#fdfdfc; --dk-paper:#ffffff; --dk-ink:#16171a; --dk-muted:#5b5e67; --dk-rule:#d8dbe1;
+  --dk-soft:#f3f4f7; --dk-wash:#e8edf6; --dk-accent:#1f4f8a; --dk-accent-soft:#dde5f6; --dk-on-accent:#ffffff; --dk-mark:#f6eaa9;
+  --dk-display:"Libre Caslon Display","Bodoni 72",Didot,Georgia,serif;
+  --dk-body:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --dk-ui:"Libre Franklin","Helvetica Neue",Arial,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --dk-bg:#121316; --dk-paper:#1a1b20; --dk-ink:#ebeae5; --dk-muted:#a3a6ae; --dk-rule:#34363c;
+  --dk-soft:#1c1e23; --dk-wash:#1b2331; --dk-accent:#8db2e8; --dk-accent-soft:#25314f; --dk-on-accent:#0f1320; --dk-mark:#4b4321; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --dk-bg:#121316; --dk-paper:#1a1b20; --dk-ink:#ebeae5; --dk-muted:#a3a6ae; --dk-rule:#34363c;
+  --dk-soft:#1c1e23; --dk-wash:#1b2331; --dk-accent:#8db2e8; --dk-accent-soft:#25314f; --dk-on-accent:#0f1320; --dk-mark:#4b4321; color-scheme:dark}
+.dk-bar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px 16px;padding:14px 0 12px;border-bottom:1px solid var(--dk-rule)}
+.dk-crumbs{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;font:600 12px/1.3 var(--dk-ui);letter-spacing:.08em;text-transform:uppercase}
+.dk-crumbs a{color:var(--dk-ink);text-decoration:none;border-bottom:1px solid transparent}
+.dk-crumbs a:hover{color:var(--dk-accent);border-color:var(--dk-accent)}
+.dk-crumbs .dk-sep{color:var(--dk-muted)}
+.dk-prefs{display:flex;gap:8px;flex-wrap:wrap}
+.dk-seg{display:inline-flex;border:1px solid var(--dk-rule);border-radius:2px;overflow:hidden}
+.dk-seg button{background:transparent;border:0;margin:0;padding:5px 10px;cursor:pointer;font:600 11px/1.4 var(--dk-ui);letter-spacing:.08em;text-transform:uppercase;color:var(--dk-muted)}
+.dk-seg button+button{border-left:1px solid var(--dk-rule)}
+.dk-seg button:hover{color:var(--dk-ink)}
+.dk-seg button[aria-pressed="true"]{background:var(--dk-ink);color:var(--dk-bg)}
+.dk-seg button:focus-visible,.dk-crumbs a:focus-visible{outline:2px solid var(--dk-accent);outline-offset:2px}
+</style>
+<script>
+/* Shared preferences: language (Spanish by default) and theme (auto by default), remembered across all pages of the desk. */
+(function(){
+  var R=document.documentElement;
+  var DEF={'desk-lang':'es','desk-theme':'auto'};
+  function get(k){try{return localStorage.getItem(k)||DEF[k]}catch(e){return DEF[k]}}
+  function put(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+  function sys(){return (navigator.language||'').toLowerCase().indexOf('es')===0?'es':'en'}
+  var T={en:{auto:'Auto',light:'Light',dark:'Dark',home:'Writing desk',lang:'Language',theme:'Theme'},
+         es:{auto:'Auto',light:'Claro',dark:'Oscuro',home:'Mesa de escritura',lang:'Idioma',theme:'Tema'}};
+  var D=window.DESK={lang:get('desk-lang'),theme:get('desk-theme'),onLang:null,
+    eff:function(){return this.lang==='auto'?sys():this.lang}};
+  function applyTheme(){if(D.theme==='light'||D.theme==='dark')R.setAttribute('data-theme',D.theme);else R.removeAttribute('data-theme')}
+  function paint(){
+    var t=T[D.eff()];
+    document.querySelectorAll('[data-dk-lang]').forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-dk-lang')===D.lang)});
+    document.querySelectorAll('[data-dk-theme]').forEach(function(b){var v=b.getAttribute('data-dk-theme');b.setAttribute('aria-pressed',v===D.theme);b.textContent=t[v]});
+    document.querySelectorAll('[data-dk-t]').forEach(function(e){e.textContent=t[e.getAttribute('data-dk-t')]});
+    document.querySelectorAll('[data-dk-aria]').forEach(function(e){e.setAttribute('aria-label',t[e.getAttribute('data-dk-aria')])});
+  }
+  function fire(){paint();if(D.onLang)D.onLang(D.eff())}
+  D.setLang=function(l){D.lang=l;put('desk-lang',l);fire()};
+  D.setTheme=function(t){D.theme=t;put('desk-theme',t);applyTheme();paint()};
+  D.paint=paint;
+  document.addEventListener('click',function(e){
+    var b=e.target.closest&&e.target.closest('[data-dk-lang],[data-dk-theme]');if(!b)return;
+    if(b.hasAttribute('data-dk-lang'))D.setLang(b.getAttribute('data-dk-lang'));else D.setTheme(b.getAttribute('data-dk-theme'));
+  });
+  window.addEventListener('languagechange',function(){if(D.lang==='auto')fire()});
+  window.addEventListener('storage',function(e){
+    if(e.key==='desk-theme'){D.theme=e.newValue||'auto';applyTheme();paint()}
+    if(e.key==='desk-lang'){D.lang=e.newValue||'es';fire()}
+  });
+  applyTheme();
+  R.lang=D.eff();
+})();
+</script>
+<style>
+:root{
+  --bg:var(--dk-bg); --ink:var(--dk-ink); --muted:var(--dk-muted); --rule:var(--dk-rule); --card:var(--dk-soft);
+  --accent:var(--dk-accent); --accent-soft:var(--dk-accent-soft); --on-accent:var(--dk-on-accent); --mark:var(--dk-mark);
+  --serif:var(--dk-body); --sans:var(--dk-ui); --display:var(--dk-display);
+}
+html[lang="es"] .en, html[lang="en"] .es{display:none!important}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--serif);font-size:17px;line-height:1.55}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 60px}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.kicker,label,.lbl{font-family:var(--sans);font-size:11.5px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+
+header.mast{display:grid;gap:6px;padding-top:16px;border-bottom:3px double var(--ink);padding-bottom:14px}
+.mast-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--rule);padding-bottom:8px}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(2.3rem,6vw,4.2rem);line-height:1;margin:10px 0 2px;letter-spacing:-.015em;text-wrap:balance}
+h2,h3{text-wrap:balance}
+.dek{margin:0;color:var(--muted);font-style:italic;max-width:62ch}
+nav.sections{display:flex;flex-wrap:wrap;gap:4px 18px;margin-top:10px;font-family:var(--sans);font-size:13px;font-weight:500}
+nav.sections a{color:var(--ink);text-decoration:none;border-bottom:1px solid transparent}
+nav.sections a:hover{border-color:var(--accent);color:var(--accent)}
+.slip h2,.group h3,.ref-sec h2,.three-q b{font-family:var(--display);font-weight:400}
+.namelink{font-family:var(--sans);font-size:13px;font-weight:600;text-decoration:none;color:var(--accent)}
+.namelink:hover{text-decoration:underline}
+.ghost{font-family:var(--sans);font-size:12.5px;font-weight:600;background:transparent;color:var(--ink);border:1px solid var(--rule);border-radius:3px;padding:6px 10px;cursor:pointer}
+.ghost:hover{border-color:var(--ink)}
+
+.builder{display:grid;grid-template-columns:minmax(0,1fr) 390px;grid-template-areas:"fields slip";gap:32px;margin-top:26px}
+.fields{grid-area:fields;min-width:0}
+.slip{grid-area:slip;min-width:0}
+.slip-inner{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);background:var(--card);border:1px solid var(--rule);padding:20px 22px;display:grid;gap:12px;max-height:calc(100vh - 28px);overflow-y:auto}
+.rollbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:6px}
+.btn{font-family:var(--sans);font-weight:700;font-size:14px;background:var(--accent);color:var(--on-accent);border:0;border-radius:3px;padding:11px 18px;cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+.btn:hover{filter:brightness(1.08)}
+.btn svg{width:18px;height:18px}
+.locked-count{font-family:var(--sans);font-size:13px;color:var(--muted)}
+.mode-simple .full-only{display:none!important}
+.group{margin-top:22px}
+.group h3{font-family:var(--serif);font-size:1.35rem;font-weight:600;margin:0 0 10px;padding-bottom:6px;border-bottom:1px solid var(--ink);display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.group h3 a{font-family:var(--sans);font-size:12px;font-weight:500;text-decoration:none}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.card{border-top:1px solid var(--rule);padding:10px 2px 6px;display:grid;gap:6px;align-content:start;transition:background .2s}
+.card.locked{background:var(--mark);border-top-color:var(--ink)}
+.card-top{display:flex;align-items:center;gap:6px}
+.card-top label,.card-top .lbl{flex:1}
+.ib{width:30px;height:30px;display:grid;place-items:center;background:transparent;border:1px solid var(--rule);border-radius:3px;color:var(--ink);cursor:pointer;padding:0}
+.ib:hover{border-color:var(--ink)}
+.ib svg{width:16px;height:16px}
+.ib[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+select{width:100%;font-family:var(--serif);font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--rule);border-radius:3px;padding:7px 8px;min-width:0}
+.note{margin:0;font-size:14px;color:var(--muted);font-style:italic;line-height:1.4;min-height:1.4em}
+.scales{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.scale{display:grid;gap:2px}
+.scale input{width:100%;accent-color:var(--accent)}
+.scale .ends{display:flex;justify-content:space-between;font-family:var(--sans);font-size:12px;color:var(--muted)}
+.scale .val{font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink)}
+.slip h2{font-size:1.5rem;margin:0;line-height:1.15}
+#prompt p{margin:0 0 .6em;font-size:16px;line-height:1.5}
+#prompt q{font-style:italic}
+#prompt .ask{font-style:italic;color:var(--muted)}
+#prompt .task{border-top:1px solid var(--rule);padding-top:.6em;margin-top:.4em}
+.slip-btns{display:flex;flex-wrap:wrap;gap:8px}
+.toast{font-family:var(--sans);font-size:13px;color:var(--accent);min-height:1.2em}
+
+.ref-sec{margin-top:64px;padding-top:18px;border-top:3px double var(--ink);scroll-margin-top:16px}
+.ref-sec h2{font-size:clamp(1.7rem,3.6vw,2.4rem);line-height:1.1;margin:6px 0 14px}
+.ref-sec .new{font-family:var(--sans);font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;background:var(--mark);color:var(--ink);padding:2px 6px;border-radius:2px;margin-left:8px;vertical-align:middle}
+.two{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:32px;align-items:start}
+.prose{min-width:0}
+.prose p{margin:0 0 .9em;max-width:62ch}
+.prose ul{padding-left:1.2em;margin:0 0 1em}
+.prose li{margin-bottom:.35em}
+.intro{max-width:62ch;margin:0 0 16px}
+figure{margin:0;min-width:0}
+.svgbox{overflow-x:auto}
+figure svg{width:100%;height:auto;display:block}
+figcaption{font-family:var(--sans);font-size:12.5px;color:var(--muted);margin-top:8px;line-height:1.45}
+.live{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:12px;border-top:1px solid var(--rule);padding-top:10px}
+.live div{font-size:15px;line-height:1.4}
+.live .lbl{display:block;margin-bottom:2px}
+.paths{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:18px}
+.path{display:grid;gap:4px;cursor:pointer;background:none;border:1px solid transparent;text-align:left;color:var(--ink);font:inherit;padding:8px;border-radius:3px}
+.path:hover{border-color:var(--rule)}
+.path.on{border-color:var(--ink);background:var(--card)}
+.path strong{font-family:var(--sans);font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+.path span.d{font-size:14.5px;color:var(--muted);line-height:1.4}
+.rules{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px 22px;margin-top:18px}
+.rule h4{font-family:var(--sans);font-size:13px;font-weight:700;margin:0 0 2px;letter-spacing:.02em}
+.rule p{margin:0;font-size:15px;line-height:1.45;color:var(--muted)}
+.chain{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font-family:var(--sans);font-size:13.5px;font-weight:600;margin:10px 0 4px}
+.chain .step{border:1px solid var(--ink);padding:5px 10px;border-radius:2px}
+.chain .ar{color:var(--muted)}
+.mandates{counter-reset:m;list-style:none;padding:0;margin:0;display:grid;gap:8px}
+.mandates li{counter-increment:m;display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:baseline}
+.mandates li::before{content:counter(m);font-family:var(--sans);font-weight:700;font-size:13px;width:26px;height:26px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center}
+.three-q{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-top:6px}
+.three-q > div{border-top:2px solid var(--ink);padding-top:8px}
+.three-q b{display:block;font-size:1.05rem;line-height:1.25;margin-bottom:4px}
+.three-q .d{font-size:14.5px;color:var(--muted)}
+
+/* Ridiculous-method panel */
+.rid-panel{background:var(--card);border:1px solid var(--rule);padding:18px 20px;display:grid;gap:14px;min-width:0}
+.rid-panel .grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+#ridPrompt{margin:0;font-size:17px;line-height:1.5}
+.rid-q{margin:0;padding-left:1.3em;font-size:15px;color:var(--muted)}
+.rid-q li{margin-bottom:.3em}
+textarea{width:100%;min-height:130px;resize:vertical;font-family:var(--serif);font-size:16px;line-height:1.5;color:var(--ink);background:var(--bg);border:1px solid var(--rule);border-radius:3px;padding:10px 12px}
+textarea:focus{border-color:var(--ink)}
+
+footer{margin-top:60px;border-top:1px solid var(--rule);padding-top:12px;font-family:var(--sans);font-size:12.5px;color:var(--muted)}
+
+.fig text{font-family:var(--sans);fill:var(--ink)}
+.fig .t-h{font-size:13px;font-weight:700;letter-spacing:.08em}
+.fig .t-h2{font-size:12px;font-weight:700;letter-spacing:.05em}
+.fig .t-s{font-size:11.5px;fill:var(--muted)}
+.fig .t-v{font-family:var(--serif);font-size:15px;font-style:italic}
+.fig .ln{stroke:var(--ink);stroke-width:1.5;fill:none}
+.fig .dash{stroke:var(--muted);stroke-width:1.5;fill:none;stroke-dasharray:4 4}
+.fig .dot{stroke:var(--ink);stroke-width:1.5;fill:none;stroke-dasharray:1.5 5;stroke-linecap:round}
+.fig .box{fill:var(--card);stroke:var(--ink);stroke-width:1.5}
+.fig .soft{fill:var(--accent-soft);stroke:var(--ink);stroke-width:1.5}
+.fig .zone{fill:var(--accent-soft);stroke:none}
+.fig .acc{fill:var(--accent)}
+.fig .accs{stroke:var(--accent);stroke-width:2.5;fill:none}
+.fig .ink{fill:var(--ink)}
+.fig .bg{fill:var(--bg);stroke:var(--ink);stroke-width:1.5}
+.fig .ah{fill:var(--ink)}
+.fig .aha{fill:var(--accent)}
+.fig .onacc{stroke:var(--on-accent);stroke-width:2.5}
+.fig .eng{transition:opacity .2s}
+.fig .eng.dim{opacity:.28}
+.mz{cursor:pointer}
+.mz polygon{fill:var(--card);stroke:var(--ink);stroke-width:1.5;transition:fill .2s}
+.mz:hover polygon{fill:var(--accent-soft)}
+.mz.on polygon{fill:var(--accent)}
+.mz.on .num{fill:var(--on-accent)}
+.mz .num{font-size:14px;font-weight:700}
+.tt circle{fill:var(--accent-soft);fill-opacity:.65;stroke:var(--ink);stroke-width:1.5}
+
+@media (max-width:900px){
+  .builder{grid-template-columns:1fr;grid-template-areas:"slip" "fields"}
+  .slip-inner{position:static;max-height:none}
+  .two{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="dk-bar">
+  <nav class="dk-crumbs" aria-label="Breadcrumb"><a href="index.html">← <span data-dk-t="home">Writing desk</span></a></nav>
+  <div class="dk-prefs">
+    <div class="dk-seg" role="group" data-dk-aria="lang" aria-label="Language"><button type="button" data-dk-lang="auto">Auto</button><button type="button" data-dk-lang="en">EN</button><button type="button" data-dk-lang="es">ES</button></div>
+    <div class="dk-seg" role="group" data-dk-aria="theme" aria-label="Theme"><button type="button" data-dk-theme="auto">Auto</button><button type="button" data-dk-theme="light">Light</button><button type="button" data-dk-theme="dark">Dark</button></div>
+  </div>
+</div>
+<script>DESK.paint()</script>
+<header class="mast">
+  <div class="mast-top">
+    <span class="kicker"><span class="en">Fiction desk · character notes</span><span class="es">Mesa de ficción · notas de personaje</span></span>
+  </div>
+  <h1><span class="en">Character Workbench</span><span class="es">Taller de personajes</span></h1>
+  <p class="dek"><span class="en">Pick or roll each part of a character, lock what you like, and turn the result into a writing prompt. The reference below explains every choice.</span><span class="es">Elegí o sorteá cada parte de un personaje, bloqueá lo que te guste y convertí el resultado en una consigna de escritura. Más abajo se explica cada elección.</span></p>
+  <nav class="sections" aria-label="Sections">
+    <a href="#builder"><span class="en">Builder</span><span class="es">Armado</span></a>
+    <a href="#inside-out"><span class="en">Inside out</span><span class="es">De adentro hacia afuera</span></a>
+    <a href="#needs"><span class="en">Needs</span><span class="es">Necesidades</span></a>
+    <a href="#wound"><span class="en">Wound, want, need</span><span class="es">Herida, deseo, necesidad</span></a>
+    <a href="#goals"><span class="en">Goals</span><span class="es">Metas</span></a>
+    <a href="#motives"><span class="en">Motives</span><span class="es">Motivos</span></a>
+    <a href="#paths"><span class="en">Paths</span><span class="es">Caminos</span></a>
+    <a href="#drive"><span class="en">Drive</span><span class="es">Motor</span></a>
+    <a href="#context"><span class="en">Context</span><span class="es">Contexto</span></a>
+    <a href="#coherence"><span class="en">Coherence</span><span class="es">Coherencia</span></a>
+    <a href="#ridiculo"><span class="en">The ridiculous</span><span class="es">El ridículo</span></a>
+    <a href="#moral"><span class="en">Morality</span><span class="es">Moral</span></a>
+    <a href="#scales"><span class="en">Scales</span><span class="es">Escalas</span></a>
+    <a href="#surface"><span class="en">Surface</span><span class="es">Superficie</span></a>
+    <a href="#mannerisms"><span class="en">Mannerisms</span><span class="es">Gestos</span></a>
+    <a href="#cast"><span class="en">Cast</span><span class="es">Elenco</span></a>
+    <a href="#time"><span class="en">Three times</span><span class="es">Tres tiempos</span></a>
+    <a href="name.html"><span class="en">Names by generation ↗</span><span class="es">Nombres por generación ↗</span></a>
+  </nav>
+</header>
+
+<section class="builder" id="builder">
+  <aside class="slip">
+    <div class="slip-inner">
+      <span class="kicker"><span class="en">Your prompt</span><span class="es">Tu consigna</span></span>
+      <h2 id="slipTitle">Character</h2>
+      <div id="prompt" aria-live="polite"></div>
+      <div class="slip-btns">
+        <button class="btn" type="button" id="copyBtn"><span class="en">Copy prompt</span><span class="es">Copiar consigna</span></button>
+        <button class="ghost" type="button" id="rollBtn2"><span class="en">Roll unlocked</span><span class="es">Sortear lo no bloqueado</span></button>
+      </div>
+      <div class="toast" id="toast"></div>
+    </div>
+  </aside>
+  <div class="fields">
+    <div class="rollbar">
+      <button class="btn" type="button" id="rollBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.4" fill="currentColor"/><circle cx="16" cy="16" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/></svg><span class="en">Roll unlocked</span><span class="es">Sortear lo no bloqueado</span></button>
+      <button class="ghost" type="button" id="unlockBtn"><span class="en">Unlock all</span><span class="es">Desbloquear todo</span></button>
+      <div class="dk-seg" role="group" aria-label="Mode" id="modeSeg"><button type="button" data-mode="simple"><span class="en">Simple</span><span class="es">Simple</span></button><button type="button" data-mode="full"><span class="en">Full</span><span class="es">Completo</span></button></div>
+      <span class="locked-count" id="lockedCount"></span>
+    </div>
+    <div id="groups"></div>
+  </div>
+</section>
+
+<section class="ref-sec" id="inside-out">
+  <span class="kicker"><span class="en">Foundation</span><span class="es">Base</span></span>
+  <h2><span class="en">Build from the inside out</span><span class="es">Construir de adentro hacia afuera</span></h2>
+  <div class="two">
+    <div class="prose">
+      <p class="en">Start with one short sentence the character lives by. Everything else grows from it: a backstory that explains why they believe it, a temperament that colours how they act on it, and the visible layer of gestures, speech and clothes.</p>
+      <p class="es">Empezá por una frase corta con la que vive el personaje. Todo lo demás crece desde ahí: una historia previa que explica por qué lo cree, un temperamento que tiñe cómo actúa, y la capa visible de gestos, forma de hablar y ropa.</p>
+      <p class="en">Working backwards, from a cool outfit or a quirky habit toward a belief, tends to produce a hollow character. The details don't add up to anyone.</p>
+      <p class="es">Trabajar al revés, desde una ropa llamativa o una manía curiosa hacia la creencia, suele dar un personaje hueco. Los detalles no suman a nadie.</p>
+      <p class="en"><b>Unspoken rules</b> are a quick test. A rule the character refuses to break (never gives an opinion, never asks for help) shows the belief without stating it.</p>
+      <p class="es">Las <b>reglas no dichas</b> son una prueba rápida. Una regla que el personaje se niega a romper (nunca opina, nunca pide ayuda) muestra la creencia sin enunciarla.</p>
+    </div>
+    <figure>
+      <div class="svgbox"><svg class="fig" viewBox="0 0 620 380" role="img" aria-label="Pyramid: core belief, internal and external elements, actions">
+        <defs><marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0L10 5L0 10z"/></marker></defs>
+        <polygon class="soft" points="300,20 384,130 216,130"/>
+        <polygon class="box" points="216,130 384,130 476,250 124,250"/>
+        <line class="ln" x1="300" y1="130" x2="300" y2="250"/>
+        <polygon class="box" points="124,250 476,250 560,360 40,360"/>
+        <text class="t-h" x="300" y="98" text-anchor="middle"><tspan class="en">ACTIONS</tspan><tspan class="es">ACCIONES</tspan></text>
+        <text class="t-s" x="300" y="118" text-anchor="middle"><tspan class="en">what they do</tspan><tspan class="es">lo que hace</tspan></text>
+        <text class="t-h" x="245" y="170" text-anchor="middle"><tspan class="en">INTERNAL</tspan><tspan class="es">INTERNO</tspan></text>
+        <text class="t-s" x="245" y="192" text-anchor="middle"><tspan class="en">backstory</tspan><tspan class="es">historia previa</tspan></text>
+        <text class="t-s" x="245" y="209" text-anchor="middle"><tspan class="en">personality</tspan><tspan class="es">personalidad</tspan></text>
+        <text class="t-h" x="360" y="170" text-anchor="middle"><tspan class="en">EXTERNAL</tspan><tspan class="es">EXTERNO</tspan></text>
+        <text class="t-s" x="360" y="192" text-anchor="middle"><tspan class="en">mannerisms</tspan><tspan class="es">gestos</tspan></text>
+        <text class="t-s" x="360" y="209" text-anchor="middle"><tspan class="en">speech</tspan><tspan class="es">forma de hablar</tspan></text>
+        <text class="t-s" x="360" y="226" text-anchor="middle"><tspan class="en">appearance</tspan><tspan class="es">apariencia</tspan></text>
+        <text class="t-h" x="300" y="302" text-anchor="middle" style="font-size:16px"><tspan class="en">CORE BELIEF</tspan><tspan class="es">CREENCIA CENTRAL</tspan></text>
+        <text class="t-s" x="300" y="326" text-anchor="middle"><tspan class="en">one sentence the character lives by</tspan><tspan class="es">una frase con la que vive el personaje</tspan></text>
+        <line class="ln" x1="590" y1="350" x2="590" y2="30" marker-end="url(#arr)"/>
+        <text class="t-s" transform="translate(608 190) rotate(-90)" text-anchor="middle"><tspan class="en">build upward</tspan><tspan class="es">construir hacia arriba</tspan></text>
+      </svg></div>
+      <div class="live"><div><span class="lbl"><span class="en">Belief</span><span class="es">Creencia</span></span><span id="lv-belief"></span></div><div><span class="lbl"><span class="en">Code</span><span class="es">Código</span></span><span id="lv-code"></span></div></div>
+    </figure>
+  </div>
+</section>
+
+<section class="ref-sec" id="needs">
+  <span class="kicker"><span class="en">Motivation</span><span class="es">Motivación</span></span>
+  <h2><span class="en">What level of need drives them?</span><span class="es">¿Qué nivel de necesidad lo mueve?</span></h2>
+  <div class="two">
+    <div class="prose">
+      <p class="en">Maslow's hierarchy sorts needs from survival at the bottom to self-fulfilment at the top. A character fighting for food and safety behaves very differently from one fighting for respect.</p>
+      <p class="es">La pirámide de Maslow ordena las necesidades desde la supervivencia, abajo, hasta la realización personal, arriba. Un personaje que pelea por comida y seguridad actúa muy distinto de uno que pelea por respeto.</p>
+      <p class="en">Most stories live in the middle: <b>love and belonging</b> and <b>esteem</b> carry the most dramatic weight, because they involve other people. Safety stakes work best as sudden pressure. Self-actualization is powerful but quieter.</p>
+      <p class="es">La mayoría de las historias vive en el medio: <b>amor y pertenencia</b> y <b>estima</b> tienen más peso dramático porque involucran a otras personas. Lo que está en juego en la seguridad funciona mejor como presión repentina. La autorrealización es potente pero más silenciosa.</p>
+      <p class="en">A strong move is to knock a character down a level: someone chasing status suddenly has to worry about rent.</p>
+      <p class="es">Una jugada fuerte es bajar al personaje un escalón: alguien que buscaba prestigio de golpe tiene que preocuparse por el alquiler.</p>
+      <p><i><span class="en">Click a level to set it in the builder.</span><span class="es">Hacé clic en un nivel para elegirlo en el armado.</span></i></p>
+    </div>
+    <figure>
+      <div class="svgbox"><svg class="fig" viewBox="0 0 660 360" role="img" aria-label="Maslow pyramid">
+        <g class="mz" data-i="0" tabindex="0" role="button"><polygon points="60,276 380,276 420,340 20,340"/><text class="num" x="220" y="313" text-anchor="middle">1</text></g>
+        <g class="mz" data-i="1" tabindex="0" role="button"><polygon points="100,212 340,212 380,276 60,276"/><text class="num" x="220" y="249" text-anchor="middle">2</text></g>
+        <g class="mz" data-i="2" tabindex="0" role="button"><polygon points="140,148 300,148 340,212 100,212"/><text class="num" x="220" y="185" text-anchor="middle">3</text></g>
+        <g class="mz" data-i="3" tabindex="0" role="button"><polygon points="180,84 260,84 300,148 140,148"/><text class="num" x="220" y="121" text-anchor="middle">4</text></g>
+        <g class="mz" data-i="4" tabindex="0" role="button"><polygon points="220,20 260,84 180,84"/><text class="num" x="220" y="70" text-anchor="middle">5</text></g>
+        <line class="dash" x1="250" y1="62" x2="432" y2="62"/><text class="t-h" x="440" y="58"><tspan class="en">SELF-ACTUALIZATION</tspan><tspan class="es">AUTORREALIZACIÓN</tspan></text><text class="t-s" x="440" y="74"><tspan class="en">becoming the most one can be</tspan><tspan class="es">llegar a ser lo máximo posible</tspan></text>
+        <line class="dash" x1="280" y1="116" x2="432" y2="116"/><text class="t-h" x="440" y="112"><tspan class="en">ESTEEM</tspan><tspan class="es">ESTIMA</tspan></text><text class="t-s" x="440" y="128"><tspan class="en">respect, status, self-worth</tspan><tspan class="es">respeto, estatus, valor propio</tspan></text>
+        <line class="dash" x1="320" y1="180" x2="432" y2="180"/><text class="t-h" x="440" y="176"><tspan class="en">LOVE &amp; BELONGING</tspan><tspan class="es">AMOR Y PERTENENCIA</tspan></text><text class="t-s" x="440" y="192"><tspan class="en">friends, family, intimacy</tspan><tspan class="es">amistad, familia, intimidad</tspan></text>
+        <line class="dash" x1="360" y1="244" x2="432" y2="244"/><text class="t-h" x="440" y="240"><tspan class="en">SAFETY</tspan><tspan class="es">SEGURIDAD</tspan></text><text class="t-s" x="440" y="256"><tspan class="en">security, work, resources</tspan><tspan class="es">protección, trabajo, recursos</tspan></text>
+        <line class="dash" x1="400" y1="308" x2="432" y2="308"/><text class="t-h" x="440" y="304"><tspan class="en">PHYSIOLOGICAL</tspan><tspan class="es">FISIOLÓGICO</tspan></text><text class="t-s" x="440" y="320"><tspan class="en">food, water, shelter, sleep</tspan><tspan class="es">comida, agua, techo, sueño</tspan></text>
+      </svg></div>
+      <figcaption><span class="en">The highlighted level is the one your current character is acting from.</span><span class="es">El nivel resaltado es desde el que actúa tu personaje actual.</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="ref-sec" id="wound">
+  <span class="kicker"><span class="en">The sacred flaw</span><span class="es">El defecto sagrado</span></span>
+  <h2><span class="en">Wound, want, need</span><span class="es">Herida, deseo, necesidad</span></h2>
+  <div class="two">
+    <div class="prose">
+      <p class="en"><b>The wound</b> is a past event that left a false belief behind. <b>The want</b> is the concrete thing the character chases to soothe it; it gives temporary relief at best. <b>The need</b> is the hard truth that would actually heal them, and it usually points the opposite way from the want.</p>
+      <p class="es"><b>La herida</b> es un hecho del pasado que dejó una creencia falsa. <b>El deseo</b> es lo concreto que el personaje persigue para calmarla; como mucho da un alivio pasajero. <b>La necesidad</b> es la verdad difícil que de verdad lo sanaría, y casi siempre apunta en dirección contraria al deseo.</p>
+      <p class="en">The arc tests the flaw at four moments. The inciting incident pushes them out of their routine. At the midpoint something makes them question the flaw. At the climax they choose between the want and the need. The resolution shows how that choice changes their future, for better or worse.</p>
+      <p class="es">El arco pone a prueba el defecto en cuatro momentos. El detonante lo saca de su rutina. En el punto medio algo le hace dudar del defecto. En el clímax elige entre el deseo y la necesidad. La resolución muestra cómo esa elección cambia su futuro, para bien o para mal.</p>
+      <p class="en">The flaw should also show in daily behaviour and in relationships: who they push away, what kind of people they attract.</p>
+      <p class="es">El defecto también tiene que verse en la conducta diaria y en los vínculos: a quién aleja, qué tipo de personas atrae.</p>
+    </div>
+    <figure>
+      <div class="svgbox"><svg class="fig" viewBox="0 0 640 150" role="img" aria-label="Wound, want, need">
+        <defs><marker id="arr2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0L10 5L0 10z"/></marker></defs>
+        <rect class="box" x="10" y="20" width="170" height="80" rx="3"/><text class="t-h" x="95" y="54" text-anchor="middle"><tspan class="en">THE WOUND</tspan><tspan class="es">LA HERIDA</tspan></text><text class="t-s" x="95" y="76" text-anchor="middle"><tspan class="en">what happened</tspan><tspan class="es">lo que pasó</tspan></text>
+        <rect class="soft" x="235" y="20" width="170" height="80" rx="3"/><text class="t-h" x="320" y="54" text-anchor="middle"><tspan class="en">THE WANT</tspan><tspan class="es">EL DESEO</tspan></text><text class="t-s" x="320" y="76" text-anchor="middle"><tspan class="en">what they chase</tspan><tspan class="es">lo que persigue</tspan></text>
+        <rect class="bg" x="460" y="20" width="170" height="80" rx="3"/><text class="t-h" x="545" y="54" text-anchor="middle"><tspan class="en">THE NEED</tspan><tspan class="es">LA NECESIDAD</tspan></text><text class="t-s" x="545" y="76" text-anchor="middle"><tspan class="en">what would heal them</tspan><tspan class="es">lo que sanaría</tspan></text>
+        <line class="ln" x1="182" y1="60" x2="231" y2="60" marker-end="url(#arr2)"/>
+        <line class="dash" x1="409" y1="60" x2="456" y2="60" marker-start="url(#arr2)" marker-end="url(#arr2)"/>
+        <text class="t-s" x="207" y="50" text-anchor="middle"><tspan class="en">drives</tspan><tspan class="es">impulsa</tspan></text>
+        <text class="t-s" x="432" y="50" text-anchor="middle"><tspan class="en">opposite</tspan><tspan class="es">opuesto</tspan></text>
+        <text class="t-s" x="320" y="134" text-anchor="middle"><tspan class="en">The want soothes the wound. Only the need heals it.</tspan><tspan class="es">El deseo alivia la herida. Solo la necesidad la sana.</tspan></text>
+      </svg></div>
+      <div class="svgbox" style="margin-top:14px"><svg class="fig" viewBox="0 0 640 215" role="img" aria-label="Arc">
+        <polyline class="accs" points="20,185 110,165 270,130 460,65 610,110"/>
+        <circle class="ink" cx="110" cy="165" r="5"/><circle class="ink" cx="270" cy="130" r="5"/><circle class="acc" cx="460" cy="65" r="7"/><circle class="ink" cx="610" cy="110" r="5"/>
+        <text class="t-h" x="110" y="192" text-anchor="middle"><tspan class="en">INCITING</tspan><tspan class="es">DETONANTE</tspan></text><text class="t-s" x="110" y="207" text-anchor="middle"><tspan class="en">pushed out of routine</tspan><tspan class="es">sale de su rutina</tspan></text>
+        <text class="t-h" x="270" y="157" text-anchor="middle"><tspan class="en">MIDPOINT</tspan><tspan class="es">PUNTO MEDIO</tspan></text><text class="t-s" x="270" y="172" text-anchor="middle"><tspan class="en">flaw questioned</tspan><tspan class="es">duda del defecto</tspan></text>
+        <text class="t-h" x="460" y="32" text-anchor="middle"><tspan class="en">CLIMAX</tspan><tspan class="es">CLÍMAX</tspan></text><text class="t-s" x="460" y="47" text-anchor="middle"><tspan class="en">want or need?</tspan><tspan class="es">¿deseo o necesidad?</tspan></text>
+        <text class="t-h" x="615" y="137" text-anchor="end"><tspan class="en">RESOLUTION</tspan><tspan class="es">RESOLUCIÓN</tspan></text><text class="t-s" x="615" y="152" text-anchor="end"><tspan class="en">a changed future</tspan><tspan class="es">un futuro distinto</tspan></text>
+      </svg></div>
+      <div class="live"><div><span class="lbl"><span class="en">Wound</span><span class="es">Herida</span></span><span id="lv-wound"></span></div><div><span class="lbl"><span class="en">Want</span><span class="es">Deseo</span></span><span id="lv-want"></span></div><div><span class="lbl"><span class="en">Need</span><span class="es">Necesidad</span></span><span id="lv-need"></span></div></div>
+    </figure>
+  </div>
+</section>
+
+<section class="ref-sec" id="goals">
+  <span class="kicker"><span class="en">Goals</span><span class="es">Metas</span></span>
+  <h2><span class="en">Three questions for any goal</span><span class="es">Tres preguntas para cualquier meta</span></h2>
+  <div class="three-q">
+    <div><b><span class="en">Can you film it?</span><span class="es">¿Se puede filmar?</span></b><span class="d"><span class="en">The goal must be visible and external. "Find peace" can't be filmed; "get the house back" can.</span><span class="es">La meta tiene que ser visible y externa. "Encontrar la paz" no se filma; "recuperar la casa", sí.</span></span></div>
+    <div><b><span class="en">Does it create opposition?</span><span class="es">¿Genera oposición?</span></b><span class="d"><span class="en">Pursuing it should run into people, obstacles and rivals who act against it.</span><span class="es">Perseguirla tiene que chocar con personas, obstáculos y rivales que actúan en contra.</span></span></div>
+    <div><b><span class="en">Does it cost something they value?</span><span class="es">¿Le cuesta algo que valora?</span></b><span class="d"><span class="en">Real stakes mean compromise and moral choices. The builder's "impossible choice" field covers this.</span><span class="es">Lo que está en juego implica concesiones y elecciones morales. El campo "elección imposible" del armado cubre esto.</span></span></div>
+  </div>
+  <div class="two" style="margin-top:28px">
+    <div class="prose">
+      <p class="en">A good goal is also a <b>story catalyst</b>. It does six jobs at once.</p>
+      <p class="es">Una buena meta también es un <b>catalizador de la historia</b>. Cumple seis funciones a la vez.</p>
+    </div>
+    <div class="prose">
+      <ol class="mandates">
+        <li><span><span class="en">It is visible and active.</span><span class="es">Es visible y activa.</span></span></li>
+        <li><span><span class="en">It shapes the whole story, start to end.</span><span class="es">Da forma a toda la historia, de principio a fin.</span></span></li>
+        <li><span><span class="en">The audience understands it clearly.</span><span class="es">El lector la entiende con claridad.</span></span></li>
+        <li><span><span class="en">It unites the ensemble around it.</span><span class="es">Une al elenco a su alrededor.</span></span></li>
+        <li><span><span class="en">It divides the ensemble when interests clash.</span><span class="es">Divide al elenco cuando chocan los intereses.</span></span></li>
+        <li><span><span class="en">It forces the protagonist into impossible choices.</span><span class="es">Obliga al protagonista a elecciones imposibles.</span></span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="ref-sec" id="motives">
+  <span class="kicker"><span class="en">Motives</span><span class="es">Motivos</span></span>
+  <h2><span class="en">Two motives, one engine</span><span class="es">Dos motivos, un motor</span><span class="new">Verni</span></h2>
+  <div class="two">
+    <div class="prose">
+      <p class="en">A <b>motive</b> is a pressing reason that turns an argument into energy for action and makes the character's decisions justifiable. Motives are the fuel.</p>
+      <p class="es">Un <b>motivo</b> es una razón apremiante que convierte un argumento en energía para la acción y vuelve justificables las decisiones. Los motivos son el combustible del personaje.</p>
+      <p class="en"><b>Motives in conflict.</b> When two motives collide, the context decides which is more pressing: if you are thirsty and hungry, you drink first. The builder now gives the character a second motive that pulls against the visible goal.</p>
+      <p class="es"><b>Motivos en conflicto.</b> Cuando dos motivos chocan, el contexto decide cuál es más apremiante: si tenés sed y hambre, primero tomás agua. El armado ahora le da al personaje un segundo motivo que tira en contra de la meta visible.</p>
+      <p class="en">Motives also change as the character transforms, especially in longer pieces.</p>
+      <p class="es">Los motivos también cambian a lo largo de la transformación del personaje, sobre todo en relatos extensos.</p>
+      <p class="en"><b>The two great engines.</b> <b>Obsession</b> comes from inside: no peace until a problem with no solution is solved (the detective, Gatsby). <b>Destiny</b> comes from outside: circumstances force the hero toward a goal (The Matrix, The Lord of the Rings). Both give constant motivation, which is why they sustain long stories.</p>
+      <p class="es"><b>Los dos grandes motores.</b> La <b>obsesión</b> viene de adentro: no hay paz hasta resolver un problema que no tiene solución (el detective, Gatsby). El <b>destino</b> viene de afuera: las circunstancias obligan al héroe a cumplir una meta (Matrix, El Señor de los Anillos). Los dos dan motivación constante, y por eso sostienen relatos largos.</p>
+    </div>
+    <figure>
+      <div class="svgbox"><svg class="fig" viewBox="0 0 600 240" role="img" aria-label="Obsession and destiny">
+        <defs><marker id="arr6" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="ah" d="M0 0L10 5L0 10z"/></marker></defs>
+        <g class="eng" id="eng-0">
+          <circle class="soft" cx="150" cy="105" r="58"/>
+          <circle class="ink" cx="150" cy="105" r="6"/>
+          <line class="ln" x1="150" y1="98" x2="150" y2="22" marker-end="url(#arr6)"/>
+          <line class="ln" x1="157" y1="105" x2="233" y2="105" marker-end="url(#arr6)"/>
+          <line class="ln" x1="150" y1="112" x2="150" y2="188" marker-end="url(#arr6)"/>
+          <line class="ln" x1="143" y1="105" x2="67" y2="105" marker-end="url(#arr6)"/>
+          <text class="t-h" x="150" y="216" text-anchor="middle"><tspan class="en">OBSESSION</tspan><tspan class="es">OBSESIÓN</tspan></text>
+          <text class="t-s" x="150" y="233" text-anchor="middle"><tspan class="en">comes from inside</tspan><tspan class="es">viene de adentro</tspan></text>
+        </g>
+        <g class="eng" id="eng-1">
+          <circle class="bg" cx="450" cy="105" r="58"/>
+          <circle class="ink" cx="450" cy="105" r="6"/>
+          <line class="ln" x1="450" y1="8" x2="450" y2="42" marker-end="url(#arr6)"/>
+          <line class="ln" x1="560" y1="105" x2="513" y2="105" marker-end="url(#arr6)"/>
+          <line class="ln" x1="450" y1="198" x2="450" y2="168" marker-end="url(#arr6)"/>
+          <line class="ln" x1="340" y1="105" x2="387" y2="105" marker-end="url(#arr6)"/>
+          <text class="t-h" x="450" y="216" text-anchor="middle"><tspan class="en">DESTINY</tspan><tspan class="es">DESTINO</tspan></text>
+          <text class="t-s" x="450" y="233" text-anchor="middle"><tspan class="en">comes from outside</tspan><tspan class="es">viene de afuera</tspan></text>
+        </g>
+      </svg></div>
+      <figcaption><span class="en">The engine in full colour is your character's current one.</span><span class="es">El motor a color es el de tu personaje actual.</span></figcaption>
+      <div class="live"><div><span class="lbl"><span class="en">Visible goal</span><span class="es">Meta visible</span></span><span id="lv-mot1"></span></div><div><span class="lbl"><span class="en">Competing motive</span><span class="es">Motivo en conflicto</span></span><span id="lv-mot2"></span></div><div><span class="lbl"><span class="en">Engine</span><span class="es">Motor</span></span><span id="lv-engine"></span></div></div>
+    </figure>
+  </div>
+</section>
+
+<section class="ref-sec" id="paths">
+  <span class="kicker"><span class="en">Motivation paths</span><span class="es">Caminos de motivación</span></span>
+  <h2><span class="en">How the character moves toward the goal</span><span class="es">Cómo avanza el personaje hacia la meta</span></h2>
+  <p class="intro"><span class="en">The shape of the route matters as much as the destination. Click a path to set it in the builder.</span><span class="es">La forma del recorrido importa tanto como el destino. Hacé clic en un camino para elegirlo en el armado.</span></p>
+  <div class="paths">
+    <button class="path" type="button" data-i="0">
+      <svg class="fig" viewBox="0 0 220 90" aria-hidden="true"><circle class="bg" cx="20" cy="45" r="10"/><line class="ln" x1="30" y1="45" x2="188" y2="45"/><polygon class="soft" points="110,31 124,45 110,59 96,45"/><rect class="acc" x="188" y="35" width="20" height="20"/><text class="t-s" x="110" y="80" text-anchor="middle"><tspan class="en">a value in the way</tspan><tspan class="es">un valor en el camino</tspan></text></svg>
+      <strong><span class="en">Straight</span><span class="es">Recto</span></strong><span class="d"><span class="en">The goal collides with something they love, like career against home.</span><span class="es">La meta choca con algo que ama, como la carrera contra el hogar.</span></span>
+    </button>
+    <button class="path" type="button" data-i="1">
+      <svg class="fig" viewBox="0 0 220 90" aria-hidden="true"><circle class="bg" cx="20" cy="45" r="10"/><line class="ln" x1="30" y1="45" x2="118" y2="45"/><line class="ln" x1="120" y1="35" x2="140" y2="55" style="stroke-width:3"/><line class="ln" x1="140" y1="35" x2="120" y2="55" style="stroke-width:3"/><line class="dash" x1="148" y1="45" x2="188" y2="45"/><rect class="dash" x="188" y="35" width="20" height="20"/></svg>
+      <strong><span class="en">Impossible</span><span class="es">Imposible</span></strong><span class="d"><span class="en">What they want can't be had. The story is about how they live with that.</span><span class="es">Lo que quiere no se puede tener. La historia trata de cómo vive con eso.</span></span>
+    </button>
+    <button class="path" type="button" data-i="2">
+      <svg class="fig" viewBox="0 0 220 90" aria-hidden="true"><circle class="bg" cx="20" cy="70" r="10"/><path class="ln" d="M28 63 Q110 -12 192 63"/><circle class="soft" cx="110" cy="27" r="7"/><circle class="acc" cx="200" cy="70" r="10"/></svg>
+      <strong><span class="en">Curving</span><span class="es">Curvo</span></strong><span class="d"><span class="en">They reach the goal indirectly, through another person.</span><span class="es">Llega a la meta de forma indirecta, a través de otra persona.</span></span>
+    </button>
+    <button class="path" type="button" data-i="3">
+      <svg class="fig" viewBox="0 0 220 90" aria-hidden="true"><circle class="bg" cx="20" cy="45" r="10"/><line class="dot" x1="32" y1="45" x2="68" y2="45"/><circle class="bg" cx="80" cy="45" r="10"/><line class="ln" x1="73" y1="52" x2="87" y2="38"/><line class="dot" x1="92" y1="45" x2="118" y2="45"/><circle class="bg" cx="130" cy="45" r="10"/><line class="ln" x1="123" y1="52" x2="137" y2="38"/><line class="dot" x1="142" y1="45" x2="180" y2="45"/><circle class="soft" cx="195" cy="45" r="13"/><text class="t-h" x="195" y="50" text-anchor="middle">?</text></svg>
+      <strong><span class="en">Changing</span><span class="es">Cambiante</span></strong><span class="d"><span class="en">They refuse the call, refuse again, then commit to a new goal.</span><span class="es">Se niega, vuelve a negarse y después se compromete con una meta nueva.</span></span>
+    </button>
+    <button class="path" type="button" data-i="4">
+      <svg class="fig" viewBox="0 0 220 90" aria-hidden="true"><circle class="bg" cx="20" cy="18" r="8"/><circle class="bg" cx="20" cy="45" r="8"/><circle class="bg" cx="20" cy="72" r="8"/><line class="dot" x1="30" y1="20" x2="182" y2="44"/><line class="dot" x1="30" y1="45" x2="182" y2="45"/><line class="dot" x1="30" y1="70" x2="182" y2="46"/><circle class="acc" cx="196" cy="45" r="13"/><line class="onacc" x1="189" y1="45" x2="203" y2="45"/><line class="onacc" x1="196" y1="38" x2="196" y2="52"/></svg>
+      <strong><span class="en">Different</span><span class="es">Diferente</span></strong><span class="d"><span class="en">Several characters want the same thing, each for their own reason.</span><span class="es">Varios personajes quieren lo mismo, cada uno por su propia razón.</span></span>
+    </button>
+  </div>
+</section>
+
+<section class="ref-sec" id="drive">
+  <span class="kicker"><span class="en">Drive</span><span class="es">Motor</span></span>
+  <h2><span class="en">From inner drive to the end of the story</span><span class="es">Del motor interno al final de la historia</span></h2>
+  <div class="two">
+    <div class="prose">
+      <p class="en">The core need stays inside. The reader only sees it through four channels: what the character <b>says</b>, what they <b>do</b>, what they <b>did</b> before the story, and the <b>world</b> around them.</p>
+      <p class="es">La necesidad central queda adentro. El lector solo la ve por cuatro canales: lo que el personaje <b>dice</b>, lo que <b>hace</b>, lo que <b>hizo</b> antes de la historia y el <b>entorno</b> que lo rodea.</p>
+      <p class="en">Two things can complicate the pursuit: a <b>hidden drive</b> revealed later as a twist, and <b>obstacles</b> that test their resolve.</p>
+      <p class="es">Dos cosas pueden complicar la búsqueda: un <b>motivo oculto</b> que se revela después como giro, y <b>obstáculos</b> que ponen a prueba su determinación.</p>
+      <p class="en">The pursuit then ends in one of four ways: they keep pushing, they hold on for a deeper reason, they bend and want something new, or they accept that the goal is out of reach. Some psychology stays unknowable, and that is fine.</p>
+      <p class="es">La búsqueda termina de una de cuatro maneras: sigue empujando, resiste por una razón más profunda, se dobla y quiere algo nuevo, o acepta que la meta está fuera de alcance. Parte de la psicología queda en lo desconocido, y está bien.</p>
+    </div>
+    <figure>
+      <div class="svgbox"><svg class="fig" viewBox="0 0 780 290" role="img" aria-label="Drive flow" style="min-width:560px">
+        <defs><marker id="arr3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path class="ah" d="M0 0L10 5L0 10z"/></marker></defs>
+        <rect class="soft" x="10" y="115" width="110" height="60" rx="3"/><text class="t-h2" x="65" y="141" text-anchor="middle"><tspan class="en">CORE</tspan><tspan class="es">NECESIDAD</tspan></text><text class="t-h2" x="65" y="158" text-anchor="middle"><tspan class="en">NEED</tspan><tspan class="es">CENTRAL</tspan></text>
+        <rect class="box" x="170" y="15" width="130" height="40" rx="3"/><text class="t-h2" x="235" y="40" text-anchor="middle"><tspan class="en">DIALOGUE</tspan><tspan class="es">DIÁLOGO</tspan></text>
+        <rect class="box" x="170" y="85" width="130" height="40" rx="3"/><text class="t-h2" x="235" y="110" text-anchor="middle"><tspan class="en">BEHAVIOR</tspan><tspan class="es">CONDUCTA</tspan></text>
+        <rect class="box" x="170" y="155" width="130" height="40" rx="3"/><text class="t-h2" x="235" y="180" text-anchor="middle"><tspan class="en">PAST ACTIONS</tspan><tspan class="es">SU PASADO</tspan></text>
+        <rect class="box" x="170" y="225" width="130" height="40" rx="3"/><text class="t-h2" x="235" y="250" text-anchor="middle"><tspan class="en">SOCIAL CONTEXT</tspan><tspan class="es">ENTORNO</tspan></text>
+        <g class="ln">
+          <line x1="120" y1="145" x2="167" y2="35" marker-end="url(#arr3)"/><line x1="120" y1="145" x2="167" y2="105" marker-end="url(#arr3)"/><line x1="120" y1="145" x2="167" y2="175" marker-end="url(#arr3)"/><line x1="120" y1="145" x2="167" y2="245" marker-end="url(#arr3)"/>
+          <line x1="300" y1="35" x2="347" y2="140" marker-end="url(#arr3)"/><line x1="300" y1="105" x2="347" y2="143" marker-end="url(#arr3)"/><line x1="300" y1="175" x2="347" y2="147" marker-end="url(#arr3)"/><line x1="300" y1="245" x2="347" y2="150" marker-end="url(#arr3)"/>
+          <line x1="480" y1="145" x2="537" y2="35" marker-end="url(#arr3)"/><line x1="480" y1="145" x2="537" y2="105" marker-end="url(#arr3)"/><line x1="480" y1="145" x2="537" y2="175" marker-end="url(#arr3)"/><line x1="480" y1="145" x2="537" y2="245" marker-end="url(#arr3)"/>
+          <line x1="415" y1="225" x2="415" y2="183" marker-end="url(#arr3)"/>
+        </g>
+        <rect class="box" x="350" y="110" width="130" height="70" rx="3" style="stroke-width:2.5"/><text class="t-h2" x="415" y="141" text-anchor="middle"><tspan class="en">PURSUES</tspan><tspan class="es">PERSIGUE</tspan></text><text class="t-h2" x="415" y="158" text-anchor="middle"><tspan class="en">THE GOAL</tspan><tspan class="es">LA META</tspan></text>
+        <rect class="bg" x="350" y="225" width="130" height="44" rx="3" style="stroke-dasharray:4 4"/><text class="t-s" x="415" y="243" text-anchor="middle"><tspan class="en">hidden drive</tspan><tspan class="es">motivo oculto</tspan></text><text class="t-s" x="415" y="259" text-anchor="middle"><tspan class="en">obstacles</tspan><tspan class="es">obstáculos</tspan></text>
+        <rect class="box" x="540" y="15" width="200" height="40" rx="3"/><text class="t-h2" x="640" y="40" text-anchor="middle"><tspan class="en">PERSISTENT DRIVE</tspan><tspan class="es">IMPULSO PERSISTENTE</tspan></text>
+        <rect class="box" x="540" y="85" width="200" height="40" rx="3"/><text class="t-h2" x="640" y="110" text-anchor="middle"><tspan class="en">ANCHORED RESOLVE</tspan><tspan class="es">RESOLUCIÓN ANCLADA</tspan></text>
+        <rect class="box" x="540" y="155" width="200" height="40" rx="3"/><text class="t-h2" x="640" y="180" text-anchor="middle"><tspan class="en">REDEFINED GOAL</tspan><tspan class="es">META REDEFINIDA</tspan></text>
+        <rect class="box" x="540" y="225" width="200" height="40" rx="3"/><text class="t-h2" x="640" y="250" text-anchor="middle"><tspan class="en">ULTIMATE ACCEPTANCE</tspan><tspan class="es">ACEPTACIÓN FINAL</tspan></text>
+        <rect id="pursuitMark" class="acc" x="744" y="15" width="8" height="40"/>
+      </svg></div>
+      <figcaption><span class="en">The bar on the right marks your character's current outcome.</span><span class="es">La barra de la derecha marca el desenlace actual de tu personaje.</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="ref-sec" id="context">
+  <span class="kicker"><span class="en">Context</span><span class="es">Contexto</span></span>
+  <h2><span class="en">The context sets the weight of every act</span><span class="es">El contexto define el peso de cada acto</span><span class="new">Verni</span></h2>
+  <div class="two">
+    <div class="prose">
+      <p class="en"><b>Context</b> is the set of decisions, rules of interaction and psychological limits that surround the characters and act on them. It is not scenery.</p>
+      <p class="es">El <b>contexto</b> es el conjunto de decisiones, reglas de interacción y límites psicológicos que rodean a los personajes y tienen efectos sobre ellos. No es escenografía.</p>
+      <p class="en">The same act weighs differently in different contexts. In Fogwill's story, set between the seventies and eighties, informing on a colleague is abominable in a way it would not be in a democracy. In "Bienvenido a la comunidad", the comfortable, apparently happy suburb clashes with the protagonist's loneliness.</p>
+      <p class="es">El mismo acto pesa distinto según el contexto. En el cuento de Fogwill, ambientado entre los setenta y los ochenta, delatar a un colega es abominable de un modo que no lo sería en democracia. En "Bienvenido a la comunidad", el suburbio acomodado y en apariencia feliz choca con la soledad de la protagonista.</p>
+      <p class="en"><b>How to dose it.</b> Dumping all the information at once, in dialogue or description, overexposes the context. Present it as shared obviousness, the way friends don't explain what they all already know.</p>
+      <p class="es"><b>Cómo dosificarlo.</b> Volcar toda la información de golpe, en diálogos o descripciones, lo sobreexpone. Funciona mejor como una obviedad compartida, como en una charla entre amigos que no se explican lo que ya saben.</p>
+      <p class="en"><b>Gradual revelation.</b> When the facts arrive bit by bit, each one reconfigures what was already read.</p>
+      <p class="es"><b>Revelación gradual.</b> Cuando los datos aparecen de a poco, cada uno reconfigura lo que ya se leyó y le da otro sentido.</p>
+    </div>
+    <figure>
+      <div class="svgbox"><svg class="fig" viewBox="0 0 560 230" role="img" aria-label="Same act, different weight">
+        <text class="t-h" x="280" y="22" text-anchor="middle"><tspan class="en">THE SAME ACT</tspan><tspan class="es">EL MISMO ACTO</tspan></text>
+        <text class="t-v" x="280" y="44" text-anchor="middle"><tspan class="en">reporting a colleague</tspan><tspan class="es">delatar a un colega</tspan></text>
+        <line class="ln" x1="60" y1="190" x2="500" y2="190"/>
+        <rect class="box" x="130" y="160" width="90" height="30"/>
+        <rect class="acc" x="340" y="64" width="90" height="126"/>
+        <text class="t-h2" x="175" y="210" text-anchor="middle"><tspan class="en">IN DEMOCRACY</tspan><tspan class="es">EN DEMOCRACIA</tspan></text>
+        <text class="t-h2" x="385" y="210" text-anchor="middle"><tspan class="en">UNDER DICTATORSHIP</tspan><tspan class="es">BAJO DICTADURA</tspan></text>
+        <text class="t-s" x="175" y="150" text-anchor="middle"><tspan class="en">weighs this much</tspan><tspan class="es">pesa esto</tspan></text>
+        <text class="t-s" x="450" y="80"><tspan class="en">and this</tspan><tspan class="es">y esto</tspan></text>
+      </svg></div>
+      <div class="live"><div><span class="lbl"><span class="en">Where and when</span><span class="es">Dónde y cuándo</span></span><span id="lv-era"></span></div><div><span class="lbl"><span class="en">Unspoken rule</span><span class="es">Regla no dicha</span></span><span id="lv-rule"></span></div><div><span class="lbl"><span class="en">Weighs more here</span><span class="es">Acá pesa más</span></span><span id="lv-weight"></span></div></div>
+    </figure>
+  </div>
+</section>
+
+<section class="ref-sec" id="coherence">
+  <span class="kicker"><span class="en">Internal coherence</span><span class="es">Coherencia interna</span></span>
+  <h2><span class="en">Coherence before contradiction</span><span class="es">Coherencia interna antes que contradicción</span><span class="new">Verni</span></h2>
+  <div class="two">
+    <div class="prose">
+      <p class="en">The usual cure for a one-note character is "add contradictions". But the mind has no pure contradictions. It has <b>priority interests</b> and an internal coherence. That is why the builder no longer stops at "against type": it rolls two behaviors that seem to clash and a priority, and asks you to find how the priority explains both.</p>
+      <p class="es">Ante un personaje monocorde, la receta habitual es "agregarle contradicciones". Pero en la mente no hay contradicciones puras: hay <b>intereses prioritarios</b> y una coherencia interna. Por eso el armado ya no se queda en "contra el tipo": sortea dos conductas que parecen chocar y una prioridad, y te pide encontrar cómo esa prioridad explica las dos.</p>
+      <p class="en">An obsessive person can be impeccable at work and keep a disastrous bedroom. Both behaviors obey the same logic, ordered by what matters to them.</p>
+      <p class="es">Alguien obsesivo puede ser impecable en el trabajo y tener el cuarto hecho un desastre. Las dos conductas responden a la misma lógica, ordenada según lo que le importa.</p>
+      <p class="en">Even self-destructive behavior, like the loser archetype's, has its logic and an internal payoff.</p>
+      <p class="es">Incluso las conductas autodestructivas, como las del arquetipo del perdedor, tienen su lógica y una ganancia interna.</p>
+      <p class="en"><b>Working in an "L".</b> A character doesn't have to go straight from A to B. Detours make them complex: a detective who keeps her schedule and social life in the middle of a murder case.</p>
+      <p class="es"><b>Trabajar en "L".</b> Un personaje no tiene por qué ir en línea recta de A a B. Los desvíos lo vuelven complejo: una detective que investiga un crimen y sigue respetando horarios y vida social.</p>
+    </div>
+    <figure>
+      <div class="svgbox"><svg class="fig" viewBox="0 0 620 210" role="img" aria-label="Two behaviors, one priority">
+        <defs><marker id="arr5" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="ah" d="M0 0L10 5L0 10z"/></marker></defs>
+        <rect class="box" x="10" y="20" width="200" height="60" rx="3"/>
+        <text class="t-h2" x="110" y="46" text-anchor="middle"><tspan class="en">BEHAVIOR A</tspan><tspan class="es">CONDUCTA A</tspan></text>
+        <text class="t-s" x="110" y="66" text-anchor="middle"><tspan class="en">impeccable at work</tspan><tspan class="es">impecable en el trabajo</tspan></text>
+        <rect class="box" x="10" y="130" width="200" height="60" rx="3"/>
+        <text class="t-h2" x="110" y="156" text-anchor="middle"><tspan class="en">BEHAVIOR B</tspan><tspan class="es">CONDUCTA B</tspan></text>
+        <text class="t-s" x="110" y="176" text-anchor="middle"><tspan class="en">a disastrous bedroom</tspan><tspan class="es">el cuarto hecho un desastre</tspan></text>
+        <line class="dash" x1="110" y1="84" x2="110" y2="126"/>
+        <text class="t-s" x="120" y="109"><tspan class="en">contradiction?</tspan><tspan class="es">¿contradicción?</tspan></text>
+        <path class="ln" d="M212 50 C300 50 310 105 386 105" marker-end="url(#arr5)"/>
+        <path class="ln" d="M212 160 C300 160 310 105 386 105" marker-end="url(#arr5)"/>
+        <rect class="soft" x="390" y="68" width="220" height="74" rx="3"/>
+        <text class="t-h2" x="500" y="98" text-anchor="middle"><tspan class="en">ONE PRIORITY</tspan><tspan class="es">UNA PRIORIDAD</tspan></text>
+        <text class="t-s" x="500" y="118" text-anchor="middle"><tspan class="en">what matters orders everything</tspan><tspan class="es">lo que le importa ordena todo</tspan></text>
+      </svg></div>
+      <div class="live"><div><span class="lbl"><span class="en">The two behaviors</span><span class="es">Las dos conductas</span></span><span id="lv-coh-a"></span></div><div><span class="lbl"><span class="en">The priority</span><span class="es">La prioridad</span></span><span id="lv-coh-p"></span></div></div>
+    </figure>
+  </div>
+</section>
+
+<section class="ref-sec" id="ridiculo">
+  <span class="kicker"><span class="en">Method</span><span class="es">Método</span></span>
+  <h2><span class="en">The ridiculous as a method</span><span class="es">El ridículo como método</span><span class="new">Verni</span></h2>
+  <div class="two">
+    <div class="prose">
+      <p class="en">A <b>stereotype</b> is a simplified, generalized belief about a group. An <b>archetype</b> is a universal role model, present in every human narrative. Superman and Homelander share the stereotype of the indestructible superman, but belong to different archetypes: one is the hero, the other a psychotic tyrant, deeply insecure inside.</p>
+      <p class="es">Un <b>estereotipo</b> es una creencia generalizada y simplificada sobre un grupo. Un <b>arquetipo</b> es un modelo universal de rol, presente en todas las narrativas humanas. Superman y Homelander comparten el estereotipo del superhombre indestructible, pero pertenecen a arquetipos distintos: uno es el héroe y el otro un tirano psicótico, profundamente inseguro por dentro.</p>
+      <p class="en">Stereotyped characters are mechanical because we see everything coming. The method, from an idea attributed to Piglia: take a very stereotyped, archetypal character and add, at random, a quality they would never have.</p>
+      <p class="es">Los personajes estereotipados resultan mecánicos porque se ve venir todo. El método, a partir de una idea atribuida a Piglia: tomar un personaje muy estereotipado y arquetípico y sumarle al azar una cualidad que nunca tendría.</p>
+      <p class="en">The value is in the tension. You are forced to find the internal logic that joins two traits that look incompatible, and that work is exactly what makes a character organic. Plausibility is a matter of argument: with a good argument, you can connect points that are very far apart.</p>
+      <p class="es">El valor está en la tensión. Obliga a encontrar la lógica interna que une dos rasgos en apariencia incompatibles, y ese trabajo es justamente el que vuelve orgánico a un personaje. La verosimilitud es una cuestión de argumentación: con un buen argumento se conectan puntos muy lejanos.</p>
+    </div>
+    <div class="rid-panel">
+      <div class="rollbar"><button class="btn" type="button" id="ridRoll"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.4" fill="currentColor"/><circle cx="16" cy="16" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/></svg><span class="en">Roll all three</span><span class="es">Sortear los tres</span></button></div>
+      <div id="ridHost" class="grid"></div>
+      <span class="kicker"><span class="en">Your ridiculous character</span><span class="es">Tu personaje ridículo</span></span>
+      <p id="ridPrompt" aria-live="polite"></p>
+      <ol class="rid-q">
+        <li><span class="en">What priority interest joins the role and the quality?</span><span class="es">¿Qué interés prioritario une el rol y la cualidad?</span></li>
+        <li><span class="en">What do they gain from that quality, even if it is self-destructive?</span><span class="es">¿Qué gana con esa cualidad, aunque sea autodestructiva?</span></li>
+        <li><span class="en">In what scene do both appear at once?</span><span class="es">¿En qué escena aparecen las dos cosas a la vez?</span></li>
+      </ol>
+      <label for="ridLogic"><span class="en">The internal logic</span><span class="es">La lógica interna</span></label>
+      <textarea id="ridLogic"></textarea>
+      <div class="slip-btns"><button class="ghost" type="button" id="ridCopy"><span class="en">Copy character and logic</span><span class="es">Copiar personaje y lógica</span></button></div>
+      <div class="toast" id="ridToast"></div>
+    </div>
+  </div>
+</section>
+
+<section class="ref-sec" id="moral">
+  <span class="kicker"><span class="en">Morality</span><span class="es">Moral</span></span>
+  <h2><span class="en">The end of good and evil</span><span class="es">Moral de época y fin del maniqueísmo</span><span class="new">Verni</span></h2>
+  <div class="two">
+    <div class="prose">
+      <p class="en">Villains in children's animation can't leave their moral role because they are fables, made to teach right and wrong. Today's readers no longer accept purely good or purely evil characters: Breaking Bad, The Sopranos, Mad Men and Game of Thrones mark that shift.</p>
+      <p class="es">Los villanos de la animación infantil no pueden salirse de su rol moral porque son fábulas pensadas para enseñar el bien y el mal. Hoy el público ya no admite personajes puramente buenos o puramente malos: Breaking Bad, Los Soprano, Mad Men o Game of Thrones marcan ese cambio.</p>
+      <p class="en"><b>But beware the grey villain.</b> Rewrites where the villain is never quite bad (Cruella, Maleficent, Thanos) are already turning into a formula.</p>
+      <p class="es"><b>Pero ojo con el villano gris.</b> Las reescrituras donde el villano nunca es del todo malo (Cruella, Maléfica, Thanos) ya corren el riesgo de volverse cliché.</p>
+      <p class="en"><b>Selective kindness.</b> A good act in a negative character complicates rather than softens them. If someone discriminates against some people and not others, they become more perverse: it shows they <i>choose</i> to do harm, and they stop being an ignorant or a cartoon.</p>
+      <p class="es"><b>Bondad selectiva.</b> Un gesto bueno en un personaje negativo lo complejiza en lugar de suavizarlo. Si alguien discrimina a unos y no a otros, se vuelve más perverso: queda a la vista que <i>elige</i> hacer el mal, y deja de ser un ignorante o un estereotipo infantil.</p>
+    </div>
+    <figure>
+      <div class="svgbox"><svg class="fig" viewBox="0 0 600 170" role="img" aria-label="Moral spectrum">
+        <defs><marker id="arr7" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="aha" d="M0 0L10 5L0 10z"/></marker></defs>
+        <rect class="zone" x="210" y="88" width="180" height="44" rx="2"/>
+        <line class="ln" x1="40" y1="110" x2="560" y2="110"/>
+        <line class="ln" x1="40" y1="100" x2="40" y2="120"/><line class="ln" x1="560" y1="100" x2="560" y2="120"/>
+        <text class="t-h2" x="40" y="148"><tspan class="en">FABLE: GOOD</tspan><tspan class="es">FÁBULA: BUENO</tspan></text>
+        <text class="t-h2" x="560" y="148" text-anchor="end"><tspan class="en">FABLE: EVIL</tspan><tspan class="es">FÁBULA: MALO</tspan></text>
+        <text class="t-h2" x="300" y="80" text-anchor="middle"><tspan class="en">GREY</tspan><tspan class="es">GRIS</tspan></text>
+        <text class="t-s" x="300" y="150" text-anchor="middle"><tspan class="en">today, close to a formula</tspan><tspan class="es">hoy, casi una fórmula</tspan></text>
+        <path id="moralCross" class="accs" d="M80 96 Q300 10 470 96" marker-end="url(#arr7)" style="display:none"/>
+        <circle id="moralMark" class="acc" cx="300" cy="110" r="10"/>
+      </svg></div>
+      <figcaption><span class="en">The dot marks your character's moral position. A crossing character shows as an arc.</span><span class="es">El punto marca la posición moral de tu personaje. Un personaje que cruza se ve como un arco.</span></figcaption>
+      <div class="live"><div><span class="lbl"><span class="en">Position</span><span class="es">Posición</span></span><span id="lv-moral"></span></div><div><span class="lbl"><span class="en">Selective kindness</span><span class="es">Bondad selectiva</span></span><span id="lv-sel"></span></div></div>
+    </figure>
+  </div>
+</section>
+
+<section class="ref-sec" id="scales">
+  <span class="kicker"><span class="en">Three sliding scales</span><span class="es">Tres escalas</span></span>
+  <h2><span class="en">Proactivity, relatability, capability</span><span class="es">Proactividad, empatía, capacidad</span></h2>
+  <div class="two">
+    <div class="prose">
+      <p class="en">Think of each character as three dials. Readers follow a character who is high on at least one and low on another, because the gap creates room to grow.</p>
+      <p class="es">Pensá cada personaje como tres perillas. El lector sigue a un personaje que está alto en al menos una y bajo en otra, porque esa diferencia deja lugar para crecer.</p>
+      <ul class="en">
+        <li><b>Proactivity:</b> do they take charge or react? Protagonists should push the plot themselves. A villain who drives everything while the hero waits is a common problem.</li>
+        <li><b>Relatability:</b> do we like them? An early kind act, a flaw they know about, or other characters who like them all raise it.</li>
+        <li><b>Capability:</b> how good are they at what matters? Balance skills against weaknesses. Loyalty counts as a capability too.</li>
+      </ul>
+      <ul class="es">
+        <li><b>Proactividad:</b> ¿toma el mando o reacciona? El protagonista tiene que empujar la trama. Un villano que mueve todo mientras el héroe espera es un problema común.</li>
+        <li><b>Empatía:</b> ¿nos cae bien? Un gesto amable temprano, un defecto del que es consciente u otros personajes que lo quieren la suben.</li>
+        <li><b>Capacidad:</b> ¿qué tan bueno es en lo que importa? Equilibrá habilidades y debilidades. La lealtad también cuenta como capacidad.</li>
+      </ul>
+      <p class="en">Beyond the dials: a <b>flaw</b> is internal, a <b>restriction</b> is a code they impose on themselves, a <b>limitation</b> comes from outside. Dynamic characters change inside; iconic ones, like a detective in a long series, stay the same and change the world.</p>
+      <p class="es">Además de las perillas: un <b>defecto</b> es interno, una <b>restricción</b> es un código que se impone, una <b>limitación</b> viene de afuera. Los personajes dinámicos cambian por dentro; los icónicos, como el detective de una serie larga, no cambian y transforman el mundo.</p>
+    </div>
+    <figure>
+      <div class="svgbox"><svg class="fig" viewBox="0 0 600 220" role="img" aria-label="Scales"><g id="scaleSvg"></g></svg></div>
+      <figcaption><span class="en">Live: these move with the sliders in the builder.</span><span class="es">En vivo: se mueven con los controles del armado.</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="ref-sec" id="surface">
+  <span class="kicker"><span class="en">On the surface</span><span class="es">En la superficie</span></span>
+  <h2><span class="en">What makes a character memorable</span><span class="es">Qué hace memorable a un personaje</span></h2>
+  <div class="two">
+    <div class="prose">
+      <p class="en"><b>Perception gap.</b> The distance between how characters see themselves and how others see them is a steady source of drama and comedy.</p>
+      <p class="es"><b>Brecha de percepción.</b> La distancia entre cómo se ve el personaje y cómo lo ven los demás es una fuente constante de drama y de humor.</p>
+      <p class="en"><b>Symbolic possessions.</b> What someone carries says who they are: a photo, a key, a book with someone else's notes.</p>
+      <p class="es"><b>Objetos simbólicos.</b> Lo que alguien lleva encima dice quién es: una foto, una llave, un libro con notas de otra persona.</p>
+      <p class="en"><b>Contradictions with a logic.</b> One element against type makes a stereotype into a person, but only if a priority explains it. See <a href="#coherence">Coherence before contradiction</a>.</p>
+      <p class="es"><b>Contradicciones con lógica.</b> Un elemento contra el tipo convierte un estereotipo en una persona, pero solo si una prioridad lo explica. Ver <a href="#coherence">Coherencia antes que contradicción</a>.</p>
+      <p class="en"><b>Counterintuitive reactions.</b> Let them react in ways we don't expect, like laughing during a disaster.</p>
+      <p class="es"><b>Reacciones inesperadas.</b> Que reaccione de maneras que no esperamos, como reírse en medio de un desastre.</p>
+      <p class="en"><b>Immediate impact.</b> On first appearance, have them say something, then do something, then show their problem.</p>
+      <p class="es"><b>Impacto inmediato.</b> En su primera aparición, que diga algo, después que haga algo, y después que muestre su problema.</p>
+      <p class="en"><b>Foils.</b> Mentors, sidekicks and mirror antagonists reflect the main character and push on them. A foil with the same wound and the opposite choice is the sharpest kind.</p>
+      <p class="es"><b>Contrapuntos.</b> Mentores, compañeros y antagonistas espejo reflejan al protagonista y lo presionan. El más filoso tiene la misma herida y toma la decisión opuesta.</p>
+    </div>
+    <figure>
+      <div class="svgbox"><svg class="fig" viewBox="0 0 640 170" role="img" aria-label="Perception gap">
+        <defs><marker id="arr4" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0L10 5L0 10z"/></marker></defs>
+        <rect class="soft" x="10" y="40" width="250" height="90" rx="3"/><text class="t-h" x="135" y="68" text-anchor="middle"><tspan class="en">SEES THEMSELVES AS</tspan><tspan class="es">SE VE COMO</tspan></text><text class="t-v" id="pg-self" x="135" y="102" text-anchor="middle"></text>
+        <rect class="box" x="380" y="40" width="250" height="90" rx="3"/><text class="t-h" x="505" y="68" text-anchor="middle"><tspan class="en">OTHERS SEE</tspan><tspan class="es">LOS DEMÁS VEN</tspan></text><text class="t-v" id="pg-other" x="505" y="102" text-anchor="middle"></text>
+        <line class="ln" x1="268" y1="85" x2="372" y2="85" marker-start="url(#arr4)" marker-end="url(#arr4)"/>
+        <text class="t-h" x="320" y="74" text-anchor="middle"><tspan class="en">THE GAP</tspan><tspan class="es">LA BRECHA</tspan></text><text class="t-s" x="320" y="104" text-anchor="middle">= drama</text>
+      </svg></div>
+      <div class="live"><div><span class="lbl"><span class="en">Carries</span><span class="es">Lleva</span></span><span id="lv-poss"></span></div><div><span class="lbl"><span class="en">Speaks</span><span class="es">Habla</span></span><span id="lv-voice2"></span></div><div><span class="lbl"><span class="en">Foil</span><span class="es">Contrapunto</span></span><span id="lv-foil"></span></div></div>
+    </figure>
+  </div>
+</section>
+
+<section class="ref-sec" id="mannerisms">
+  <span class="kicker"><span class="en">Mannerisms and voice</span><span class="es">Gestos y forma de hablar</span></span>
+  <h2><span class="en">One gesture, built to carry meaning</span><span class="es">Un gesto, construido para cargar sentido</span></h2>
+  <p class="intro" style="margin:0"><span class="en">A good mannerism has a history. It traces back through the people they grew up with and the kind of person they became, ending in one small physical habit.</span><span class="es">Un buen gesto tiene historia. Viene de las personas con las que creció y del tipo de persona que llegó a ser, y termina en un pequeño hábito físico.</span></p>
+  <div class="chain"><span class="step"><span class="en">Backstory</span><span class="es">Historia previa</span></span><span class="ar">→</span><span class="step"><span class="en">Relationships</span><span class="es">Vínculos</span></span><span class="ar">→</span><span class="step"><span class="en">Personality</span><span class="es">Personalidad</span></span><span class="ar">→</span><span class="step"><span class="en">The gesture</span><span class="es">El gesto</span></span></div>
+  <p class="intro" style="margin:6px 0 0;font-size:15px;color:var(--muted)"><span class="en">Example: an old sports injury, so they tap the elbow under stress. Current pick:</span><span class="es">Ejemplo: una vieja lesión deportiva, entonces se toca el codo bajo presión. Elección actual:</span> <i id="lv-mann"></i></p>
+  <p class="intro" style="margin:6px 0 0;font-size:15px;color:var(--muted)"><span class="en">Current way of speaking:</span><span class="es">Forma de hablar actual:</span> <i id="lv-voice"></i></p>
+  <div class="rules">
+    <div class="rule"><h4><span class="en">Tie it to the past</span><span class="es">Atalo al pasado</span></h4><p><span class="en">It comes from family or an event, never from nowhere.</span><span class="es">Viene de la familia o de un hecho, nunca de la nada.</span></p></div>
+    <div class="rule"><h4><span class="en">Repeat it</span><span class="es">Repetilo</span></h4><p><span class="en">Repetition builds power. Let it change over time, like fingers shaking more under stress.</span><span class="es">La repetición le da fuerza. Dejá que cambie con el tiempo, como dedos que tiemblan más bajo presión.</span></p></div>
+    <div class="rule"><h4><span class="en">Identity is insistence</span><span class="es">La identidad es insistencia</span></h4><p><span class="en">Identity is recognisable traits of personality, look and language, held with constancy. Every proposal starts out a little ridiculous and becomes identity by repetition. The same goes for a phrase they keep saying.</span><span class="es">La identidad son rasgos reconocibles de personalidad, estética y lenguaje sostenidos con constancia. Toda propuesta empieza un poco ridícula y se vuelve identidad por repetición. Lo mismo vale para una frase que el personaje repite.</span></p></div>
+    <div class="rule"><h4><span class="en">Use it in the plot</span><span class="es">Usalo en la trama</span></h4><p><span class="en">A gesture before a violent act creates tension. When the gesture stops, the character has changed.</span><span class="es">Un gesto antes de un acto violento genera tensión. Cuando el gesto desaparece, el personaje cambió.</span></p></div>
+    <div class="rule"><h4><span class="en">Show the mind</span><span class="es">Mostrá la mente</span></h4><p><span class="en">A tic reveals state of mind and can work as a symbol.</span><span class="es">Un tic revela el estado de ánimo y puede funcionar como símbolo.</span></p></div>
+    <div class="rule"><h4><span class="en">Make it cause conflict</span><span class="es">Que genere conflicto</span></h4><p><span class="en">It annoys someone until they snap, which starts an argument.</span><span class="es">Molesta a alguien hasta que explota, y empieza una discusión.</span></p></div>
+    <div class="rule"><h4><span class="en">Avoid the cliché</span><span class="es">Evitá el cliché</span></h4><p><span class="en">No clenched jaws. Pick something specific to this emotion, like pulling an ear when angry.</span><span class="es">Nada de mandíbulas apretadas. Elegí algo propio de esa emoción, como tirarse de la oreja con bronca.</span></p></div>
+    <div class="rule"><h4><span class="en">One is enough</span><span class="es">Con uno alcanza</span></h4><p><span class="en">One well-made habit beats a long list.</span><span class="es">Un hábito bien construido vale más que una lista larga.</span></p></div>
+  </div>
+</section>
+
+<section class="ref-sec" id="cast">
+  <span class="kicker"><span class="en">Cast</span><span class="es">Elenco</span></span>
+  <h2><span class="en">Organic and mechanical characters</span><span class="es">Personajes orgánicos y mecánicos</span><span class="new">Verni</span></h2>
+  <div class="two">
+    <div class="prose">
+      <p class="en"><b>Mechanical</b> characters exist to move the plot and act as support: a security guard, someone behind a counter. <b>Organic</b> characters have so much life that the story follows them naturally.</p>
+      <p class="es">Los personajes <b>mecánicos</b> existen para hacer avanzar la trama y funcionan como soporte: un guardia de seguridad, alguien que atiende un mostrador. Los <b>orgánicos</b> tienen tanta vitalidad que la historia los sigue de manera natural.</p>
+      <p class="en">In "Bienvenido a la comunidad" the husband and daughters are mechanical and don't even have names; the protagonist and the neighbour are organic. In Fogwill's story, the commissioner and Captain Salinas are a backdrop for the protagonist's decisions.</p>
+      <p class="es">En "Bienvenido a la comunidad" el marido y las hijas son mecánicos y ni siquiera tienen nombre; la protagonista y el vecino son orgánicos. En el cuento de Fogwill, el comisario y el capitán Salinas hacen de telón de fondo para las decisiones de la protagonista.</p>
+      <p class="en"><b>A frequent error:</b> forced dialogue where an organic character delivers grand truths to a mechanical one who only listens. Mechanical characters should do their job discreetly.</p>
+      <p class="es"><b>Un error frecuente:</b> el diálogo forzado donde un personaje orgánico suelta verdades grandilocuentes y uno mecánico se limita a escuchar. Los mecánicos tienen que cumplir su función con discreción.</p>
+      <p class="en"><b>Not disposable.</b> Removing them takes away contrast and solidity. But a text made only of mechanical characters is boring. And a secondary character is worth the function it serves for the central conflict: if it grows too much weight of its own, it can swallow the protagonist.</p>
+      <p class="es"><b>No son descartables.</b> Sacarlos le quita contraste y solidez al relato. Pero un texto hecho solo de mecánicos aburre. Y un secundario vale por la función que cumple respecto del conflicto central: si gana demasiado peso propio, puede fagocitar al protagonista.</p>
+    </div>
+    <figure>
+      <div class="svgbox"><svg class="fig" viewBox="0 0 600 240" role="img" aria-label="Organic and mechanical characters">
+        <defs><marker id="arr8" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="ah" d="M0 0L10 5L0 10z"/></marker></defs>
+        <circle class="soft" cx="230" cy="120" r="62"/>
+        <text class="t-h2" x="230" y="117" text-anchor="middle"><tspan class="en">PROTAGONIST</tspan><tspan class="es">PROTAGONISTA</tspan></text>
+        <text class="t-s" x="230" y="135" text-anchor="middle"><tspan class="en">organic</tspan><tspan class="es">orgánico</tspan></text>
+        <circle class="dash" cx="410" cy="84" r="66"/>
+        <circle class="box" cx="410" cy="84" r="40"/>
+        <text class="t-s" x="410" y="81" text-anchor="middle"><tspan class="en">secondary</tspan><tspan class="es">secundario</tspan></text>
+        <text class="t-s" x="410" y="96" text-anchor="middle"><tspan class="en">organic</tspan><tspan class="es">orgánico</tspan></text>
+        <path class="ln" d="M478 40 Q540 30 556 70" marker-end="url(#arr8)"/>
+        <text class="t-s" x="482" y="24"><tspan class="en">if it grows, it swallows</tspan><tspan class="es">si crece, fagocita</tspan></text>
+        <circle class="bg" cx="80" cy="56" r="10"/><circle class="bg" cx="70" cy="178" r="10"/><circle class="bg" cx="380" cy="196" r="10"/><circle class="bg" cx="500" cy="180" r="10"/>
+        <line class="dot" x1="90" y1="62" x2="172" y2="100"/><line class="dot" x1="80" y1="174" x2="170" y2="140"/><line class="dot" x1="370" y1="190" x2="288" y2="146"/>
+        <text class="t-s" x="300" y="232" text-anchor="middle"><tspan class="en">mechanical: they do their job and step aside</tspan><tspan class="es">mecánicos: cumplen su función y se corren</tspan></text>
+      </svg></div>
+      <div class="live"><div><span class="lbl"><span class="en">Mechanical character</span><span class="es">Personaje mecánico</span></span><span id="lv-mech"></span></div><div><span class="lbl"><span class="en">Is there to</span><span class="es">Está para</span></span><span id="lv-func"></span></div></div>
+    </figure>
+  </div>
+</section>
+
+<section class="ref-sec" id="time">
+  <span class="kicker"><span class="en">The three-time character</span><span class="es">El personaje en tres tiempos</span></span>
+  <h2><span class="en">Past, present and future at once</span><span class="es">Pasado, presente y futuro a la vez</span></h2>
+  <div class="two">
+    <div class="prose">
+      <p class="en">A full character exists in three tenses. The <b>past</b> haunts them: give little information and a lot of feeling. The <b>present</b> is where they wrestle with outer and inner conflict. The <b>future</b> is what they fear or prepare for.</p>
+      <p class="es">Un personaje completo existe en tres tiempos. El <b>pasado</b> lo persigue: poca información y mucha emoción. El <b>presente</b> es donde lucha con el conflicto externo e interno. El <b>futuro</b> es lo que teme o para lo que se prepara.</p>
+      <p class="en">Each tense spills into the next. The past shapes what they want now, and what they want now decides what they dread.</p>
+      <p class="es">Cada tiempo se derrama en el siguiente. El pasado da forma a lo que quiere hoy, y lo que quiere hoy decide lo que teme.</p>
+    </div>
+    <figure>
+      <div class="svgbox"><svg class="fig tt" viewBox="0 0 600 200" role="img" aria-label="Past, present, future">
+        <circle cx="170" cy="100" r="90"/><circle cx="300" cy="100" r="90"/><circle cx="430" cy="100" r="90"/>
+        <text class="t-h" x="125" y="96" text-anchor="middle"><tspan class="en">PAST</tspan><tspan class="es">PASADO</tspan></text><text class="t-s" x="125" y="114" text-anchor="middle"><tspan class="en">haunted by</tspan><tspan class="es">lo persigue</tspan></text>
+        <text class="t-h" x="300" y="96" text-anchor="middle"><tspan class="en">PRESENT</tspan><tspan class="es">PRESENTE</tspan></text><text class="t-s" x="300" y="114" text-anchor="middle"><tspan class="en">wrestling with</tspan><tspan class="es">con qué lucha</tspan></text>
+        <text class="t-h" x="475" y="96" text-anchor="middle"><tspan class="en">FUTURE</tspan><tspan class="es">FUTURO</tspan></text><text class="t-s" x="475" y="114" text-anchor="middle"><tspan class="en">wary of</tspan><tspan class="es">lo que teme</tspan></text>
+      </svg></div>
+      <div class="live"><div><span class="lbl"><span class="en">Past</span><span class="es">Pasado</span></span><span id="lv-past"></span></div><div><span class="lbl"><span class="en">Present</span><span class="es">Presente</span></span><span id="lv-present"></span></div><div><span class="lbl"><span class="en">Future</span><span class="es">Futuro</span></span><span id="lv-future"></span></div></div>
+    </figure>
+  </div>
+</section>
+
+<footer><span class="en">Character Workbench. Diagrams redrawn from a set of character-building cheat sheets (Sanderson's scales, Maslow, the sacred-flaw template, and others). Sections marked "Verni" come from the intensive course "Una mente inventada" with Nicolás Verni.</span><span class="es">Taller de personajes. Diagramas redibujados a partir de un conjunto de guías de construcción de personajes (las escalas de Sanderson, Maslow, la plantilla del defecto sagrado y otras). Las secciones marcadas "Verni" vienen del intensivo "Una mente inventada", a cargo de Nicolás Verni.</span></footer>
+</div>
+
+<script>
+// Each field: label {en,es} and parallel option lists, so the selection survives a language switch.
+// Text after " — " is shown as a note under the select.
+const FIELDS=[
+ {id:'name',g:'core',label:{en:'Name',es:'Nombre'},opts:{
+  en:['Estela','Ramiro','Nélida','Facundo','Mirta','Osvaldo','Valentina','Tomás','Graciela','Hugo','Lucía','Beto'],
+  es:['Estela','Ramiro','Nélida','Facundo','Mirta','Osvaldo','Valentina','Tomás','Graciela','Hugo','Lucía','Beto']}},
+ {id:'belief',g:'core',label:{en:'Core belief',es:'Creencia central'},opts:{
+  en:['Nobody helps you unless they want something back.','If I stop working, I stop mattering.','Rules exist so the weak can survive.','Love is something you earn, then lose.','The truth always comes out, so get there first.','Family is the only thing that lasts.','Being ordinary is the worst fate.','Every debt must be paid.','Kindness is a way of controlling people.','If you plan enough, nothing can hurt you.'],
+  es:['Nadie te ayuda si no espera algo a cambio.','Si dejo de trabajar, dejo de importar.','Las reglas existen para que sobrevivan los débiles.','El amor se gana, y después se pierde.','La verdad siempre sale a la luz, así que mejor llegar primero.','La familia es lo único que dura.','Ser común es el peor destino.','Toda deuda se paga.','La amabilidad es una forma de controlar a la gente.','Si planificás lo suficiente, nada puede lastimarte.']}},
+ {id:'wound',g:'core',label:{en:'Wound',es:'Herida'},opts:{
+  en:['a parent left without a word','they took the blame for a sibling\'s mistake','they lost the business they built for ten years','they were the only one who walked away from an accident','a teacher mocked their work in front of the class','they spent their teens caring for a sick parent','their best friend betrayed them over money','someone they admired called their talent worthless','the family moved to a new town every year'],
+  es:['su padre o su madre se fue sin decir nada','cargó con la culpa de un error de su hermano','perdió el negocio que construyó durante diez años','fue la única persona que salió con vida de un accidente','un docente se burló de su trabajo frente a toda la clase','pasó la adolescencia cuidando a un padre enfermo','su mejor amistad terminó en una traición por plata','alguien a quien admiraba dijo que su talento no valía nada','la familia se mudaba de pueblo todos los años']}},
+ {id:'need',g:'core',label:{en:'Internal need',es:'Necesidad interna'},opts:{
+  en:['accept help without keeping score','forgive themselves','let someone watch them fail','stop controlling outcomes','say the truth out loud','choose people over being right','rest','grieve what is already gone'],
+  es:['aceptar ayuda sin llevar la cuenta','perdonarse','dejar que alguien vea cómo falla','dejar de controlar los resultados','decir la verdad en voz alta','elegir a las personas antes que tener razón','descansar','hacer el duelo por lo que ya se perdió']}},
+ {id:'maslow',g:'core',label:{en:'Need level',es:'Nivel de necesidad'},opts:{
+  en:['Physiological — food, water, shelter, sleep','Safety — security, a job, resources','Love and belonging — friends, family, intimacy','Esteem — respect, status, self-worth','Self-actualization — becoming the most one can be'],
+  es:['Fisiológico — comida, agua, techo, sueño','Seguridad — protección, trabajo, recursos','Amor y pertenencia — amistad, familia, intimidad','Estima — respeto, estatus, valor propio','Autorrealización — llegar a ser lo máximo posible']}},
+
+ {id:'want',g:'goal',label:{en:'Surface goal',es:'Meta visible'},opts:{
+  en:['win back the house they grew up in','get the promotion promised two years ago','find out who sent the anonymous letters','finish a marathon before turning fifty','get their daughter to come home for Christmas','pay off a debt to a dangerous man','open their own restaurant','win the town\'s yearly competition','prove a colleague is stealing'],
+  es:['recuperar la casa donde se crió','conseguir el ascenso que le prometieron hace dos años','descubrir quién manda las cartas anónimas','correr una maratón antes de cumplir cincuenta','que su hija vuelva a casa para Navidad','pagarle una deuda a un hombre peligroso','abrir su propio restaurante','ganar el concurso anual del pueblo','probar que un compañero de trabajo está robando']}},
+ {id:'motive2',g:'goal',label:{en:'Competing motive',es:'Motivo en conflicto'},opts:{
+  en:['look after a sick mother','keep their job','keep the debt secret','save the marriage','finally beat their brother','leave town for good','look good in front of their friends'],
+  es:['cuidar a su madre enferma','no perder el trabajo','que nadie se entere de la deuda','salvar la pareja','ganarle a su hermano de una vez','irse del pueblo para siempre','quedar bien con su grupo de amigos']}},
+ {id:'engine',g:'goal',label:{en:'Engine',es:'Motor'},opts:{
+  en:['Obsession — comes from inside: no peace until they solve something with no solution','Destiny — comes from outside: circumstances force them toward a goal'],
+  es:['Obsesión — viene de adentro: no tiene paz hasta resolver algo sin solución','Destino — viene de afuera: las circunstancias lo obligan a cumplir una meta']}},
+ {id:'path',g:'goal',label:{en:'Motivation path',es:'Camino de motivación'},opts:{
+  en:['Straight — the goal collides with something they love','Impossible — what they want cannot be had','Curving — they reach the goal through another person','Changing — they refuse, then commit to a new goal','Different — others want the same thing for other reasons'],
+  es:['Recto — la meta choca con algo que ama','Imposible — lo que quiere no se puede tener','Curvo — llega a la meta a través de otra persona','Cambiante — se niega, y después se compromete con una meta nueva','Diferente — otros quieren lo mismo por otras razones']}},
+ {id:'sacrifice',g:'goal',label:{en:'Impossible choice',es:'Elección imposible'},opts:{
+  en:['their reputation','their child\'s trust','their only real friendship','the code they live by','their health','the house','the truth about their past'],
+  es:['su reputación','la confianza de su hijo','su única amistad verdadera','el código con el que vive','su salud','la casa','la verdad sobre su pasado']}},
+ {id:'pursuit',g:'goal',label:{en:'Pursuit outcome',es:'Desenlace de la búsqueda'},opts:{
+  en:['Persistent drive — keeps pushing with direct action','Anchored resolve — holds on because of a deeper need','Redefined goal — bends and wants something new','Ultimate acceptance — accepts the goal is out of reach'],
+  es:['Impulso persistente — sigue empujando con acciones directas','Resolución anclada — resiste por una necesidad más profunda','Meta redefinida — se dobla y quiere algo nuevo','Aceptación final — acepta que la meta está fuera de alcance']}},
+ {id:'arc',g:'goal',label:{en:'Arc type',es:'Tipo de arco'},opts:{
+  en:['Dynamic — overcomes the flaw and shifts values','Iconic — stays the same and changes the world around them','Tragic — fails to change and pays for it'],
+  es:['Dinámico — supera el defecto y cambia sus valores','Icónico — no cambia, y cambia el mundo a su alrededor','Trágico — no logra cambiar y lo paga']}},
+
+ {id:'era',g:'context',label:{en:'Where and when',es:'Dónde y cuándo'},opts:{
+  en:['a gated community outside the capital, today','a provincial city under the dictatorship, 1978','Buenos Aires during the bank freeze, December 2001','a small town where everyone knows everyone','a government office in the middle of a restructuring','a family in lockdown, 2020','an apartment building whose residents are at war'],
+  es:['un barrio cerrado del conurbano, hoy','una ciudad de provincia durante la dictadura, 1978','Buenos Aires en el corralito, diciembre de 2001','un pueblo chico donde todos se conocen','una oficina pública en plena reestructuración','una familia en cuarentena, 2020','un edificio con el consorcio en guerra']}},
+ {id:'rule',g:'context',label:{en:'Unspoken rule',es:'Regla no dicha'},opts:{
+  en:['nobody talks about money at the table','whoever leaves is never mentioned again','favours are repaid with favours, never with money','nobody argues in front of guests','whoever asks too many questions is suspect','dirty laundry is washed at home','the boss is on first-name terms but never contradicted'],
+  es:['nadie habla de plata en la mesa','al que se va no se lo nombra más','los favores se devuelven con favores, nunca con plata','nadie discute delante de las visitas','el que pregunta demasiado es sospechoso','los trapos sucios se lavan en casa','al jefe se lo tutea pero no se le lleva la contraria']}},
+ {id:'weight',g:'context',label:{en:'An act that weighs more here',es:'Un acto que acá pesa más'},opts:{
+  en:['borrowing money','reporting a colleague','leaving without a word','saying no','telling a family secret','showing you have money','crying in public'],
+  es:['pedir plata prestada','denunciar a un compañero','irse sin avisar','decir que no','contar un secreto de familia','mostrar que se tiene plata','llorar en público']}},
+
+ {id:'contra',g:'coherence',label:{en:'Two behaviors that seem to clash',es:'Dos conductas que parecen chocar'},opts:{
+  en:['rides with a biker club and crochets baby blankets','is a millionaire whose partner still cuts their hair','is a judge who steals hotel soap','preaches on Sundays and bets on horses on Saturdays','lifts weights at dawn and sleeps with the light on','is a pacifist who collects knives','shouts in class and whispers at home','is impeccable at work and keeps a disastrous bedroom'],
+  es:['anda con un club de motoqueros y teje mantitas de bebé','tiene millones y su pareja todavía le corta el pelo','es juez y se roba los jabones de los hoteles','predica los domingos y apuesta a los caballos los sábados','levanta pesas al amanecer y duerme con la luz prendida','es pacifista y colecciona cuchillos','grita en clase y susurra en casa','es impecable en el trabajo y tiene el cuarto hecho un desastre']}},
+ {id:'priority',g:'coherence',label:{en:'Priority behind both',es:'Prioridad que une las dos'},opts:{
+  en:['that nobody sees their fear','being in control','owing nobody anything','their mother\'s approval','feeling useful','loyalty to their own','not letting life slip by','their own comfort'],
+  es:['que nadie vea su miedo','tener el control','no deberle nada a nadie','la aprobación de su madre','sentirse útil','la lealtad a los suyos','que la vida no se le escape','la propia comodidad']}},
+
+ {id:'moral',g:'moral',label:{en:'Moral position',es:'Posición moral'},opts:{
+  en:['White — good without cracks; risks becoming a fable','Grey — does harm for good reasons; risks becoming a formula','Dark by choice — knows what they do and chooses it','Crossing — starts on one side and ends on the other'],
+  es:['Blanco — bueno sin fisuras; riesgo de fábula','Gris — hace daño con buenas razones; riesgo de fórmula','Oscuro por elección — sabe lo que hace y lo elige','Cruzado — empieza de un lado y termina del otro']}},
+ {id:'selective',g:'moral',label:{en:'Selective kindness',es:'Bondad selectiva'},opts:{
+  en:['is ruthless with employees and tender with stray dogs','forgives their daughter everything and their son nothing','cons strangers but never a neighbour','is charming to those above and cruel to those below','looks down on some immigrants and not on others','helps everyone except their own brother'],
+  es:['es implacable con sus empleados y tierno con los perros de la calle','le perdona todo a su hija y nada a su hijo','estafa a desconocidos pero nunca a un vecino','es encantador con los de arriba y cruel con los de abajo','desprecia a unos inmigrantes y a otros no','ayuda a todo el mundo menos a su propio hermano']}},
+
+ {id:'mannerism',g:'surface',label:{en:'Mannerism',es:'Gesto característico'},opts:{
+  en:['taps an old elbow injury when lying — from a sports injury in youth','pulls an eyelash to stay calm — learned while hiding fear from a strict father','tugs an earlobe when angry — copied from a grandmother','straightens other people\'s things — grew up in a chaotic house','hums the same two notes while waiting — a lullaby from a mother who left','counts coins in a pocket — learned in the years when money ran out','winds thread around a finger — a habit from long hospital waits','rubs a thumb over a ring that isn\'t there — kept after a divorce'],
+  es:['se toca un viejo golpe en el codo cuando miente — de una lesión deportiva de juventud','se arranca una pestaña para mantener la calma — aprendido al esconder el miedo ante un padre estricto','se tira de la oreja cuando se enoja — copiado de una abuela','ordena las cosas de los demás — creció en una casa caótica','tararea las mismas dos notas mientras espera — una canción de cuna de una madre que se fue','cuenta monedas en el bolsillo — de los años en que no alcanzaba la plata','enrosca un hilo en un dedo — un hábito de largas esperas en hospitales','se frota el dedo donde ya no está el anillo — le quedó del divorcio']}},
+ {id:'voice',g:'surface',label:{en:'Way of speaking',es:'Forma de hablar'},opts:{
+  en:['ends every sentence with "you follow me?"','talks about themselves in the third person when angry','answers questions with another question','uses diminutives for everything, even threats','never finishes a sentence','quotes proverbs, always slightly wrong','says "back in my day" despite being thirty'],
+  es:['cierra cada frase con un "¿me explico?"','habla de sí en tercera persona cuando se enoja','contesta las preguntas con otra pregunta','usa diminutivos para todo, hasta para amenazar','nunca termina las frases','cita refranes, siempre un poco mal','dice "en mi época" aunque tenga treinta años']}},
+ {id:'possession',g:'surface',label:{en:'Symbolic possession',es:'Objeto simbólico'},opts:{
+  en:['a broken wristwatch','a Bible full of someone else\'s notes','an instant camera with one shot left','the key to a house that was sold','a coin stamped with a skull','a comic book from childhood','a folded eviction notice','a hospital wristband'],
+  es:['un reloj roto','una Biblia llena de notas de otra persona','una cámara instantánea con una sola foto','la llave de una casa que se vendió','una moneda con una calavera grabada','una historieta de la infancia','una orden de desalojo doblada','una pulsera de hospital']}},
+ {id:'gap',g:'surface',label:{en:'Perception gap',es:'Brecha de percepción'},opts:{
+  en:['a misunderstood genius → an immature manchild','the only adult in the room → a control freak','a loyal friend → a doormat','a realist → a cynic','a protector → a jailer','self-made → lucky and ungrateful'],
+  es:['un genio incomprendido → un nene grande','la única persona adulta de la sala → alguien obsesionado con el control','alguien leal → un felpudo','una persona realista → una persona cínica','una protección → una cárcel','alguien que se hizo a sí mismo → alguien con suerte que no agradece']}},
+ {id:'foil',g:'surface',label:{en:'Foil',es:'Contrapunto'},opts:{
+  en:['a mentor who already failed the same way','a comic sidekick who says what they won\'t','a rival who wants exactly the same thing','a mirror: same wound, opposite choice','a sibling who got everything easily'],
+  es:['un mentor que ya fracasó de la misma manera','un compañero gracioso que dice lo que el protagonista calla','un rival que quiere exactamente lo mismo','un espejo: la misma herida, la elección opuesta','un hermano al que todo le resultó fácil']}},
+
+ {id:'mech',g:'cast',label:{en:'Mechanical character',es:'Personaje mecánico'},opts:{
+  en:['the building\'s doorman','the supermarket cashier','a duty police officer','the cab driver','the boss\'s secretary','a waiter','the neighbour in 3B'],
+  es:['el portero del edificio','la cajera del súper','un policía de guardia','el remisero','la secretaria del jefe','un mozo','la vecina del tercero B']}},
+ {id:'func',g:'cast',label:{en:'Their function',es:'Su función'},opts:{
+  en:['bring a piece of news','block the way','be a witness','do well what the protagonist does badly','ask the awkward question','show the context without explaining it'],
+  es:['traer una noticia','cortar el paso','ser testigo','hacer bien lo que el protagonista hace mal','hacer la pregunta incómoda','mostrar el contexto sin explicarlo']}},
+
+ {id:'flaw',g:'limits',label:{en:'Flaw (internal)',es:'Defecto (interno)'},opts:{
+  en:['pride','jealousy','cowardice','impatience','dishonesty','greed','self-pity','stubbornness'],
+  es:['orgullo','celos','cobardía','impaciencia','deshonestidad','codicia','autocompasión','terquedad']}},
+ {id:'code',g:'limits',label:{en:'Restriction (own code)',es:'Restricción (código propio)'},opts:{
+  en:['never asks for help','never lies to children','never breaks a deal','never cries in front of anyone','never drinks','never goes back to their hometown'],
+  es:['nunca pide ayuda','nunca les miente a los chicos','nunca rompe un trato','nunca llora delante de nadie','nunca toma alcohol','nunca vuelve a su pueblo']}},
+ {id:'limit',g:'limits',label:{en:'Limitation (external)',es:'Limitación (externa)'},opts:{
+  en:['no car in a town with one bus a day','a bad back','can\'t leave the country','an old dog that needs care','doesn\'t speak the local language','a boss who watches every move'],
+  es:['no tiene auto en un pueblo con un colectivo por día','una espalda mala','no puede salir del país','un perro viejo que necesita cuidados','no habla el idioma del lugar','un jefe que vigila cada movimiento']}},
+ {id:'fear',g:'limits',label:{en:'Future fear',es:'Miedo al futuro'},opts:{
+  en:['ending up alone, like their father','being found out','becoming irrelevant','losing the house','turning into the person who hurt them','being forgotten'],
+  es:['terminar en soledad, como su padre','que se descubra la verdad','volverse irrelevante','perder la casa','convertirse en quien le hizo daño','que se olviden de su nombre']}},
+
+ {id:'scene',g:'task',label:{en:'Scene to write',es:'Escena a escribir'},opts:{
+  en:['The opening: they say something and do something before we learn their problem.','The midpoint, when an event makes them question the flaw.','The climax, where they must choose between the want and the need.','A scene from the foil\'s point of view.','A family meal where the perception gap shows.','A scene where the mannerism appears twice and changes the second time.','The last scene, where the mannerism stops.','A behavior that shows a power dynamic without explaining it.','A scene where both clashing behaviors appear and the priority that joins them shows.','A scene where the two motives collide and the context decides.','A scene where the mechanical character does their job and disappears.'],
+  es:['La apertura: dice algo y hace algo antes de que conozcamos su problema.','El punto medio, cuando un hecho le hace cuestionar su defecto.','El clímax, donde tiene que elegir entre el deseo y la necesidad.','Una escena desde el punto de vista del contrapunto.','Una comida familiar donde se nota la brecha de percepción.','Una escena donde el gesto aparece dos veces y cambia la segunda.','La última escena, donde el gesto desaparece.','Una conducta que muestre una dinámica de poder sin explicarla.','Una escena donde aparecen las dos conductas que parecen chocar y se ve la prioridad que las une.','Una escena donde los dos motivos chocan y el contexto decide.','Una escena donde el personaje mecánico cumple su función y desaparece.']}}
+];
+
+// The ridiculous method: its own three fields, rolled separately from the main builder.
+const RFIELDS=[
+ {id:'stereo',label:{en:'Stereotype',es:'Estereotipo'},opts:{
+  en:['the retiree who argues politics at the bar','the wellness influencer','the bank manager','the lifelong primary school teacher','the nightclub bouncer','the small-town priest','the taxi driver with an opinion on everything','the grandmother who cooks for the whole block','the seventeen-year-old gamer','the politician on the campaign trail','the football fan who never misses a match','the tidy accountant'],
+  es:['el jubilado que discute de política en el bar','la influencer de vida sana','el gerente de banco','la maestra de grado de toda la vida','el patovica de boliche','el cura de pueblo','el taxista que opina de todo','la abuela que cocina para todo el barrio','el gamer de diecisiete años','el político en campaña','el hincha que no falta nunca a la cancha','la contadora prolija']}},
+ {id:'arche',label:{en:'Archetype',es:'Arquetipo'},opts:{
+  en:['Hero — sacrifices for others','Mentor — guides someone else','Tyrant — rules through fear','Trickster — breaks rules with wit','Orphan — longs to belong','Guardian — protects a boundary','Rebel — breaks what is established','Innocent — trusts the world','Martyr — suffers to give it meaning','Explorer — needs to leave'],
+  es:['Héroe — se sacrifica por los demás','Mentor — guía a otro','Tirano — controla por miedo','Embaucador — rompe las reglas con ingenio','Huérfano — busca pertenecer','Guardián — protege un límite','Rebelde — rompe lo establecido','Inocente — confía en el mundo','Mártir — sufre para darle sentido','Explorador — necesita irse']}},
+ {id:'odd',label:{en:'A quality they would never have',es:'Una cualidad que nunca tendría'},opts:{
+  en:['collects dried butterflies','cries at Turkish soap operas','is the provincial chess champion','is terrified of pigeons','writes haiku on napkins','is fifty and wants to "farm aura" with twenty-year-olds','secretly embroiders tablecloths','sings opera in the shower','can\'t bring themselves to answer the phone','believes UFOs visit them','is a strict vegan','never swears'],
+  es:['colecciona mariposas disecadas','llora con las telenovelas turcas','es campeón provincial de ajedrez','le tiene pánico a las palomas','escribe haikus en servilletas','tiene cincuenta años y quiere "farmear aura" con pibes','borda manteles a escondidas','canta ópera en la ducha','no se anima a atender el teléfono','cree que lo visitan ovnis','es vegano estricto','nunca dice una mala palabra']}}
+];
+const ALL=[...FIELDS,...RFIELDS];
+
+const GROUPS={
+ core:[{en:'Foundation',es:'Base'},'#inside-out'],
+ goal:[{en:'Goal, motives and arc',es:'Meta, motivos y arco'},'#motives'],
+ context:[{en:'Context',es:'Contexto'},'#context'],
+ coherence:[{en:'Internal coherence',es:'Coherencia interna'},'#coherence'],
+ moral:[{en:'Morality',es:'Moral'},'#moral'],
+ surface:[{en:'On the surface',es:'En la superficie'},'#surface'],
+ cast:[{en:'Cast',es:'Elenco'},'#cast'],
+ limits:[{en:'Limits and fears',es:'Límites y miedos'},'#time'],
+ task:[{en:'What to write',es:'Qué escribir'},'#wound']
+};
+const SCALES=[['pro',{en:'Proactivity',es:'Proactividad'},{en:'Reactive',es:'Reacciona'},{en:'Takes charge',es:'Toma el mando'}],
+              ['rel',{en:'Relatability',es:'Empatía'},{en:'Arrogant',es:'Arrogante'},{en:'Kind',es:'Amable'}],
+              ['cap',{en:'Capability',es:'Capacidad'},{en:'Incompetent',es:'Incompetente'},{en:'Master',es:'Maestría'}]];
+const UI={
+  en:{more:'Read more ↓',scales:'Sliding scales',roll:'Roll',lock:'Lock',locked:n=>n+' locked',copied:'Copied',sel:'Selected. Press Ctrl+C to copy.',ph:'Write the logic that joins the role and the quality…',logic:'Internal logic'},
+  es:{more:'Leer más ↓',scales:'Escalas',roll:'Sortear',lock:'Bloquear',locked:n=>n+(n===1?' bloqueado':' bloqueados'),copied:'Copiado',sel:'Seleccionado. Apretá Ctrl+C para copiar.',ph:'Escribí la lógica que une el rol y la cualidad…',logic:'Lógica interna'}
+};
+const state={}, locked=new Set();
+const scaleVals={pro:5,rel:5,cap:5};
+let lang='es';
+const $=s=>document.querySelector(s);
+const rnd=n=>Math.floor(Math.random()*n);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const F=id=>ALL.find(f=>f.id===id);
+const raw=id=>F(id).opts[lang][state[id]];
+const short=id=>raw(id).split(' — ')[0];
+const note=id=>raw(id).split(' — ')[1]||'';
+const ICON_DICE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.3" fill="currentColor"/><circle cx="16" cy="16" r="1.3" fill="currentColor"/><circle cx="16" cy="8" r="1.3" fill="currentColor"/><circle cx="8" cy="16" r="1.3" fill="currentColor"/></svg>';
+const ICON_LOCK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
+
+function card(f,t,withLock){
+  const lab=esc(f.label[lang]);
+  return `<div class="card" id="c-${f.id}"><div class="card-top"><label for="f-${f.id}">${lab}</label>
+  <button class="ib" type="button" data-roll="${f.id}" aria-label="${t.roll}: ${lab}" title="${t.roll}">${ICON_DICE}</button>
+  ${withLock?`<button class="ib" type="button" data-lock="${f.id}" aria-pressed="false" aria-label="${t.lock}: ${lab}" title="${t.lock}">${ICON_LOCK}</button>`:''}</div>
+  <select id="f-${f.id}">${f.opts[lang].map((o,i)=>`<option value="${i}">${esc(f.id==='gap'?o.replace(' → ',' / '):o.split(' — ')[0])}</option>`).join('')}</select>
+  <p class="note" id="n-${f.id}"></p>${f.id==='name'?`<a class="namelink" href="name.html">${lang==='es'?'Buscar un nombre por década →':'Find a name by decade →'}</a>`:''}</div>`;
+}
+
+function build(){
+  const host=$('#groups'); host.innerHTML='';
+  const t=UI[lang];
+  Object.entries(GROUPS).forEach(([g,[title,ref]])=>{
+    const sec=document.createElement('div'); sec.className='group';
+    let html=`<h3>${title[lang]}<a href="${ref}">${t.more}</a></h3><div class="grid">`;
+    FIELDS.filter(f=>f.g===g).forEach(f=>{html+=card(f,t,true)});
+    if(g==='goal'){
+      html+=`<div class="card" id="c-scales" style="grid-column:1/-1"><div class="card-top"><span class="lbl">${t.scales}</span>
+      <button class="ib" type="button" data-roll="scales" aria-label="${t.roll}: ${t.scales}" title="${t.roll}">${ICON_DICE}</button>
+      <button class="ib" type="button" data-lock="scales" aria-pressed="false" aria-label="${t.lock}: ${t.scales}" title="${t.lock}">${ICON_LOCK}</button></div><div class="scales">`+
+      SCALES.map(([k,ti,a,b])=>`<div class="scale"><label for="s-${k}">${ti[lang]} <span class="val" id="sv-${k}"></span></label><input type="range" id="s-${k}" min="0" max="10" step="1" value="${scaleVals[k]}"><div class="ends"><span>${a[lang]}</span><span>${b[lang]}</span></div></div>`).join('')+`</div></div>`;
+    }
+    sec.innerHTML=html+'</div>'; host.appendChild(sec);
+  });
+  // Mark what Simple hides: non-simple cards, groups with no simple field, and the scales card.
+  FIELDS.forEach(f=>{if(!SIMPLE.has(f.id))$('#c-'+f.id).classList.add('full-only')});
+  [...host.children].forEach((sec,i)=>{const g=Object.keys(GROUPS)[i]; if(!FIELDS.some(f=>f.g===g&&SIMPLE.has(f.id)))sec.classList.add('full-only')});
+  $('#c-scales').classList.add('full-only');
+  $('#ridHost').innerHTML=RFIELDS.map(f=>card(f,t,false)).join('');
+  ALL.forEach(f=>$('#f-'+f.id).addEventListener('change',e=>{state[f.id]=+e.target.value;render()}));
+  SCALES.forEach(([k])=>$('#s-'+k).addEventListener('input',e=>{scaleVals[k]=+e.target.value;render()}));
+}
+$('#groups').addEventListener('click',e=>{
+  const r=e.target.closest('[data-roll]'), l=e.target.closest('[data-lock]');
+  if(r){rollOne(r.dataset.roll);render()}
+  if(l){const id=l.dataset.lock; locked.has(id)?locked.delete(id):locked.add(id); render()}
+});
+$('#ridHost').addEventListener('click',e=>{
+  const r=e.target.closest('[data-roll]'); if(r){rollOne(r.dataset.roll);render()}
+});
+function rollOne(id){
+  if(id==='scales'){SCALES.forEach(([k])=>scaleVals[k]=rnd(11));return}
+  if(id==='scene'&&mode==='simple'){
+    const pool=SIMPLE_SCENES.filter(i=>i!==state.scene); state.scene=pool[rnd(pool.length)]; return;
+  }
+  const n=F(id).opts.en.length; let v=rnd(n); if(n>1&&v===state[id])v=(v+1+rnd(n-1))%n; state[id]=v;
+}
+// Simple mode: the fields needed to start a draft. Hidden fields keep their values.
+const SIMPLE=new Set(['name','want','motive2','era','weight','contra','priority','voice','scene']);
+// Scenes that only need Simple's fields: the opening, power dynamic, both behaviors, two motives.
+const SIMPLE_SCENES=[0,7,8,9];
+let mode='simple';
+try{mode=localStorage.getItem('desk-char-mode')==='full'?'full':'simple'}catch(e){}
+const visible=id=>mode==='full'||SIMPLE.has(id);
+function setMode(m){
+  mode=m; try{localStorage.setItem('desk-char-mode',m)}catch(e){}
+  if(m==='simple'&&!SIMPLE_SCENES.includes(state.scene)&&!locked.has('scene'))rollOne('scene');
+  $('#builder').classList.toggle('mode-simple',m==='simple');
+  document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===m));
+  render();
+}
+document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
+
+function rollAll(){FIELDS.forEach(f=>{if(visible(f.id)&&!locked.has(f.id))rollOne(f.id)}); if(mode==='full'&&!locked.has('scales'))rollOne('scales'); render()}
+
+function promptHTML(sv){
+  const n=esc(raw('name')), [self,other]=raw('gap').split(' → '), e=x=>esc(raw(x));
+  if(mode==='simple'){
+    if(lang==='es') return `<p><b>${n}</b> quiere ${e('want')}. Pero también quiere ${e('motive2')}. <span class="ask">¿Cuál de los dos es más apremiante acá?</span></p>
+    <p><b>Contexto:</b> ${e('era')}. Acá, ${e('weight')} pesa más de lo normal.</p>
+    <p><b>Coherencia:</b> ${n} ${e('contra')}. Las dos conductas responden a una misma prioridad: ${e('priority')}. <span class="ask">¿Cómo la explica a las dos?</span></p>
+    <p><b>Al hablar,</b> ${e('voice')}.</p>
+    <p class="task"><b>Escribí:</b> ${e('scene')}</p>`;
+    return `<p><b>${n}</b> wants to ${e('want')}. But they also want to ${e('motive2')}. <span class="ask">Which is more pressing here?</span></p>
+    <p><b>Context:</b> ${e('era')}. Here, ${e('weight')} weighs more than usual.</p>
+    <p><b>Coherence:</b> ${n} ${e('contra')}. Both behaviors answer to one priority: ${e('priority')}. <span class="ask">How does it explain both?</span></p>
+    <p><b>When talking,</b> ${n} ${e('voice')}.</p>
+    <p class="task"><b>Write:</b> ${e('scene')}</p>`;
+  }
+  if(lang==='es') return `<p><b>${n}</b> cree: <q>${e('belief')}</q></p>
+    <p>La creencia nació cuando ${e('wound')}. En la superficie, ${n} quiere ${e('want')}. Lo que necesita es ${e('need')}. Su motor está en el nivel de <b>${esc(short('maslow').toLowerCase())}</b>.</p>
+    <p><b>Motor:</b> ${esc(short('engine').toLowerCase())}, ${esc(note('engine'))}. <b>Motivo en conflicto:</b> también quiere ${e('motive2')}. <span class="ask">¿Cuál de los dos es más apremiante en este contexto?</span></p>
+    <p><b>Camino:</b> ${esc(short('path').toLowerCase())}: ${esc(note('path'))}. <b>Desenlace:</b> ${esc(short('pursuit').toLowerCase())}. <b>Arco:</b> ${esc(short('arc').toLowerCase())}.</p>
+    <p><b>Elección imposible:</b> para ${e('want')}, ${n} tiene que arriesgar ${e('sacrifice')}.</p>
+    <p><b>Contexto:</b> ${e('era')}. Regla no dicha: ${e('rule')}. Acá, ${e('weight')} pesa más de lo normal.</p>
+    <p><b>Coherencia:</b> ${n} ${e('contra')}. Las dos conductas responden a una misma prioridad: ${e('priority')}. <span class="ask">¿Cómo la explica a las dos?</span></p>
+    <p><b>Moral:</b> ${esc(short('moral').toLowerCase())}. <b>Bondad selectiva:</b> ${e('selective')}.</p>
+    <p><b>En la superficie:</b> ${n} ${esc(short('mannerism'))} y lleva ${e('possession')}. Al hablar, ${e('voice')}. Se ve como ${esc(self)}; los demás ven ${esc(other)}. <b>Contrapunto:</b> ${e('foil')}.</p>
+    <p><b>Elenco:</b> ${e('mech')}, mecánico, está para ${e('func')}. Que lo cumpla sin robar foco.</p>
+    <p><b>Defecto:</b> ${e('flaw')}. <b>Código:</b> ${e('code')}. <b>Limitación:</b> ${e('limit')}. <b>Teme:</b> ${e('fear')}.</p>
+    <p><b>Escalas:</b> proactividad ${sv.pro}/10, empatía ${sv.rel}/10, capacidad ${sv.cap}/10.</p>
+    <p class="task"><b>Escribí:</b> ${e('scene')}</p>`;
+  return `<p><b>${n}</b> believes: <q>${e('belief')}</q></p>
+    <p>The belief took root when ${e('wound')}. On the surface, ${n} wants to ${e('want')}. What ${n} needs is to ${e('need')}. The drive sits at the <b>${esc(short('maslow').toLowerCase())}</b> level.</p>
+    <p><b>Engine:</b> ${esc(short('engine').toLowerCase())}, ${esc(note('engine'))}. <b>Competing motive:</b> they also want to ${e('motive2')}. <span class="ask">Which is more pressing in this context?</span></p>
+    <p><b>Path:</b> ${esc(short('path').toLowerCase())}: ${esc(note('path'))}. <b>Pursuit:</b> ${esc(short('pursuit').toLowerCase())}. <b>Arc:</b> ${esc(short('arc').toLowerCase())}.</p>
+    <p><b>Impossible choice:</b> to ${e('want')}, ${n} has to risk ${e('sacrifice')}.</p>
+    <p><b>Context:</b> ${e('era')}. Unspoken rule: ${e('rule')}. Here, ${e('weight')} weighs more than usual.</p>
+    <p><b>Coherence:</b> ${n} ${e('contra')}. Both behaviors answer to one priority: ${e('priority')}. <span class="ask">How does it explain both?</span></p>
+    <p><b>Morality:</b> ${esc(short('moral').toLowerCase())}. <b>Selective kindness:</b> ${e('selective')}.</p>
+    <p><b>On the surface:</b> ${n} ${esc(short('mannerism'))} and carries ${e('possession')}. When talking, ${n} ${e('voice')}. Sees themselves as ${esc(self)}; others see ${esc(other)}. <b>Foil:</b> ${e('foil')}.</p>
+    <p><b>Cast:</b> ${e('mech')}, a mechanical character, is there to ${e('func')}. They should do it without stealing focus.</p>
+    <p><b>Flaw:</b> ${e('flaw')}. <b>Code:</b> ${e('code')}. <b>Limitation:</b> ${e('limit')}. <b>Fears:</b> ${e('fear')}.</p>
+    <p><b>Scales:</b> proactivity ${sv.pro}/10, relatability ${sv.rel}/10, capability ${sv.cap}/10.</p>
+    <p class="task"><b>Write:</b> ${e('scene')}</p>`;
+}
+function ridHTML(){
+  const s=esc(raw('stereo')), a=esc(short('arche').toLowerCase()), an=esc(note('arche')), o=esc(raw('odd'));
+  if(lang==='es') return `<b>${s}</b>, del arquetipo <b>${a}</b> (${an}), que además <b>${o}</b>.`;
+  return `<b>${s}</b>, a <b>${a}</b> archetype (${an}), who also <b>${o}</b>.`;
+}
+
+const MORAL_X=[70,300,480,480];
+function render(){
+  FIELDS.forEach(f=>{
+    $('#f-'+f.id).value=state[f.id];
+    $('#n-'+f.id).textContent=f.id==='gap'?'':note(f.id);
+    $('#c-'+f.id).classList.toggle('locked',locked.has(f.id));
+    document.querySelector(`[data-lock="${f.id}"]`).setAttribute('aria-pressed',locked.has(f.id));
+  });
+  [...$('#f-scene').options].forEach((o,i)=>{o.hidden=o.disabled=mode==='simple'&&!SIMPLE_SCENES.includes(i)&&i!==state.scene});
+  RFIELDS.forEach(f=>{$('#f-'+f.id).value=state[f.id]; $('#n-'+f.id).textContent=note(f.id)});
+  $('#c-scales').classList.toggle('locked',locked.has('scales'));
+  document.querySelector('[data-lock="scales"]').setAttribute('aria-pressed',locked.has('scales'));
+  $('#lockedCount').textContent=UI[lang].locked(locked.size);
+  const sv=scaleVals;
+  SCALES.forEach(([k])=>{$('#s-'+k).value=sv[k]; $('#sv-'+k).textContent=sv[k]+'/10'});
+
+  const [self,other]=raw('gap').split(' → ');
+  $('#slipTitle').textContent=raw('name');
+  $('#prompt').innerHTML=promptHTML(sv);
+  $('#ridPrompt').innerHTML=ridHTML();
+
+  $('#lv-belief').textContent=raw('belief'); $('#lv-code').textContent=raw('code');
+  $('#lv-wound').textContent=raw('wound'); $('#lv-want').textContent=raw('want'); $('#lv-need').textContent=raw('need');
+  $('#lv-mot1').textContent=raw('want'); $('#lv-mot2').textContent=raw('motive2'); $('#lv-engine').textContent=short('engine');
+  $('#lv-era').textContent=raw('era'); $('#lv-rule').textContent=raw('rule'); $('#lv-weight').textContent=raw('weight');
+  $('#lv-coh-a').textContent=raw('contra'); $('#lv-coh-p').textContent=raw('priority');
+  $('#lv-moral').textContent=short('moral'); $('#lv-sel').textContent=raw('selective');
+  $('#lv-mech').textContent=raw('mech'); $('#lv-func').textContent=raw('func');
+  $('#pg-self').textContent=self; $('#pg-other').textContent=other;
+  $('#lv-poss').textContent=raw('possession'); $('#lv-voice2').textContent=raw('voice'); $('#lv-foil').textContent=raw('foil');
+  $('#lv-mann').textContent=raw('mannerism').replace(' — ',' (')+')';
+  $('#lv-voice').textContent=raw('voice');
+  $('#lv-past').textContent=raw('wound'); $('#lv-present').textContent=raw('want'); $('#lv-future').textContent=raw('fear');
+  document.querySelectorAll('.mz').forEach(g=>g.classList.toggle('on',+g.dataset.i===state.maslow));
+  document.querySelectorAll('.path').forEach(b=>b.classList.toggle('on',+b.dataset.i===state.path));
+  $('#eng-0').classList.toggle('dim',state.engine!==0); $('#eng-1').classList.toggle('dim',state.engine!==1);
+  $('#moralMark').setAttribute('cx',MORAL_X[state.moral]);
+  $('#moralCross').style.display=state.moral===3?'':'none';
+  $('#pursuitMark').setAttribute('y',15+state.pursuit*70);
+  let s=''; SCALES.forEach(([k,ti,a,b],i)=>{const y=55+i*65, x=60+sv[k]*48;
+    s+=`<text class="t-h" x="60" y="${y-18}">${ti[lang].toUpperCase()}</text><line class="ln" x1="60" y1="${y}" x2="540" y2="${y}"/>`;
+    for(let j=0;j<=10;j++)s+=`<line class="ln" x1="${60+j*48}" y1="${y-4}" x2="${60+j*48}" y2="${y+4}" style="stroke-width:1"/>`;
+    s+=`<text class="t-s" x="60" y="${y+20}">${a[lang]}</text><text class="t-s" x="540" y="${y+20}" text-anchor="end">${b[lang]}</text><circle class="acc" cx="${x}" cy="${y}" r="9"/><text class="t-h" x="575" y="${y+5}" text-anchor="middle">${sv[k]}</text>`;});
+  $('#scaleSvg').innerHTML=s;
+}
+
+function setField(id,i){state[id]=i;render()}
+document.querySelectorAll('.mz').forEach(g=>{
+  const go=()=>setField('maslow',+g.dataset.i);
+  g.addEventListener('click',go); g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go()}});
+});
+document.querySelectorAll('.path').forEach(b=>b.addEventListener('click',()=>setField('path',+b.dataset.i)));
+$('#rollBtn').addEventListener('click',rollAll); $('#rollBtn2').addEventListener('click',rollAll);
+$('#unlockBtn').addEventListener('click',()=>{locked.clear();render()});
+$('#ridRoll').addEventListener('click',()=>{RFIELDS.forEach(f=>rollOne(f.id));render()});
+
+function copyText(text,toast,selectEl){
+  const done=()=>{toast.textContent=UI[lang].copied;setTimeout(()=>toast.textContent='',1800)};
+  const fallback=()=>{const r=document.createRange();r.selectNodeContents(selectEl);const s=getSelection();s.removeAllRanges();s.addRange(r);toast.textContent=UI[lang].sel};
+  try{navigator.clipboard.writeText(text).then(done,fallback)}catch(e){fallback()}
+}
+$('#copyBtn').addEventListener('click',()=>copyText($('#prompt').innerText.trim(),$('#toast'),$('#prompt')));
+$('#ridCopy').addEventListener('click',()=>{
+  const logic=$('#ridLogic').value.trim();
+  const text=$('#ridPrompt').innerText.trim()+'\n\n'+$('.rid-q').innerText.trim()+(logic?'\n\n'+UI[lang].logic+':\n'+logic:'');
+  copyText(text,$('#ridToast'),$('#ridPrompt'));
+});
+
+// The written logic is a per-viewer draft, kept in this browser only.
+const ridArea=$('#ridLogic');
+try{ridArea.value=localStorage.getItem('desk-rid-logic')||''}catch(e){}
+ridArea.addEventListener('input',()=>{try{localStorage.setItem('desk-rid-logic',ridArea.value)}catch(e){}});
+
+const root=document.documentElement;
+function setLang(l){
+  lang=l; root.lang=l;
+  document.title=l==='es'?'Taller de personajes':'Character Workbench';
+  ridArea.placeholder=UI[l].ph;
+  build(); render();
+}
+ALL.forEach(f=>rollOne(f.id)); rollOne('scales');
+DESK.onLang=setLang;
+setLang(DESK.eff());
+setMode(mode);
+</script>
+</body>
+</html>

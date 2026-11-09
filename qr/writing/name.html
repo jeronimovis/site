@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Nombres por generación</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Libre+Franklin:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap">
+<style id="desk-shared">
+/* Shared design language for the writing desk: one palette, three typefaces, one top bar. */
+:root{
+  --dk-bg:#fdfdfc; --dk-paper:#ffffff; --dk-ink:#16171a; --dk-muted:#5b5e67; --dk-rule:#d8dbe1;
+  --dk-soft:#f3f4f7; --dk-wash:#e8edf6; --dk-accent:#1f4f8a; --dk-accent-soft:#dde5f6; --dk-on-accent:#ffffff; --dk-mark:#f6eaa9;
+  --dk-display:"Libre Caslon Display","Bodoni 72",Didot,Georgia,serif;
+  --dk-body:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --dk-ui:"Libre Franklin","Helvetica Neue",Arial,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --dk-bg:#121316; --dk-paper:#1a1b20; --dk-ink:#ebeae5; --dk-muted:#a3a6ae; --dk-rule:#34363c;
+  --dk-soft:#1c1e23; --dk-wash:#1b2331; --dk-accent:#8db2e8; --dk-accent-soft:#25314f; --dk-on-accent:#0f1320; --dk-mark:#4b4321; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --dk-bg:#121316; --dk-paper:#1a1b20; --dk-ink:#ebeae5; --dk-muted:#a3a6ae; --dk-rule:#34363c;
+  --dk-soft:#1c1e23; --dk-wash:#1b2331; --dk-accent:#8db2e8; --dk-accent-soft:#25314f; --dk-on-accent:#0f1320; --dk-mark:#4b4321; color-scheme:dark}
+.dk-bar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px 16px;padding:14px 0 12px;border-bottom:1px solid var(--dk-rule)}
+.dk-crumbs{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;font:600 12px/1.3 var(--dk-ui);letter-spacing:.08em;text-transform:uppercase}
+.dk-crumbs a{color:var(--dk-ink);text-decoration:none;border-bottom:1px solid transparent}
+.dk-crumbs a:hover{color:var(--dk-accent);border-color:var(--dk-accent)}
+.dk-crumbs .dk-sep{color:var(--dk-muted)}
+.dk-prefs{display:flex;gap:8px;flex-wrap:wrap}
+.dk-seg{display:inline-flex;border:1px solid var(--dk-rule);border-radius:2px;overflow:hidden}
+.dk-seg button{background:transparent;border:0;margin:0;padding:5px 10px;cursor:pointer;font:600 11px/1.4 var(--dk-ui);letter-spacing:.08em;text-transform:uppercase;color:var(--dk-muted)}
+.dk-seg button+button{border-left:1px solid var(--dk-rule)}
+.dk-seg button:hover{color:var(--dk-ink)}
+.dk-seg button[aria-pressed="true"]{background:var(--dk-ink);color:var(--dk-bg)}
+.dk-seg button:focus-visible,.dk-crumbs a:focus-visible{outline:2px solid var(--dk-accent);outline-offset:2px}
+</style>
+<script>
+/* Shared preferences: language (Spanish by default) and theme (light by default), remembered across all pages of the desk. */
+(function(){
+  var R=document.documentElement;
+  var DEF={'desk-lang':'es','desk-theme':'light'};
+  function get(k){try{return localStorage.getItem(k)||DEF[k]}catch(e){return DEF[k]}}
+  function put(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+  function sys(){return (navigator.language||'').toLowerCase().indexOf('es')===0?'es':'en'}
+  var T={en:{auto:'Auto',light:'Light',dark:'Dark',home:'Writing desk',lang:'Language',theme:'Theme'},
+         es:{auto:'Auto',light:'Claro',dark:'Oscuro',home:'Mesa de escritura',lang:'Idioma',theme:'Tema'}};
+  var D=window.DESK={lang:get('desk-lang'),theme:get('desk-theme'),onLang:null,
+    eff:function(){return this.lang==='auto'?sys():this.lang}};
+  function applyTheme(){if(D.theme==='light'||D.theme==='dark')R.setAttribute('data-theme',D.theme);else R.removeAttribute('data-theme')}
+  function paint(){
+    var t=T[D.eff()];
+    document.querySelectorAll('[data-dk-lang]').forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-dk-lang')===D.lang)});
+    document.querySelectorAll('[data-dk-theme]').forEach(function(b){var v=b.getAttribute('data-dk-theme');b.setAttribute('aria-pressed',v===D.theme);b.textContent=t[v]});
+    document.querySelectorAll('[data-dk-t]').forEach(function(e){e.textContent=t[e.getAttribute('data-dk-t')]});
+    document.querySelectorAll('[data-dk-aria]').forEach(function(e){e.setAttribute('aria-label',t[e.getAttribute('data-dk-aria')])});
+  }
+  function fire(){paint();if(D.onLang)D.onLang(D.eff())}
+  D.setLang=function(l){D.lang=l;put('desk-lang',l);fire()};
+  D.setTheme=function(t){D.theme=t;put('desk-theme',t);applyTheme();paint()};
+  D.paint=paint;
+  document.addEventListener('click',function(e){
+    var b=e.target.closest&&e.target.closest('[data-dk-lang],[data-dk-theme]');if(!b)return;
+    if(b.hasAttribute('data-dk-lang'))D.setLang(b.getAttribute('data-dk-lang'));else D.setTheme(b.getAttribute('data-dk-theme'));
+  });
+  window.addEventListener('languagechange',function(){if(D.lang==='auto')fire()});
+  window.addEventListener('storage',function(e){
+    if(e.key==='desk-theme'){D.theme=e.newValue||'light';applyTheme();paint()}
+    if(e.key==='desk-lang'){D.lang=e.newValue||'es';fire()}
+  });
+  applyTheme();
+  R.lang=D.eff();
+})();
+</script>
+<style>
+/* Layout: masthead like the other desk pages; decade tabs, two name columns where type size drops with frequency, then two tool panels. */
+:root{--bg:var(--dk-bg);--ink:var(--dk-ink);--muted:var(--dk-muted);--rule:var(--dk-rule);--soft:var(--dk-soft);--accent:var(--dk-accent);
+  --display:var(--dk-display);--body:var(--dk-body);--ui:var(--dk-ui)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5}
+.wrap{max-width:980px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 56px;display:grid;gap:26px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.label{font:600 11.5px var(--ui);text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
+
+.mast{display:flex;justify-content:space-between;align-items:flex-end;gap:16px 24px;flex-wrap:wrap;padding-top:18px;padding-bottom:16px;border-bottom:3px double var(--ink)}
+.mast .kick{color:var(--accent)}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(2.3rem,6.5vw,4.2rem);line-height:1;margin:8px 0 8px;letter-spacing:-.01em;text-wrap:balance}
+.lede{margin:0;color:var(--muted);font-style:italic;max-width:58ch}
+.country{display:inline-flex;border:1px solid var(--rule);border-radius:2px;overflow:hidden;flex:none}
+.country button{background:none;border:0;padding:7px 14px;font:600 12px var(--ui);letter-spacing:.08em;color:var(--muted)}
+.country button+button{border-left:1px solid var(--rule)}
+.country button[aria-checked="true"]{background:var(--ink);color:var(--bg)}
+
+.decades{display:flex;gap:2px;overflow-x:auto;border-bottom:1px solid var(--rule);scrollbar-width:thin;margin-top:-6px}
+.decades button{background:none;border:0;border-bottom:3px solid transparent;padding:8px 10px 9px;font:500 14px var(--ui);color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.decades button:hover{color:var(--ink)}
+.decades button[aria-selected="true"]{color:var(--ink);font-weight:700;border-bottom-color:var(--accent)}
+
+.era{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 20px}
+.era h2{font-family:var(--display);font-size:clamp(28px,5vw,40px);font-weight:400;margin:0;line-height:1.1}
+.era .age{font:500 13px var(--ui);color:var(--muted);font-variant-numeric:tabular-nums}
+
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:20px 40px}
+@media (max-width:640px){.cols{grid-template-columns:1fr}}
+.col{min-width:0;display:grid;gap:18px;align-content:start}
+.col h3{margin:0;padding-bottom:6px;border-bottom:1px solid var(--ink);font:600 12.5px var(--ui);text-transform:uppercase;letter-spacing:.1em}
+.tier{display:grid;gap:4px}
+.names{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:2px 14px}
+.t0 .names{font-family:var(--display);font-size:27px;line-height:1.25}
+.t1 .names{font-size:20px;line-height:1.3}
+.t2 .names{font-size:17px;color:var(--muted)}
+.t3 .names{font-size:16px;font-style:italic;color:var(--muted)}
+.names li.hit{color:var(--accent);text-decoration:underline;text-underline-offset:3px}
+
+.tools{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:640px){.tools{grid-template-columns:1fr}}
+.panel{background:var(--soft);border-top:1px solid var(--ink);padding:16px;display:grid;gap:10px;min-width:0;align-content:start}
+.row{display:flex;flex-wrap:wrap;gap:8px}
+.btn{background:var(--bg);border:1px solid var(--rule);border-radius:2px;padding:7px 13px;font:600 13px var(--ui)}
+.btn:hover{border-color:var(--ink)}
+.pick{font-family:var(--display);font-size:34px;min-height:1.3em;line-height:1.2}
+.pick small{display:block;font:500 12px var(--ui);color:var(--muted);letter-spacing:.04em}
+input[type="search"]{width:100%;font:inherit;font-size:17px;padding:8px 10px;border:1px solid var(--rule);border-radius:2px;background:var(--bg);color:var(--ink)}
+.found{font-size:15px;color:var(--muted)}
+.found b{color:var(--ink);font-weight:600}
+.found button{background:none;border:0;padding:0;color:var(--accent);text-decoration:underline;text-underline-offset:2px;font:600 13px var(--ui)}
+footer{color:var(--muted);font:400 13px/1.5 var(--ui);border-top:1px solid var(--rule);padding-top:12px;max-width:80ch}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="dk-bar">
+  <nav class="dk-crumbs" aria-label="Breadcrumb"><a href="index.html">← <span data-dk-t="home">Writing desk</span></a><span class="dk-sep">·</span><a href="character.html" id="crumbChar">Character workbench</a></nav>
+  <div class="dk-prefs">
+    <div class="dk-seg" role="group" data-dk-aria="lang" aria-label="Language"><button type="button" data-dk-lang="auto">Auto</button><button type="button" data-dk-lang="en">EN</button><button type="button" data-dk-lang="es">ES</button></div>
+    <div class="dk-seg" role="group" data-dk-aria="theme" aria-label="Theme"><button type="button" data-dk-theme="auto">Auto</button><button type="button" data-dk-theme="light">Light</button><button type="button" data-dk-theme="dark">Dark</button></div>
+  </div>
+</div>
+<script>DESK.paint()</script>
+  <header class="mast">
+    <div>
+      <div class="label kick" id="where"></div>
+      <h1 id="h1"></h1>
+      <p class="lede" id="lede"></p>
+    </div>
+    <div class="country" role="radiogroup" id="countryGrp">
+      <button type="button" role="radio" data-c="ar" aria-checked="true">AR</button>
+      <button type="button" role="radio" data-c="us" aria-checked="false">US</button>
+    </div>
+  </header>
+
+  <nav class="decades" id="decades" role="tablist"></nav>
+
+  <section aria-live="polite">
+    <div class="era"><h2 id="eraName"></h2><span class="age" id="eraAge"></span></div>
+  </section>
+
+  <div class="cols">
+    <div class="col" id="colM"><h3 id="hM"></h3></div>
+    <div class="col" id="colF"><h3 id="hF"></h3></div>
+  </div>
+
+  <div class="tools">
+    <div class="panel">
+      <span class="label" id="rndLbl"></span>
+      <div class="row">
+        <button class="btn" type="button" id="rndM"></button>
+        <button class="btn" type="button" id="rndF"></button>
+        <button class="btn" type="button" id="rndR"></button>
+      </div>
+      <div class="pick" id="pick" aria-live="polite"></div>
+    </div>
+    <div class="panel">
+      <label class="label" for="q" id="qLbl"></label>
+      <input type="search" id="q" autocomplete="off">
+      <div class="found" id="found"></div>
+    </div>
+  </div>
+
+  <footer id="foot"></footer>
+</div>
+
+<script>
+const DATA = {ar: {
+1930:{m:["Juan, José, Carlos, Jorge, Roberto, Luis, Antonio, Alberto","Héctor, Mario, Osvaldo, Raúl, Rubén, Oscar, Francisco, Pedro","Ángel, Hugo, Manuel, Ricardo, Domingo, Enrique","Eusebio, Anselmo, Ciriaco, Wenceslao, Nicanor, Eleuterio"],
+      f:["María, Ana, Rosa, Elena, Nélida, Elsa, Teresa, Juana","Blanca, Haydée, Delia, Esther, Irma, Lidia, Carmen, Dora","Olga, Mercedes, Hilda, Angélica, Josefa, Aída","Eulalia, Clotilde, Filomena, Herminia, Edelmira, Brígida"]},
+1940:{m:["Juan Carlos, Carlos Alberto, Jorge, Roberto, Héctor, Hugo, Rubén, Osvaldo","Mario, Raúl, Alberto, Miguel Ángel, Ricardo, Oscar, Néstor, Norberto","Eduardo, Domingo, Enrique, Ramón, Rodolfo, Rogelio","Gumersindo, Evaristo, Rufino, Saturnino, Abelardo, Leopoldo"],
+      f:["María, Norma, Nélida, Graciela, Beatriz, Susana, Marta, Elsa","Mirta, Ana María, Alicia, Nilda, Gladys, Hilda, Isabel, Mabel","Stella Maris, Irma, Yolanda, Edith, Nidia, Iris","Zunilda, Amanda, Perla, Celina, Eva, Ilda"]},
+1950:{m:["Carlos Alberto, Jorge Luis, Juan Carlos, Daniel, Ricardo, Miguel Ángel, Rubén, Héctor","Osvaldo, Luis Alberto, Roberto, Eduardo, Oscar, Néstor, Raúl, Hugo","Sergio, Omar, Edgardo, Rodolfo, Walter, Ángel","Ubaldo, Elvio, Dante, Nelson, Aníbal, Américo"],
+      f:["María, Graciela, Susana, Silvia, Marta, Liliana, Mónica, Beatriz","Ana María, Norma, Stella Maris, Alicia, Mirta, Patricia, Cristina, Nora","Adriana, Elba, Gloria, Estela, Zulma, Marisa","Amalia, Leonor, Lía, Ester, Delia, Ofelia"]},
+1960:{m:["Daniel, Carlos, Jorge, Gustavo, Claudio, Sergio, Marcelo, Fernando","Ricardo, Luis, Alejandro, Walter, José Luis, Miguel, Javier, Fabián","Guillermo, Horacio, Gerardo, Adrián, Rolando, Ariel","Hipólito, Aníbal, Lisandro, Wilfredo, Atilio, Elbio"],
+      f:["Silvia, Claudia, Mónica, Patricia, Liliana, Graciela, Adriana, Alejandra","Gabriela, Andrea, Sandra, Marcela, Laura, Viviana, Susana, Cristina","Analía, Roxana, Fabiana, Nancy, Mariela, Marisa","Ivonne, Miriam, Griselda, Daniela, Inés, Zulema"]},
+1970:{m:["Diego, Pablo, Sergio, Gustavo, Marcelo, Fernando, Alejandro, Javier","Daniel, Claudio, Martín, Cristian, Fabián, Gabriel, Hernán, Leonardo","Mariano, Ariel, Walter, Germán, Damián, Gastón","Ernesto, Aldo, Lisandro, Rómulo, Abel, Teodoro"],
+      f:["Andrea, Claudia, Silvina, Gabriela, Mariana, Carolina, Verónica, Natalia","Paola, Lorena, Valeria, Laura, Marcela, Sandra, Karina, Viviana","Vanesa, Alejandra, Romina, Soledad, Analía, Gisela","Erica, Mercedes, Inés, Victoria, Florencia, Malvina"]},
+1980:{m:["Matías, Juan Pablo, Diego, Martín, Lucas, Federico, Leandro, Sebastián","Pablo, Cristian, Maximiliano, Ezequiel, Emiliano, Gonzalo, Damián, Nicolás","Mariano, Hernán, Rodrigo, Facundo, Esteban, Germán","Leonel, Lisandro, Ulises, Fermín, Augusto, Bruno"],
+      f:["Carolina, Romina, Natalia, Vanesa, Paola, Soledad, Florencia, Lorena","Jésica, Melina, Cintia, Daiana, Yanina, Gisela, Valeria, Noelia","Verónica, Micaela, Celeste, Mariela, Belén, Luciana","Guadalupe, Josefina, Inés, Clara, Pilar, Delfina"]},
+1990:{m:["Agustín, Nicolás, Lucas, Matías, Facundo, Franco, Ezequiel, Brian","Maximiliano, Tomás, Gonzalo, Federico, Leandro, Rodrigo, Ramiro, Joaquín","Emanuel, Kevin, Jonathan, Alan, Lautaro, Nahuel","Felipe, Benicio, Ciro, Octavio, Lorenzo, Valentino"],
+      f:["Micaela, Florencia, Camila, Agustina, Melina, Daiana, Rocío, Antonela","Milagros, Aldana, Yamila, Julieta, Brenda, Belén, Sofía, Luciana","Celeste, Abigail, Tamara, Ayelén, Macarena, Jazmín","Emilia, Olivia, Renata, Catalina, Alma, Josefina"]},
+2000:{m:["Santiago, Thiago, Benjamín, Joaquín, Tomás, Lautaro, Valentín, Bautista","Agustín, Juan Ignacio, Mateo, Nicolás, Facundo, Ian, Ignacio, Franco","Bruno, Thomas, Ezequiel, Gael, Santino, Alexis","Jorge, Carlos, Roberto, Héctor, Raúl, Osvaldo"],
+      f:["Sofía, Martina, Valentina, Camila, Lucía, Milagros, Agustina, Abril","Candela, Florencia, Delfina, Julieta, Micaela, Morena, Catalina, Victoria","Brisa, Aylén, Rocío, Ludmila, Priscila, Zoe","Graciela, Susana, Norma, Mónica, Silvia, Liliana"]},
+2010:{m:["Benjamín, Bautista, Thiago, Mateo, Felipe, Santino, Joaquín, Lorenzo","Valentino, Ciro, Tomás, Benicio, Francesco, Lautaro, Gael, Dante","Lisandro, Liam, Simón, Juan Cruz, Salvador, Bastián","Eduardo, Daniel, Claudio, Sergio, Marcelo, Gustavo"],
+      f:["Sofía, Emma, Isabella, Martina, Catalina, Mía, Olivia, Valentina","Delfina, Alma, Josefina, Victoria, Lucía, Emilia, Renata, Julia","Guadalupe, Morena, Ámbar, Pilar, Lola, Malena","Claudia, Patricia, Andrea, Sandra, Marcela, Viviana"]},
+2020:{m:["Mateo, Bautista, Benjamín, Felipe, Lorenzo, Benicio, Liam, Santino","Thiago, Ciro, Valentino, Gael, Bastián, Noah, Lisandro, Salvador","Lucio, Elías, Augusto, Vicente, Teo, Faustino","Matías, Diego, Lucas, Leandro, Cristian, Ezequiel"],
+      f:["Isabella, Emma, Olivia, Mía, Catalina, Sofía, Alma, Martina","Emilia, Delfina, Aurora, Victoria, Lola, Renata, Amparo, Elena","Ámbar, Paloma, Juana, Francesca, Clara, Luz","Romina, Carolina, Natalia, Vanesa, Lorena, Daiana"]}
+},
+us: {
+1930:{m:["Robert, James, John, William, Richard, Charles, Donald, George","Thomas, Joseph, David, Edward, Ronald, Paul, Kenneth, Frank","Raymond, Jack, Harold, Billy, Gerald, Walter","Elmer, Virgil, Homer, Orville, Wilbur, Thaddeus"],
+      f:["Mary, Betty, Barbara, Shirley, Patricia, Dorothy, Joan, Margaret","Nancy, Helen, Carol, Joyce, Doris, Ruth, Virginia, Marilyn","Elizabeth, Jean, Frances, Beverly, Lois, Alice","Mildred, Gertrude, Bernice, Agnes, Myrtle, Opal"]},
+1940:{m:["James, Robert, John, William, Richard, David, Charles, Thomas","Michael, Ronald, Larry, Donald, Joseph, Gary, George, Kenneth","Paul, Edward, Jerry, Dennis, Frank, Roger","Lyle, Merle, Orval, Clyde, Delbert, Wendell"],
+      f:["Mary, Linda, Barbara, Patricia, Carol, Sandra, Nancy, Sharon","Judith, Susan, Betty, Carolyn, Margaret, Shirley, Judy, Karen","Donna, Kathleen, Joyce, Brenda, Janet, Diane","Velma, Imogene, Wilma, Bertha, Hazel, Lorraine"]},
+1950:{m:["James, Michael, Robert, John, David, William, Richard, Thomas","Mark, Charles, Steven, Gary, Joseph, Donald, Ronald, Kenneth","Paul, Larry, Daniel, Stephen, Dennis, Timothy","Rodney, Duane, Leroy, Floyd, Vernon, Marvin"],
+      f:["Mary, Linda, Patricia, Susan, Deborah, Barbara, Debra, Karen","Nancy, Donna, Cynthia, Sandra, Pamela, Sharon, Kathleen, Carol","Diane, Brenda, Cheryl, Janet, Elizabeth, Kathy","Darlene, Glenda, Bonnie, Peggy, Marsha, Gail"]},
+1960:{m:["Michael, David, John, James, Robert, Mark, William, Richard","Thomas, Jeffrey, Steven, Joseph, Timothy, Kevin, Scott, Brian","Charles, Paul, Daniel, Christopher, Kenneth, Anthony","Clifford, Wayne, Randall, Curtis, Darrell, Byron"],
+      f:["Lisa, Mary, Susan, Karen, Kimberly, Patricia, Linda, Donna","Michelle, Cynthia, Sandra, Deborah, Tammy, Pamela, Lori, Laura","Elizabeth, Julie, Brenda, Angela, Barbara, Debra","Darla, Lynette, Rosemary, Marcia, Bobbie, Colleen"]},
+1970:{m:["Michael, Christopher, Jason, David, James, John, Robert, Brian","William, Matthew, Joseph, Daniel, Kevin, Eric, Jeffrey, Richard","Scott, Mark, Steven, Thomas, Timothy, Anthony","Silas, Ezra, Levi, Gideon, Otis, Abel"],
+      f:["Jennifer, Amy, Melissa, Michelle, Kimberly, Lisa, Angela, Heather","Stephanie, Nicole, Jessica, Elizabeth, Rebecca, Kelly, Mary, Christina","Amanda, Julie, Sarah, Laura, Shannon, Christine","Misty, Tabitha, Autumn, Summer, Jodi, Dana"]},
+1980:{m:["Michael, Christopher, Matthew, Joshua, David, James, Daniel, Robert","John, Joseph, Jason, Justin, Andrew, Ryan, William, Brandon","Kyle, Cody, Derek, Corey, Travis, Dustin","Jasper, Silas, Ezekiel, Atticus, Rhett, August"],
+      f:["Jessica, Jennifer, Amanda, Ashley, Sarah, Stephanie, Melissa, Nicole","Elizabeth, Heather, Tiffany, Michelle, Amber, Megan, Amy, Rachel","Brittany, Danielle, Crystal, Kimberly, Lauren, Courtney","Hazel, Violet, Stella, Ruby, Eleanor, Penelope"]},
+1990:{m:["Michael, Christopher, Matthew, Joshua, Jacob, Nicholas, Andrew, Daniel","Tyler, Joseph, Brandon, David, James, Ryan, John, Zachary","Austin, Kyle, Cody, Dylan, Justin, Jordan","Theodore, Henry, Leo, Oliver, Arthur, Hudson"],
+      f:["Jessica, Ashley, Emily, Sarah, Samantha, Amanda, Brittany, Elizabeth","Taylor, Megan, Hannah, Kayla, Lauren, Stephanie, Rachel, Jennifer","Alexis, Courtney, Madison, Chelsea, Destiny, Brianna","Aurora, Ivy, Nora, Hazel, Eleanor, Willow"]},
+2000:{m:["Jacob, Michael, Joshua, Matthew, Daniel, Christopher, Andrew, Ethan","Joseph, William, Anthony, David, Alexander, Nicholas, Ryan, Tyler","Jayden, Aiden, Logan, Noah, Dylan, Brandon","Gary, Larry, Dennis, Ronald, Kenneth, Donald"],
+      f:["Emily, Madison, Emma, Olivia, Hannah, Abigail, Isabella, Samantha","Elizabeth, Ashley, Alexis, Sarah, Sophia, Alyssa, Grace, Ava","Brianna, Chloe, Kaylee, Destiny, Mackenzie, Haley","Linda, Deborah, Barbara, Sandra, Donna, Brenda"]},
+2010:{m:["Noah, Liam, Mason, Jacob, William, Ethan, James, Alexander","Michael, Benjamin, Elijah, Daniel, Aiden, Logan, Matthew, Lucas","Jackson, Oliver, Jayden, Sebastian, Henry, Carter","Brian, Jeffrey, Scott, Gregory, Todd, Keith"],
+      f:["Emma, Sophia, Olivia, Isabella, Ava, Mia, Abigail, Emily","Charlotte, Madison, Harper, Elizabeth, Amelia, Evelyn, Avery, Ella","Chloe, Sofia, Aubrey, Addison, Lily, Natalie","Lisa, Kimberly, Tammy, Michelle, Tracy, Cheryl"]},
+2020:{m:["Liam, Noah, Oliver, James, Elijah, Mateo, Theodore, Henry","Lucas, William, Benjamin, Levi, Sebastian, Jack, Ezra, Hudson","Luca, Maverick, Kai, Asher, Leo, Grayson","Jason, Justin, Brandon, Kevin, Eric, Travis"],
+      f:["Olivia, Emma, Charlotte, Amelia, Sophia, Mia, Isabella, Ava","Evelyn, Luna, Harper, Sofia, Eleanor, Camila, Elizabeth, Violet","Scarlett, Hazel, Aurora, Nova, Ivy, Willow","Jessica, Ashley, Amanda, Brittany, Heather, Tiffany"]}
+}};
+for (const c in DATA) for (const d in DATA[c]) for (const g of ["m","f"]) DATA[c][d][g] = DATA[c][d][g].map(s => s.split(",").map(x => x.trim()));
+
+const UI = {
+  es: { title: "Nombres por generación", lede: "Qué nombres se ponían en cada década, de los más comunes a los raros. El tamaño de la letra baja con la frecuencia.",
+    tiers: ["Muy comunes", "Comunes", "Poco frecuentes", "Raros"], m: "Varón", f: "Mujer", rare: "Solo raros",
+    rnd: "Sortear un nombre de esta década", q: "¿De qué época es un nombre?", hint: "Escribí un nombre para ver en qué décadas aparece.",
+    none: "No está en las listas.", in: "en", now: "2020–hoy", country: "País", decades: "Décadas",
+    era: d => d === 2020 ? "Nacidos de 2020 a hoy" : `Nacidos en los ${d >= 2000 ? "años " + d : "’" + String(d).slice(2)}`,
+    age: (d, end, lo, hi) => `${d}–${end} · hoy tienen ${lo === 0 ? "menos de 1" : lo} a ${hi} años`,
+    where: { ar: "Argentina · 1930 a hoy", us: "Estados Unidos · 1930 a hoy" },
+    ph: { ar: "Ej.: Nélida, Thiago, Graciela", us: "Ej.: Mildred, Jayden, Brittany" },
+    foot: { ar: "Listas aproximadas, armadas a partir de las tendencias conocidas de cada época (el RENAPER publicó los nombres registrados de 1922 a 2015 en datos.gob.ar).",
+            us: "Listas aproximadas, armadas a partir de las tendencias conocidas de cada época (la Social Security Administration publica los nombres registrados desde 1880 en ssa.gov). Canadá sigue tendencias muy parecidas." },
+    rareNote: " Los “raros” son nombres que existían pero se usaban poco; en las décadas recientes, son sobre todo los nombres de padres y abuelos.",
+    character: "Taller de personajes" },
+  en: { title: "Names by generation", lede: "What children were named in each decade, from the most common to the rare. Type size drops with frequency.",
+    tiers: ["Very common", "Common", "Less common", "Rare"], m: "Boys", f: "Girls", rare: "Rare only",
+    rnd: "Draw a name from this decade", q: "Which era is a name from?", hint: "Type a name to see which decades it appears in.",
+    none: "Not in the lists.", in: "in", now: "2020–now", country: "Country", decades: "Decades",
+    era: d => d === 2020 ? "Born 2020 to today" : `Born in the ${d}s`,
+    age: (d, end, lo, hi) => `${d}–${end} · today aged ${lo === 0 ? "under 1" : lo} to ${hi}`,
+    where: { ar: "Argentina · 1930 to today", us: "United States · 1930 to today" },
+    ph: { ar: "e.g. Nélida, Thiago, Graciela", us: "e.g. Mildred, Jayden, Brittany" },
+    foot: { ar: "Approximate lists, built from the known trends of each period (RENAPER published the names registered from 1922 to 2015 at datos.gob.ar).",
+            us: "Approximate lists, built from the known trends of each period (the Social Security Administration publishes registered names since 1880 at ssa.gov). Canada follows very similar trends." },
+    rareNote: " “Rare” names existed but were little used; in recent decades they are mostly the names of parents and grandparents.",
+    character: "Character workbench" }
+};
+const $ = id => document.getElementById(id);
+const norm = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+const YEAR = new Date().getFullYear();
+const decades = Object.keys(DATA.ar).map(Number);
+let lang = DESK.eff(), country = "ar", D = DATA.ar, cur = 1950, query = "", lastPick = null;
+const u = () => UI[lang];
+
+function show(d) {
+  cur = d;
+  document.querySelectorAll("#decades button").forEach(b => b.setAttribute("aria-selected", +b.dataset.d === d));
+  $("eraName").textContent = u().era(d);
+  const end = Math.min(d + 9, YEAR);
+  $("eraAge").textContent = u().age(d, end, YEAR - end, YEAR - d);
+  const q = norm(query);
+  for (const [g, el] of [["m", $("colM")], ["f", $("colF")]]) {
+    el.querySelectorAll(".tier").forEach(n => n.remove());
+    D[d][g].forEach((list, i) => {
+      const t = document.createElement("div");
+      t.className = "tier t" + i;
+      t.innerHTML = `<span class="label">${u().tiers[i]}</span><ul class="names">${
+        list.map(n => `<li${q && norm(n).includes(q) ? ' class="hit"' : ""}>${n}</li>`).join("")}</ul>`;
+      el.appendChild(t);
+    });
+  }
+}
+function paintPick() {
+  if (!lastPick) { $("pick").innerHTML = ""; return; }
+  const [n, i, g, d] = lastPick;
+  $("pick").innerHTML = `${n}<small>${u()[g].toLowerCase()} · ${u().tiers[i].toLowerCase()} · ${d}s</small>`;
+}
+function pick(g, rareOnly) {
+  const pool = [];
+  for (const gg of g ? [g] : ["m", "f"]) D[cur][gg].forEach((l, i) => { if (!rareOnly || i >= 2) l.forEach(n => pool.push([n, i, gg, cur])); });
+  lastPick = pool[Math.floor(Math.random() * pool.length)];
+  paintPick();
+}
+function search() {
+  query = $("q").value.trim();
+  const q = norm(query);
+  if (q.length < 2) { $("found").textContent = u().hint; show(cur); return; }
+  const hits = [];
+  for (const d of decades) for (const g of ["m", "f"]) D[d][g].forEach((l, i) => l.forEach(n => { if (norm(n).includes(q)) hits.push({ d, i, n }); }));
+  if (!hits.length) { $("found").textContent = u().none; show(cur); return; }
+  $("found").innerHTML = hits.map(h => `<div><b>${h.n}</b> · ${u().tiers[h.i].toLowerCase()} ${u().in} <button type="button" data-d="${h.d}">${h.d}s</button></div>`).join("");
+  show(cur);
+}
+function paintStatic() {
+  const t = u();
+  document.documentElement.lang = lang;
+  document.title = t.title;
+  $("h1").textContent = t.title; $("lede").textContent = t.lede;
+  $("where").textContent = t.where[country];
+  $("hM").textContent = t.m; $("hF").textContent = t.f;
+  $("rndLbl").textContent = t.rnd; $("rndM").textContent = t.m; $("rndF").textContent = t.f; $("rndR").textContent = t.rare;
+  $("qLbl").textContent = t.q; $("q").placeholder = t.ph[country];
+  $("foot").textContent = t.foot[country] + t.rareNote;
+  $("countryGrp").setAttribute("aria-label", t.country);
+  $("decades").setAttribute("aria-label", t.decades);
+  $("crumbChar").textContent = t.character;
+  $("decades").innerHTML = decades.map(d => `<button type="button" role="tab" data-d="${d}">${d === 2020 ? t.now : d + "s"}</button>`).join("");
+}
+function setCountry(c) {
+  country = c; D = DATA[c];
+  document.querySelectorAll(".country button").forEach(b => b.setAttribute("aria-checked", b.dataset.c === c));
+  try { localStorage.setItem("pais", c); } catch (e) {}
+  paintStatic(); search(); pick();
+}
+function setLang(l) { lang = l; paintStatic(); search(); paintPick(); }
+
+$("countryGrp").addEventListener("click", e => { const b = e.target.closest("button"); if (b) setCountry(b.dataset.c); });
+$("decades").addEventListener("click", e => { const b = e.target.closest("button"); if (b) show(+b.dataset.d); });
+$("found").addEventListener("click", e => { const b = e.target.closest("button"); if (b) show(+b.dataset.d); });
+$("rndM").onclick = () => pick("m");
+$("rndF").onclick = () => pick("f");
+$("rndR").onclick = () => pick(null, true);
+$("q").addEventListener("input", search);
+
+DESK.onLang = setLang;
+let saved = "ar";
+try { saved = localStorage.getItem("pais") || "ar"; } catch (e) {}
+setCountry(DATA[saved] ? saved : "ar");
+</script>
+</body>
+</html>

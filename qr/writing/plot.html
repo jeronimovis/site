@@ -1,0 +1,765 @@
+<title>The Plot Atlas</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Libre+Franklin:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap">
+<style id="desk-shared">
+/* Shared design language for the writing desk: one palette, three typefaces, one top bar. */
+:root{
+  --dk-bg:#fdfdfc; --dk-paper:#ffffff; --dk-ink:#16171a; --dk-muted:#5b5e67; --dk-rule:#d8dbe1;
+  --dk-soft:#f3f4f7; --dk-wash:#e8edf6; --dk-accent:#1f4f8a; --dk-accent-soft:#dde5f6; --dk-on-accent:#ffffff; --dk-mark:#f6eaa9;
+  --dk-display:"Libre Caslon Display","Bodoni 72",Didot,Georgia,serif;
+  --dk-body:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --dk-ui:"Libre Franklin","Helvetica Neue",Arial,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --dk-bg:#121316; --dk-paper:#1a1b20; --dk-ink:#ebeae5; --dk-muted:#a3a6ae; --dk-rule:#34363c;
+  --dk-soft:#1c1e23; --dk-wash:#1b2331; --dk-accent:#8db2e8; --dk-accent-soft:#25314f; --dk-on-accent:#0f1320; --dk-mark:#4b4321; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --dk-bg:#121316; --dk-paper:#1a1b20; --dk-ink:#ebeae5; --dk-muted:#a3a6ae; --dk-rule:#34363c;
+  --dk-soft:#1c1e23; --dk-wash:#1b2331; --dk-accent:#8db2e8; --dk-accent-soft:#25314f; --dk-on-accent:#0f1320; --dk-mark:#4b4321; color-scheme:dark}
+.dk-bar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px 16px;padding:14px 0 12px;border-bottom:1px solid var(--dk-rule)}
+.dk-crumbs{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;font:600 12px/1.3 var(--dk-ui);letter-spacing:.08em;text-transform:uppercase}
+.dk-crumbs a{color:var(--dk-ink);text-decoration:none;border-bottom:1px solid transparent}
+.dk-crumbs a:hover{color:var(--dk-accent);border-color:var(--dk-accent)}
+.dk-crumbs .dk-sep{color:var(--dk-muted)}
+.dk-prefs{display:flex;gap:8px;flex-wrap:wrap}
+.dk-seg{display:inline-flex;border:1px solid var(--dk-rule);border-radius:2px;overflow:hidden}
+.dk-seg button{background:transparent;border:0;margin:0;padding:5px 10px;cursor:pointer;font:600 11px/1.4 var(--dk-ui);letter-spacing:.08em;text-transform:uppercase;color:var(--dk-muted)}
+.dk-seg button+button{border-left:1px solid var(--dk-rule)}
+.dk-seg button:hover{color:var(--dk-ink)}
+.dk-seg button[aria-pressed="true"]{background:var(--dk-ink);color:var(--dk-bg)}
+.dk-seg button:focus-visible,.dk-crumbs a:focus-visible{outline:2px solid var(--dk-accent);outline-offset:2px}
+</style>
+<script>
+/* Shared preferences: language (Spanish by default) and theme (light by default), remembered across all pages of the desk. */
+(function(){
+  var R=document.documentElement;
+  var DEF={'desk-lang':'es','desk-theme':'light'};
+  function get(k){try{return localStorage.getItem(k)||DEF[k]}catch(e){return DEF[k]}}
+  function put(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+  function sys(){return (navigator.language||'').toLowerCase().indexOf('es')===0?'es':'en'}
+  var T={en:{auto:'Auto',light:'Light',dark:'Dark',home:'Writing desk',lang:'Language',theme:'Theme'},
+         es:{auto:'Auto',light:'Claro',dark:'Oscuro',home:'Mesa de escritura',lang:'Idioma',theme:'Tema'}};
+  var D=window.DESK={lang:get('desk-lang'),theme:get('desk-theme'),onLang:null,
+    eff:function(){return this.lang==='auto'?sys():this.lang}};
+  function applyTheme(){if(D.theme==='light'||D.theme==='dark')R.setAttribute('data-theme',D.theme);else R.removeAttribute('data-theme')}
+  function paint(){
+    var t=T[D.eff()];
+    document.querySelectorAll('[data-dk-lang]').forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-dk-lang')===D.lang)});
+    document.querySelectorAll('[data-dk-theme]').forEach(function(b){var v=b.getAttribute('data-dk-theme');b.setAttribute('aria-pressed',v===D.theme);b.textContent=t[v]});
+    document.querySelectorAll('[data-dk-t]').forEach(function(e){e.textContent=t[e.getAttribute('data-dk-t')]});
+    document.querySelectorAll('[data-dk-aria]').forEach(function(e){e.setAttribute('aria-label',t[e.getAttribute('data-dk-aria')])});
+  }
+  function fire(){paint();if(D.onLang)D.onLang(D.eff())}
+  D.setLang=function(l){D.lang=l;put('desk-lang',l);fire()};
+  D.setTheme=function(t){D.theme=t;put('desk-theme',t);applyTheme();paint()};
+  D.paint=paint;
+  document.addEventListener('click',function(e){
+    var b=e.target.closest&&e.target.closest('[data-dk-lang],[data-dk-theme]');if(!b)return;
+    if(b.hasAttribute('data-dk-lang'))D.setLang(b.getAttribute('data-dk-lang'));else D.setTheme(b.getAttribute('data-dk-theme'));
+  });
+  window.addEventListener('languagechange',function(){if(D.lang==='auto')fire()});
+  window.addEventListener('storage',function(e){
+    if(e.key==='desk-theme'){D.theme=e.newValue||'light';applyTheme();paint()}
+    if(e.key==='desk-lang'){D.lang=e.newValue||'es';fire()}
+  });
+  applyTheme();
+  R.lang=D.eff();
+})();
+</script>
+<style>
+/* Layout: broadsheet masthead, generator desk on top, atlas grid of diagrams below; detail opens as a plate */
+:root{
+  --bg:var(--dk-bg); --ink:var(--dk-ink); --muted:var(--dk-muted); --rule:var(--dk-rule);
+  --wash:var(--dk-wash); --wash2:var(--dk-soft); --accent:var(--dk-accent); --on-accent:var(--dk-on-accent);
+  --display:var(--dk-display); --body:var(--dk-body); --ui:var(--dk-ui);
+}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:0 48px}
+.wrap{max-width:1180px;margin:0 auto}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* masthead */
+.mast{padding-block:18px 18px;border-bottom:3px double var(--ink)}
+.mast-top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font:500 12px var(--ui);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--rule);padding-bottom:10px}
+.mast h1{font-family:var(--display);font-weight:400;font-size:clamp(46px,8vw,92px);line-height:1;text-align:center;margin:18px 0 8px;letter-spacing:-.01em}
+.mast p{text-align:center;margin:0 auto;max-width:60ch;color:var(--muted);font-style:italic}
+
+/* section heads */
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;border-bottom:1px solid var(--ink);padding-bottom:8px;margin:40px 0 20px}
+.kicker{font:600 12px var(--ui);letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.sec-head h2{font-family:var(--display);font-weight:400;font-size:34px;line-height:1.1;margin:2px 0 0;text-wrap:balance}
+.sec-head .note{font:400 14px var(--ui);color:var(--muted);max-width:46ch}
+
+/* generator */
+.desk{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:28px}
+@media (max-width:860px){.desk{grid-template-columns:1fr}}
+.controls{display:flex;flex-direction:column;gap:14px;min-width:0}
+.spin-row{display:flex;gap:10px;flex-wrap:wrap}
+.btn{font:600 14px var(--ui);letter-spacing:.02em;border:1px solid var(--ink);background:transparent;padding:10px 16px;cursor:pointer;border-radius:2px}
+.btn:hover{background:var(--wash2)}
+.btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn.primary:hover{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.field{display:flex;flex-direction:column;gap:4px;font:500 12px var(--ui);color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+select{font:400 16px var(--body);color:var(--ink);background:var(--bg);border:1px solid var(--rule);padding:8px 10px;border-radius:2px;width:100%}
+.slots{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--rule)}
+@media (max-width:420px){.slots{grid-template-columns:1fr}}
+.slot{display:flex;align-items:stretch;border-bottom:1px solid var(--rule);min-width:0}
+.slot:nth-child(odd){border-right:1px solid var(--rule)}
+@media (max-width:420px){.slot:nth-child(odd){border-right:0}}
+.slot-main{flex:1;min-width:0;text-align:left;background:none;border:0;padding:10px 10px 10px 0;cursor:pointer}
+.slot:nth-child(even) .slot-main{padding-left:12px}
+.slot-main:hover .sv{color:var(--accent)}
+.sl{display:block;font:600 11px var(--ui);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.sv{display:block;font-size:15.5px;line-height:1.35;margin-top:2px}
+.lock{flex:none;width:34px;background:none;border:0;cursor:pointer;color:var(--muted);display:grid;place-items:center}
+.lock svg{width:15px;height:15px}
+.lock[aria-pressed="true"]{color:var(--accent)}
+.slot.locked .sv{font-weight:600}
+.hint{font:400 13px var(--ui);color:var(--muted);margin:0}
+
+.result{border:1px solid var(--ink);padding:22px 24px;min-width:0;background:var(--bg)}
+.result .kicker{display:block}
+.result h3{font-family:var(--display);font-weight:400;font-size:clamp(24px,3vw,32px);line-height:1.15;margin:6px 0 12px;text-wrap:balance}
+.result p{margin:0 0 12px;max-width:65ch}
+.result b{font-weight:600}
+.constraint{font:500 14px var(--ui);border-left:3px solid var(--accent);padding:6px 0 6px 12px;color:var(--ink)}
+.result-fig{background:var(--wash2);margin:16px 0;padding:8px}
+.result-fig svg{display:block;width:100%;max-height:240px}
+.result h4{font:600 12px var(--ui);letter-spacing:.1em;text-transform:uppercase;margin:16px 0 8px;color:var(--muted)}
+.res-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;align-items:center}
+.copied{font:500 13px var(--ui);color:var(--accent)}
+
+/* beats list */
+.beats{list-style:none;counter-reset:b;margin:0;padding:0;display:grid;gap:10px}
+.beats li{counter-increment:b;display:grid;grid-template-columns:24px 1fr;gap:10px;align-items:start}
+.beats li::before{content:counter(b);width:22px;height:22px;border-radius:50%;background:var(--accent);color:var(--on-accent);font:600 11px/22px var(--ui);text-align:center;margin-top:2px}
+.beats b{font:600 15px var(--ui);display:block}
+.beats span{font-size:15.5px;color:var(--ink)}
+.beats.cols{grid-template-columns:1fr 1fr;column-gap:24px}
+@media (max-width:640px){.beats.cols{grid-template-columns:1fr}}
+
+/* atlas */
+.filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.chip{font:500 13px var(--ui);border:1px solid var(--rule);background:transparent;padding:6px 12px;border-radius:999px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:28px 24px}
+.card{display:flex;flex-direction:column;gap:6px;text-align:left;background:none;border:0;border-top:1px solid var(--ink);padding:12px 0 0;cursor:pointer}
+.thumb{background:var(--wash2);padding:10px;transition:background .2s}
+.card:hover .thumb{background:var(--wash)}
+.thumb svg{display:block;width:100%;aspect-ratio:400/250;height:auto}
+.thumb .lbl,.thumb .dn{display:none}
+.card .kicker{font-size:11px;margin-top:4px}
+.card h3{font-family:var(--display);font-weight:400;font-size:24px;line-height:1.15;margin:0}
+.card p{margin:0;font-size:15px;color:var(--muted);line-height:1.45}
+
+/* svg vocabulary */
+.ln{fill:none;stroke:var(--ink);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.ln.acc{stroke:var(--accent)} .ln.thin{stroke-width:1.5} .ln.dash{stroke-dasharray:6 5}
+.guide{fill:none;stroke:var(--muted);stroke-width:1;stroke-dasharray:3 4;opacity:.7}
+.axis{fill:none;stroke:var(--muted);stroke-width:1}
+.band{fill:var(--wash)} .band2{fill:var(--wash2)}
+.shape{fill:var(--bg);stroke:var(--ink);stroke-width:1.5}
+.solid{fill:var(--ink)}
+.dot circle{fill:var(--accent)}
+.dn{fill:var(--on-accent);font:700 10px var(--ui)}
+.lbl{fill:var(--ink);font:500 11.5px var(--ui)}
+.lbl.m{fill:var(--muted);font-weight:400}
+.lbl.b{font-weight:700}
+.lbl.sm{font-size:10.5px}
+.ahp{fill:var(--ink)}
+.clue{fill:var(--accent)}
+
+/* dialog */
+dialog{border:0;padding:0;background:var(--bg);color:var(--ink);width:min(860px, calc(100% - 24px));max-height:calc(100% - 24px);border-radius:2px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+dialog::backdrop{background:rgba(10,14,20,.55)}
+.plate{padding:26px 28px 28px}
+.plate-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;border-bottom:3px double var(--ink);padding-bottom:12px}
+.plate h2{font-family:var(--display);font-weight:400;font-size:clamp(30px,5vw,44px);line-height:1.05;margin:4px 0 4px;text-wrap:balance}
+.origin{font:400 14px var(--ui);color:var(--muted)}
+.x{background:none;border:1px solid var(--rule);width:36px;height:36px;cursor:pointer;flex:none;font:400 20px/1 var(--ui)}
+.plate figure{margin:18px 0;background:var(--wash2);padding:12px}
+.plate figure svg{display:block;width:100%;height:auto;max-height:380px}
+.lede{font-size:19px;line-height:1.5;margin:0 0 18px;max-width:65ch}
+.meta{display:grid;grid-template-columns:1fr 1fr;gap:18px;border-top:1px solid var(--rule);padding-top:14px;margin-top:20px}
+@media (max-width:560px){.meta{grid-template-columns:1fr}.plate{padding:20px 18px}}
+.meta h4{font:600 12px var(--ui);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 4px}
+.meta p{margin:0;font-size:15.5px}
+.plate-actions{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:22px}
+.switches{display:flex;gap:10px;flex-wrap:wrap}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:2px;overflow:hidden}
+.seg button{background:transparent;border:0;padding:5px 10px;cursor:pointer;font:600 11px var(--ui);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.seg button+button{border-left:1px solid var(--rule)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.mast-top{align-items:center}
+footer{margin-top:48px;border-top:1px solid var(--rule);padding-top:12px;font:400 13px var(--ui);color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+<div class="dk-bar">
+  <nav class="dk-crumbs" aria-label="Breadcrumb"><a href="index.html">← <span data-dk-t="home">Writing desk</span></a></nav>
+  <div class="dk-prefs">
+    <div class="dk-seg" role="group" data-dk-aria="lang" aria-label="Language"><button type="button" data-dk-lang="auto">Auto</button><button type="button" data-dk-lang="en">EN</button><button type="button" data-dk-lang="es">ES</button></div>
+    <div class="dk-seg" role="group" data-dk-aria="theme" aria-label="Theme"><button type="button" data-dk-theme="auto">Auto</button><button type="button" data-dk-theme="light">Light</button><button type="button" data-dk-theme="dark">Dark</button></div>
+  </div>
+</div>
+<script>DESK.paint()</script>
+  <header class="mast">
+    <div class="mast-top"><span data-i="kick"></span></div>
+    <h1 data-i="title"></h1>
+    <p data-i="sub"></p>
+  </header>
+
+  <section aria-labelledby="gen-h">
+    <div class="sec-head">
+      <div><span class="kicker" data-i="desk"></span><h2 id="gen-h" data-i="spinH"></h2></div>
+      <span class="note" data-i="deskNote"></span>
+    </div>
+    <div class="desk">
+      <div class="controls">
+        <div class="spin-row">
+          <button class="btn primary" id="spin" data-i="spinBtn"></button>
+          <button class="btn" id="unlock" data-i="unlockBtn"></button>
+        </div>
+        <label class="field" for="structSel"><span data-i="structure"></span>
+          <select id="structSel"></select>
+        </label>
+        <div class="slots" id="slots"></div>
+        <p class="hint" data-i="hint"></p>
+      </div>
+      <article class="result" id="result" aria-live="polite"></article>
+    </div>
+  </section>
+
+  <section aria-labelledby="atlas-h">
+    <div class="sec-head">
+      <div><span class="kicker" data-i="atlas"></span><h2 id="atlas-h" data-i="atlasH"></h2></div>
+      <span class="note" data-i="atlasNote"></span>
+    </div>
+    <div class="filters" id="filters"></div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <footer data-i="foot"></footer>
+</div>
+
+<dialog id="dlg" aria-labelledby="dlgTitle"><div class="plate" id="plate"></div></dialog>
+
+<script>
+/* ---------- svg helpers ---------- */
+const r1 = n => Math.round(n*10)/10;
+function smooth(p){
+  let d=`M${p[0][0]},${p[0][1]}`;
+  for(let i=0;i<p.length-1;i++){
+    const p0=p[i-1]||p[i],a=p[i],b=p[i+1],p3=p[i+2]||b;
+    d+=` C${r1(a[0]+(b[0]-p0[0])/6)},${r1(a[1]+(b[1]-p0[1])/6)} ${r1(b[0]-(p3[0]-a[0])/6)},${r1(b[1]-(p3[1]-a[1])/6)} ${b[0]},${b[1]}`;
+  }
+  return d;
+}
+const T=(x,y,s,a='middle',c='')=>`<text class="lbl ${c}" x="${r1(x)}" y="${r1(y)}" text-anchor="${a}">${tr(s)}</text>`;
+const D=(x,y,n)=>`<g class="dot"><circle cx="${x}" cy="${y}" r="9"/><text class="dn" x="${x}" y="${y+3.6}" text-anchor="middle">${n}</text></g>`;
+const P=(d,c='ln',m='')=>`<path class="${c}" d="${d}" ${m?'marker-end="url(#ah)"':''}/>`;
+const L=(x1,y1,x2,y2,c='guide')=>`<line class="${c}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
+const R=(x,y,w,h,c='band')=>`<rect class="${c}" x="${x}" y="${y}" width="${w}" height="${h}"/>`;
+const svg=(inner,h=250)=>`<svg viewBox="0 0 400 ${h}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><marker id="ah" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path class="ahp" d="M0,0L10,5L0,10z"/></marker></defs>${inner}</svg>`;
+
+function koch(cx,cy,R,it){
+  let p=[0,1,2].map(k=>{const a=(-90+120*k)*Math.PI/180;return[cx+R*Math.cos(a),cy+R*Math.sin(a)]});
+  for(let n=0;n<it;n++){const q=[];for(let i=0;i<p.length;i++){const a=p[i],b=p[(i+1)%p.length];const dx=(b[0]-a[0])/3,dy=(b[1]-a[1])/3;const p1=[a[0]+dx,a[1]+dy],p3=[a[0]+2*dx,a[1]+2*dy];const g=-Math.PI/3;const p2=[p1[0]+dx*Math.cos(g)-dy*Math.sin(g),p1[1]+dx*Math.sin(g)+dy*Math.cos(g)];q.push(a,p1,p2,p3)}p=q}
+  return 'M'+p.map(v=>r1(v[0])+','+r1(v[1])).join('L')+'Z';
+}
+function mini(x0,y0,w,h,ys,title,c='ln'){
+  const top=y0+22,bot=y0+h-8,left=x0+10,right=x0+w-6;
+  const pts=ys.map((v,i)=>[r1(left+6+(right-left-10)*i/(ys.length-1)),r1(bot-(bot-top)*v)]);
+  return L(left,top,left,bot,'axis')+L(left,(top+bot)/2,right,(top+bot)/2,'guide')+P(smooth(pts),c+' thin','m')+T(x0+w/2,y0+12,title,'middle','sm b');
+}
+function circleLabels(cx,cy,r,names,start,step,skip=[]){
+  let s='';
+  names.forEach((n,i)=>{
+    if(skip.includes(i))return;
+    const a=(start+step*i)*Math.PI/180,c=Math.cos(a),sn=Math.sin(a);
+    const x=r1(cx+r*c),y=r1(cy+r*sn);
+    let lx=cx+(r+16)*c,ly=cy+(r+16)*sn+4,an=c>0.3?'start':c<-0.3?'end':'middle';
+    if(an==='middle')ly+=sn<0?-4:8;
+    s+=D(x,y,i+1)+T(lx,ly,n,an);
+  });
+  return s;
+}
+
+/* ---------- diagrams ---------- */
+const DIAG={
+pyramid:()=>svg(
+  L(20,212,380,212,'axis')+P('M20,200 L90,200 L200,40 L310,200 L380,200')+
+  D(50,200,1)+D(90,200,2)+D(145,120,3)+D(200,40,4)+D(255,120,5)+D(345,200,6)+
+  T(50,228,'Exposition')+T(80,184,'Inciting incident','end')+T(132,116,'Rising action','end')+
+  T(200,22,'Climax')+T(268,116,'Falling action','start')+T(345,228,'Resolution'),240),
+
+poetics:()=>{const p=[[25,195],[110,165],[190,120],[250,72],[275,55],[300,90],[315,135],[332,182],[380,192]];
+  return svg(L(20,206,380,206,'axis')+P(smooth(p))+
+  D(25,195,1)+D(190,120,2)+D(275,55,3)+D(300,90,4)+D(315,135,5)+D(380,192,6)+
+  T(18,178,'Beginning','start')+T(178,106,'Complication','end')+T(275,36,'Reversal')+T(312,86,'Recognition','start')+
+  T(328,140,'Suffering','start')+T(372,172,'Catharsis','end')+
+  T(140,226,'Desis · tying the knot','middle','m')+T(325,226,'Lusis · untying','middle','m'),240)},
+
+vonnegut:()=>svg(
+  mini(15,12,180,115,[.6,.6,.3,.15,.35,.78],'1 · Man in a hole')+
+  mini(205,12,180,115,[.5,.8,.85,.22,.5,.92],'2 · Boy meets girl')+
+  mini(15,135,180,115,[.15,.3,.45,.82,.12,.4,.95],'3 · Cinderella')+
+  mini(205,135,180,115,[.45,.38,.28,.18,.09,.02],'4 · From bad to worse','ln acc'),255),
+
+booker:()=>{const d=[['Monster',[.6,.4,.5,.3,.18,.92]],['Rags to riches',[.12,.45,.62,.22,.5,.95]],['The quest',[.5,.38,.58,.32,.6,.92]],['Voyage & return',[.62,.78,.45,.18,.62]],['Comedy',[.6,.42,.3,.15,.85]],['Tragedy',[.4,.7,.88,.5,.04]],['Rebirth',[.6,.35,.18,.08,.85]]];
+  let s='';d.forEach(([n,ys],i)=>{const x=i<4?14+i*94:61+(i-4)*94,y=i<4?12:135;s+=mini(x,y,90,112,ys,n,i===5?'ln acc':'ln')});return svg(s,255)},
+
+risefall:()=>{const p=[[20,150],[90,120],[160,70],[200,55],[240,70],[300,140],[340,190],[380,215]];
+  return svg(L(20,150,380,150,'guide')+P(smooth(p))+
+  D(20,150,1)+D(160,70,2)+D(200,55,3)+D(240,70,4)+D(300,140,5)+D(380,215,6)+
+  T(30,170,'where they began','start','m')+T(150,60,'The climb','end')+T(200,36,'Peak')+T(252,64,'Fatal flaw','start')+
+  T(312,134,'No way back','start')+T(368,236,'The fall','end'),245)},
+
+threeact:()=>{const p=[[20,182],[47,165],[80,155],[110,130],[155,135],[200,100],[245,110],[290,88],[335,40],[380,150]];
+  return svg(R(20,20,90,180)+R(110,20,180,180,'band2')+R(290,20,90,180)+P(smooth(p))+
+  D(47,165,1)+D(110,130,2)+D(200,100,3)+D(290,88,4)+D(335,40,5)+D(380,150,6)+
+  T(52,188,'Inciting','start')+T(110,154,'Plot point 1')+T(200,82,'Midpoint')+T(290,112,'Plot point 2')+T(323,36,'Climax','end')+T(372,176,'Resolution','end')+
+  T(65,218,'Act I','middle','b')+T(65,234,'Setup','middle','m')+T(200,218,'Act II','middle','b')+T(200,234,'Confrontation','middle','m')+T(335,218,'Act III','middle','b')+T(335,234,'Resolution','middle','m'),242)},
+
+fiveact:()=>{const p=[[20,180],[56,170],[92,152],[128,122],[164,90],[200,45],[236,85],[272,115],[308,140],[344,165],[380,175]];
+  const n=['I','II','III','IV','V'],w=['Exposition','Rising','Climax','Falling','Resolution'];let s='';
+  for(let i=0;i<5;i++){s+=R(20+i*72,20,72,180,i%2?'band2':'band')+T(56+i*72,218,n[i],'middle','b')+T(56+i*72,234,w[i],'middle','m sm')}
+  return svg(s+P(smooth(p))+D(56,170,1)+D(128,122,2)+D(200,45,3)+D(272,115,4)+D(344,165,5)+T(200,32,'the turn','middle','m'),242)},
+
+kishotenketsu:()=>{let s='';const k=[['Ki 起','introduction'],['Shō 承','development'],['Ten 転','twist'],['Ketsu 結','reconciliation']];
+  k.forEach((v,i)=>{s+=R(20+i*95,20,90,170,i%2?'band2':'band')+T(65+i*95,210,v[0],'middle','b')+T(65+i*95,226,v[1],'middle','m sm')});
+  s+=P('M32,110 L104,110')+P(smooth([[115,110],[137,98],[159,110],[181,122],[203,110]]))+L(210,110,300,110,'guide')+
+    P('M228,42 L292,100','ln acc')+P(smooth([[305,112],[345,106],[390,92]]))+P(smooth([[305,52],[345,72],[390,92]]),'ln acc')+
+    D(68,110,1)+D(159,110,2)+D(258,69,3)+D(388,92,4);
+  return svg(s,236)},
+
+savethecat:()=>{const p=[0,4.5,9,13,17,21,25.5,37,50,62,75,79,84,92,100],y=[150,128,150,118,140,118,142,100,55,95,190,166,140,85,70];
+  const X=v=>r1(20+3.6*v);const pts=p.map((v,i)=>[X(v),y[i]]);
+  let s=R(20,20,72,190)+R(92,20,108,190,'band2')+R(200,20,108,190)+R(308,20,72,190,'band2')+
+    T(56,38,'Act 1','middle','m')+T(146,38,'Act 2A','middle','m')+T(254,38,'Act 2B','middle','m')+T(344,38,'Act 3','middle','m')+
+    L(20,222,380,222,'axis')+T(20,240,'0%','start','m')+T(92,240,'20%','middle','m')+T(200,240,'50%','middle','m')+T(308,240,'80%','middle','m')+T(380,240,'100%','end','m')+
+    P(smooth(pts));
+  pts.forEach((q,i)=>s+=D(q[0],q[1],i+1));return svg(s,248)},
+
+sevenpoint:()=>{const p=[[30,205],[85,165],[140,180],[200,120],[260,135],[315,75],[370,40]];
+  let s=L(30,205,370,40,'guide')+P(smooth(p));p.forEach((q,i)=>s+=D(q[0],q[1],i+1));
+  return svg(s+T(30,230,'Hook')+T(85,148,'Plot turn 1')+T(140,204,'Pinch 1')+T(200,102,'Midpoint')+T(260,158,'Pinch 2')+T(327,96,'Plot turn 2','start')+T(372,22,'Resolution','end'),240)},
+
+fichtean:()=>{const p=[[20,200],[60,160],[75,178],[120,135],[135,155],[180,110],[195,132],[240,82],[255,105],[300,55],[318,78],[345,28],[380,150]];
+  return svg(L(20,212,380,212,'axis')+P('M'+p.map(v=>v.join(',')).join('L'))+
+  [[120,135],[240,82],[300,55]].map(v=>`<circle class="clue" cx="${v[0]}" cy="${v[1]}" r="4"/>`).join('')+
+  D(60,160,1)+D(180,110,2)+D(345,28,3)+D(380,150,4)+
+  T(20,145,'First crisis','start')+T(180,92,'Crises','middle')+T(333,24,'Climax','end')+T(372,176,'Fast ending','end')+
+  T(200,232,'backstory arrives in fragments between crises','middle','m'),240)},
+
+snowflake:()=>svg(
+  P('M30,100 L70,100','ln')+P(koch(150,104,38,0))+P(koch(250,104,40,1))+P(koch(350,104,42,2),'ln acc')+
+  P('M80,100 L104,100','ln thin','m')+P('M190,100 L206,100','ln thin','m')+P('M290,100 L304,100','ln thin','m')+
+  T(50,176,'Sentence')+T(50,192,'step 1','middle','m')+T(150,176,'Paragraph')+T(150,192,'steps 2–3','middle','m')+
+  T(250,176,'One page')+T(250,192,'steps 4–5','middle','m')+T(350,176,'Scene list')+T(350,192,'steps 6–10','middle','m')+
+  T(200,226,'each pass adds detail to the same shape','middle','m'),236),
+
+hero:()=>svg(
+  `<circle class="ln" cx="200" cy="135" r="88"/>`+L(96,135,304,135,'guide')+T(200,122,'Known world','middle','m')+T(200,156,'Special world','middle','m')+
+  circleLabels(200,135,88,['Ordinary world','Call','Refusal','Mentor','Threshold','Tests & allies','Approach','Ordeal','Reward','Road back','Resurrection','Return with elixir'],-120,30),262),
+
+storycircle:()=>svg(
+  `<circle class="ln" cx="200" cy="128" r="85"/>`+L(100,128,300,128,'guide')+T(200,116,'Order','middle','m')+T(200,148,'Chaos','middle','m')+
+  circleLabels(200,128,85,['You','Need','Go','Search','Find','Take','Return','Change'],-90,45),256),
+
+tragic:()=>svg(
+  P('M200,43 A85,85 0 1 1 115,128')+P('M115,128 A85,85 0 0 1 200,43','guide')+P('M115,128 Q116,98 141,94','ln acc','m')+
+  L(130,128,300,128,'guide')+T(222,116,'Order','middle','m')+T(200,148,'Chaos','middle','m')+
+  circleLabels(200,128,85,['You','Need','Go','Search','Find','Misread lesson','Return','Ruin'],-90,45,[7])+D(152,92,8)+T(165,80,'Ruin','start'),256),
+
+mirror:()=>{const a=[[20,190],[90,175],[150,155],[200,120],[260,80],[320,55],[380,45]],b=a.map(v=>[v[0],240-v[1]]);
+  return svg(L(20,120,380,120,'guide')+L(200,130,200,214,'guide')+P(smooth(a))+P(smooth(b),'ln acc')+
+  D(20,190,1)+D(20,50,1)+D(200,120,2)+D(260,80,3)+D(260,160,3)+D(380,45,4)+D(380,195,4)+
+  T(36,40,'Protagonist B','start')+T(36,212,'Protagonist A','start')+T(368,28,'rises','end','m')+T(368,224,'falls','end','m')+T(200,232,'the shared choice','middle','m'),242)},
+
+ensemble:()=>{const A=[[70,50],[140,70],[200,120],[270,155],[330,120]],B=[[70,120],[140,168],[200,120],[270,80],[330,120]],C=[[70,190],[140,148],[200,120],[270,108],[330,120]];
+  return svg(L(200,135,200,212,'guide')+L(330,135,330,212,'guide')+P(smooth(A))+P(smooth(B),'ln acc')+P(smooth(C),'ln dash')+P('M330,120 L380,120')+
+  T(58,54,'Thread A','end')+T(58,124,'Thread B','end')+T(58,194,'Thread C','end')+
+  D(70,120,1)+D(200,120,2)+D(330,120,3)+D(380,120,4)+T(200,228,'first crossing','middle','m')+T(330,228,'convergence','middle','m'),240)},
+
+epistolary:()=>{let s='';
+  s+=`<g transform="rotate(-5 65 85)">${R(30,40,70,90,'shape')}${[58,70,82,94,106,118].map(y=>L(40,y,90,y,'axis')).join('')}</g>`;
+  s+=`<g transform="rotate(4 185 67)">${R(150,30,70,74,'shape')}${R(158,38,54,8,'solid')}${[54,62,70,78,86,94].map(y=>L(158,y,182,y,'axis')+L(188,y,212,y,'axis')).join('')}</g>`;
+  s+=R(125,122,80,52,'shape')+P('M125,122 L165,152 L205,122','ln thin');
+  s+=`<g transform="rotate(-3 277 132)">${R(245,90,64,84,'shape')}${L(253,90,253,174,'axis')}${[104,114,124,134,144,154,164].map(y=>L(258,y,302,y,'axis')).join('')}</g>`;
+  s+=`<rect class="shape" x="318" y="36" width="68" height="40" rx="10"/>`+P('M335,76 L330,90 L348,76','shape')+[340,352,364].map(x=>`<circle class="solid" cx="${x}" cy="56" r="3"/>`).join('');
+  s+=P(smooth([[65,92],[160,148],[188,68],[277,135],[352,58]]),'ln acc dash');
+  s+=T(65,150,'Letter')+T(185,22,'Clipping')+T(165,192,'Envelope')+T(277,194,'Diary')+T(352,108,'Message')+T(200,230,'the reader assembles the story','middle','m');
+  return svg(s,240)},
+
+unreliable:()=>svg(
+  L(300,40,300,205,'guide')+P(smooth([[20,80],[100,70],[180,80],[260,70],[300,75]]))+
+  P(smooth([[20,80],[100,110],[180,140],[260,165],[300,170]]),'ln acc dash')+P('M300,170 L380,170','ln acc')+P('M300,86 L300,158','ln thin','m')+
+  `<circle class="clue" cx="100" cy="110" r="4"/><circle class="clue" cx="260" cy="165" r="4"/>`+
+  D(20,80,1)+D(180,140,2)+D(300,75,3)+D(380,170,4)+
+  T(40,56,'What the narrator tells us','start')+T(30,170,'What actually happened','start','m')+T(300,30,'Reveal')+T(372,196,'Reread','end'),222),
+
+parallel:()=>{let s='';const ys=[60,120,180],nm=['Present','Past','Future'];
+  ys.forEach((y,i)=>s+=T(88,y+4,nm[i],'end','b')+P(`M100,${y} L382,${y}`,'ln thin','m'));
+  [[60,100,150],[120,150,200],[60,200,240],[180,240,280],[120,280,330]].forEach(([y,a,b])=>s+=`<line class="ln acc" x1="${a}" y1="${y}" x2="${b}" y2="${y}" style="stroke-width:6"/>`);
+  s+=L(150,60,150,120)+L(200,120,200,60)+L(240,60,240,180)+L(280,180,280,120)+L(340,48,340,196);
+  return svg(s+D(125,60,1)+D(175,120,2)+D(260,180,3)+D(340,120,4)+T(340,224,'the lines meet','middle','m'),236)},
+};
+
+/* ---------- data ---------- */
+const FAM={arc:'Arcs & shapes',act:'Act structures',beat:'Beat sheets & methods',cycle:'Cycles',form:'Unusual forms'};
+const S=[
+{id:'pyramid',fam:'arc',name:"Freytag's Pyramid",origin:'Gustav Freytag, 1863',tag:'Tension climbs to a single peak, then releases.',
+ about:'Freytag drew this shape from five-act tragedy. Everything before the climax tightens the situation; everything after it pays off the consequences. It is the quickest way to check that a story builds instead of wandering.',
+ beats:[['Exposition','Who, where, and what normal looks like before the trouble starts.'],['Inciting incident','The event that breaks normal and hands the protagonist a problem they cannot ignore.'],['Rising action','Complications stack up; each attempt to fix things makes them harder.'],['Climax','The point of highest tension, where the central conflict is decided.'],['Falling action','The consequences of the climax play out and loose threads are tied.'],['Resolution','A new normal, visibly different from the one at the start.']],
+ best:'Short stories, tragedies, any story with one clear conflict.',ex:'Romeo and Juliet · Macbeth · most fairy tales'},
+{id:'poetics',fam:'arc',name:"Aristotle's Poetics",origin:'Aristotle, c. 335 BC',tag:'One unified action that turns on reversal and recognition.',
+ about:'Aristotle called plot the soul of tragedy: a single complete action with a beginning, middle and end, where nothing could be removed without damaging the whole. The strongest plots turn on a reversal of fortune and a moment of recognition, ideally at the same moment.',
+ beats:[['Beginning','A situation that needs nothing before it to make sense.'],['Complication','Everything that ties the knot, up to the turning point (desis).'],['Reversal','The action produces the opposite of what was intended (peripeteia).'],['Recognition','A shift from ignorance to knowledge, often about who someone really is (anagnorisis).'],['Suffering','A painful or destructive act that the recognition makes unbearable (pathos).'],['Catharsis','The untying (lusis): pity and fear are released in the audience.']],
+ best:'Tragedy, mystery, any story built around a hidden truth.',ex:'Oedipus Rex · Othello · The Sixth Sense'},
+{id:'vonnegut',fam:'arc',name:"Vonnegut's Story Shapes",origin:'Kurt Vonnegut, lecture on the shapes of stories',tag:'Plot fortune against time and stories become curves.',
+ about:'Vonnegut drew stories on two axes: good fortune to ill fortune, beginning to end. A handful of shapes repeat across cultures. Choose a shape first and the scenes start to suggest themselves.',
+ beats:[['Man in a hole','Someone falls into trouble and climbs out, ending better off than they began.'],['Boy meets girl','Someone finds something wonderful, loses it, and wins it back for good.'],['Cinderella','A steady rise, a sudden fall at the stroke of midnight, then a rise off the chart.'],['From bad to worse','Someone starts low and only sinks. No rescue arrives.']],
+ best:'Choosing the emotional ride before plotting scenes.',ex:'Jaws · Cinderella · The Metamorphosis'},
+{id:'booker',fam:'arc',name:"Booker's Seven Plots",origin:'Christopher Booker, The Seven Basic Plots, 2004',tag:'Seven master premises that most stories fall into.',
+ about:'Booker spent decades sorting stories and concluded that most belong to seven families, each promising the reader a particular kind of journey. Use it as a premise filter: pick a family first, then a structure to tell it with.',
+ beats:[['Overcoming the Monster','A threat to the community is confronted and destroyed. Beowulf, Jaws.'],['Rags to Riches','Someone humble gains wealth or love, loses it, and earns it back. Cinderella, David Copperfield.'],['The Quest','A long journey toward a distant goal, with companions and trials. The Lord of the Rings.'],['Voyage and Return','The hero enters a strange world and comes home changed. Alice in Wonderland.'],['Comedy','Confusion keeps people apart until everything is cleared up. When Harry Met Sally.'],['Tragedy','A flaw or mistake drives the hero to destruction. Macbeth, Breaking Bad.'],['Rebirth','A character trapped in darkness is redeemed. A Christmas Carol.']],
+ best:'Finding the core promise of a premise.',ex:'See each type'},
+{id:'risefall',fam:'arc',name:'Rise and Fall',origin:"The anti-hero's downfall, from classical tragedy to crime drama",tag:"A climb to the top that the hero's own flaw undoes.",
+ about:'The protagonist wins early and often, which is what makes the fall hurt. The midpoint is usually a success, and from there the same quality that carried them up starts pulling them down. The ending lands lower than where they began.',
+ beats:[['Modest start','An ordinary, frustrated life and the hunger underneath it.'],['The climb','Risky choices pay off; the reader enjoys the rise while starting to worry.'],['Peak','The midpoint: they have what they wanted, or think they do.'],['Fatal flaw','Pride, greed or loyalty begins making the decisions.'],['No way back','They pass the point where an honest exit was still possible.'],['The fall','They end below where they began, and others pay the cost too.']],
+ best:'Crime stories, cautionary tales, character studies.',ex:'Scarface · Breaking Bad · The Wolf of Wall Street'},
+{id:'threeact',fam:'act',name:'Three-Act Structure',origin:'Syd Field, Screenplay, 1979',tag:'Setup, confrontation, resolution, split roughly 25 / 50 / 25.',
+ about:'The default shape of commercial film. Act I sets up the world and ends when the protagonist commits to a goal. Act II is the long middle of escalating obstacles, split in half by a midpoint. Act III forces the final confrontation.',
+ beats:[['Inciting incident','Something disrupts the protagonist\'s life.'],['Plot point 1','The protagonist commits; the world of Act I is left behind.'],['Midpoint','A revelation or reversal that changes the goal or raises the stakes.'],['Plot point 2','The lowest moment, or a discovery that launches the finale.'],['Climax','The final confrontation with the central problem.'],['Resolution','What the win or loss has changed.']],
+ best:'Screenplays, novels with a strong external goal.',ex:'Die Hard · The Wizard of Oz · Back to the Future'},
+{id:'fiveact',fam:'act',name:'Five-Act Structure',origin:"Horace, the Elizabethan stage, Freytag",tag:'Five movements with the turn at the exact centre.',
+ about:'Elizabethan plays came in five acts, with the climax in Act III rather than near the end. That leaves two full acts for consequences, which suits stories about guilt, revenge and the cost of a choice.',
+ beats:[['Exposition','Characters, setting and the tensions already present.'],['Rising action','The conflict takes shape and the protagonist commits.'],['Climax','The turn: a decisive action whose consequences cannot be undone.'],['Falling action','Opposing forces gather; the suspense is about how, not whether.'],['Resolution','Catastrophe in tragedy, reconciliation in comedy.']],
+ best:'Plays, tragedies, stories where consequences matter more than the event.',ex:'Hamlet · Romeo and Juliet · Titanic'},
+{id:'kishotenketsu',fam:'act',name:'Kishōtenketsu',origin:'Classical Chinese and Japanese composition',tag:'Four parts, no conflict required. The twist is a change of view.',
+ about:'Borrowed from classical Chinese poetry, this form builds meaning through juxtaposition instead of struggle. Two parts establish and develop a situation, the third brings in something seemingly unrelated, and the fourth shows how they belong together.',
+ beats:[['Ki · introduction','Present the characters and their situation.'],['Shō · development','Follow and deepen that situation without major change.'],['Ten · twist','Introduce an unexpected element or angle that seems unrelated.'],['Ketsu · reconciliation','Bring the two together so the first part reads differently.']],
+ best:'Quiet literary fiction, vignettes, flash fiction, comics.',ex:'My Neighbor Totoro · four-panel yonkoma comics'},
+{id:'savethecat',fam:'beat',name:'Save the Cat',origin:'Blake Snyder, 2005',tag:'Fifteen beats with page targets, built for pace.',
+ about:'Snyder\'s beat sheet tells you not only what happens but roughly when. It was written for screenplays, but novelists use it to diagnose saggy middles: if the midpoint arrives late, the reader feels it.',
+ beats:[['Opening image','A snapshot of the hero\'s life and problem before the story.'],['Theme stated','Someone, usually not the hero, hints at the lesson.'],['Set-up','The hero\'s world, flaws and everything that needs fixing.'],['Catalyst','The life-changing event.'],['Debate','Should I go? The hero hesitates.'],['Break into Two','The hero chooses to enter the upside-down world of Act 2.'],['B story','A new relationship that carries the theme.'],['Fun and games','The promise of the premise; the scenes a trailer would show.'],['Midpoint','A false victory or false defeat; the stakes rise.'],['Bad guys close in','Outside pressure and inner doubt tighten together.'],['All is lost','The lowest point, often with a whiff of death.'],['Dark night of the soul','The hero wallows, then finds the insight.'],['Break into Three','The A and B stories meet; the hero sees the solution.'],['Finale','The hero applies the lesson and wins, changed.'],['Final image','A mirror of the opening image that proves the change.']],
+ best:'Genre novels, screenplays, fixing a slow middle.',ex:'Legally Blonde · Groundhog Day · The Hunger Games'},
+{id:'sevenpoint',fam:'beat',name:'Seven-Point Structure',origin:'Dan Wells',tag:'Plan the ending first, then make the beginning its opposite.',
+ about:'Wells suggests designing backwards: decide the resolution, then make the hook its mirror image. Plot turns move the character from reacting to acting, pinches apply pressure, and the midpoint is where they stop running and push back.',
+ beats:[['Hook','The opposite state of the resolution: weak where they will be strong.'],['Plot turn 1','A new idea, person or event sets the story moving.'],['Pinch 1','Pressure from the antagonist forces the character to act.'],['Midpoint','The character shifts from reaction to action.'],['Pinch 2','Things go badly wrong; the plan fails or a mentor is lost.'],['Plot turn 2','The last piece falls into place; they have what they need to win.'],['Resolution','The climax and the new state, mirroring the hook.']],
+ best:'Plotting a character arc against an external plot.',ex:"Harry Potter and the Philosopher's Stone · The Hunger Games"},
+{id:'fichtean',fam:'beat',name:'Fichtean Curve',origin:'John Gardner, The Art of Fiction, 1983',tag:'Start in trouble and keep raising it. Backstory can wait.',
+ about:'Instead of a calm exposition, the story opens in crisis and stacks one crisis on another, each worse than the last. Background arrives in fragments between them. After the climax, the ending comes fast.',
+ beats:[['First crisis','Open inside a problem; skip the slow introduction.'],['Rising crises','Each crisis is partly solved, and each solution causes the next. Weave in backstory here.'],['Climax','The biggest crisis, where everything is at stake.'],['Fast ending','Show the cost and stop.']],
+ best:'Thrillers, horror, survival stories, short fiction.',ex:'Jurassic Park · Misery · The Hunger Games'},
+{id:'snowflake',fam:'beat',name:'The Snowflake Method',origin:'Randy Ingermanson',tag:'Grow a novel outward from one sentence.',
+ about:'A planning method rather than a shape. You begin with a one-sentence summary and expand it in passes, like a fractal snowflake gaining detail. Each step is small, so you always know what to do next.',
+ beats:[['One sentence','Summarise the whole story in about fifteen words.'],['One paragraph','Five sentences: setup, three disasters, ending.'],['Character summaries','For each main character: goal, conflict, epiphany.'],['One page','Expand each sentence of the paragraph into a paragraph.'],['Character synopses','Tell the story from each main character\'s point of view.'],['Long synopsis','Expand each paragraph into a page.'],['Character charts','Full histories, motivations, and how each one changes.'],['Scene list','Break the synopsis into every scene.'],['Scene notes','A short paragraph of intent for each scene.'],['First draft','Write from the scene list.']],
+ best:'Planners writing a novel, anyone stuck on a big idea.',ex:'Any novel you outline before drafting'},
+{id:'hero',fam:'cycle',name:"The Hero's Journey",origin:"Joseph Campbell, 1949; Christopher Vogler's twelve stages",tag:'Leave the known world, survive the ordeal, bring something home.',
+ about:'Campbell found a shared pattern in myths worldwide; Vogler condensed it into twelve stages for screenwriters. The hero crosses from the ordinary world into a special one, is transformed by an ordeal, and returns with something that changes home.',
+ beats:[['Ordinary world','The hero\'s normal life, with a lack they may not admit.'],['Call to adventure','A problem, message or opportunity arrives.'],['Refusal of the call','Fear or duty makes them hesitate.'],['Meeting the mentor','Someone gives advice, a tool or courage.'],['Crossing the threshold','They commit and enter the special world.'],['Tests, allies, enemies','They learn the new rules and whom to trust.'],['Approach','Preparation for the central ordeal: plans and doubts.'],['Ordeal','A life-or-death crisis; something must die, literally or not.'],['Reward','They seize the prize: an object, knowledge or reconciliation.'],['The road back','Consequences give chase; they recommit to going home.'],['Resurrection','A final test that uses everything they have learned.'],['Return with the elixir','They bring home something that changes their world.']],
+ best:'Adventure, fantasy, coming-of-age stories.',ex:'Star Wars (1977) · The Hobbit · The Lion King'},
+{id:'storycircle',fam:'cycle',name:'The Story Circle',origin:'Dan Harmon, adapted from Campbell (also called the plot embryo)',tag:'Eight steps: want, go, find, pay, return, change.',
+ about:'Harmon stripped the hero\'s journey down to eight steps that fit a TV episode or a short story. The top half of the circle is order, the bottom half is chaos; the character goes down into it and comes back up changed.',
+ beats:[['You','A character in their comfort zone.'],['Need','But they want something.'],['Go','They enter an unfamiliar situation.'],['Search','They adapt to it.'],['Find','They get what they wanted.'],['Take','They pay a heavy price for it.'],['Return','They go back to their familiar situation.'],['Change','Having changed.']],
+ best:'Short stories, TV episodes, character-driven arcs.',ex:'Community · Rick and Morty · Finding Nemo'},
+{id:'tragic',fam:'cycle',name:'The Tragic Circle',origin:"A negative variant of Harmon's story circle",tag:'The same journey, but the lesson is misread and the circle never closes.',
+ about:'The character goes through the same steps, but at the moment of paying the price they draw the wrong conclusion. They return without the change they needed, or changed for the worse, and cannot fit back into their old world.',
+ beats:[['You','A character in their comfort zone, with a flaw.'],['Need','They want something, often for the wrong reason.'],['Go','They enter an unfamiliar situation.'],['Search','They adapt, sometimes too well.'],['Find','They get what they wanted.'],['Misread lesson','They pay the price but take the wrong lesson from it.'],['Return','They try to go back.'],['Ruin','Unchanged or worse, they cannot fit back in; the circle stays open.']],
+ best:'Tragedies, dark character studies, cautionary tales.',ex:'The Great Gatsby · Citizen Kane · Breaking Bad'},
+{id:'mirror',fam:'form',name:'Mirror Protagonists',origin:'Dual-actor structure',tag:'Two lives shaped by the same choice, ending in opposite places.',
+ about:'Two protagonists face the same pressure and respond in opposite ways. Each one comments on the other, so the theme is argued through action instead of explained. Their paths usually cross at the centre of the story.',
+ beats:[['Two starts','Establish both characters, alike in one crucial way.'],['The shared choice','They meet, or face the same decision, at the midpoint.'],['Divergence','Their responses send them in opposite directions.'],['Opposite endings','One rises, one falls, and each ending explains the other.']],
+ best:'Rivalry stories, thematic novels, crime and detective pairs.',ex:'The Prestige · Heat · Crime and Punishment'},
+{id:'ensemble',fam:'form',name:'Ensemble Network',origin:'Altman, Tarantino, Curtis and the multi-thread novel',tag:'Several storylines brush past each other and then collide.',
+ about:'Each thread has its own small arc, but the meaning comes from where they touch. Plan a first crossing near the middle, then a convergence where one event affects everyone.',
+ beats:[['Separate lives','Introduce each thread with its own want and problem.'],['First crossing','The threads touch, often without the characters knowing.'],['Convergence','One event pulls every thread into the same place.'],['Aftermath','Show how each life was bent by the others.']],
+ best:'Novels with a city or community as the real subject.',ex:'Pulp Fiction · Love Actually · Short Cuts'},
+{id:'epistolary',fam:'form',name:'Epistolary Collage',origin:'From Richardson\'s letter novels to found-footage fiction',tag:'The story told through documents the reader has to assemble.',
+ about:'Letters, diaries, clippings, emails and transcripts carry the plot. The narrator disappears, and the reader becomes the detective who joins the pieces. Tension lives in what falls between documents.',
+ beats:[['Choose the documents','Pick formats that reveal different sides: private, public, official.'],['The gaps','Leave events between documents for the reader to infer.'],['Contradictions','Let two documents disagree about the same event.'],['The last document','End on a piece that changes how the others read.']],
+ best:'Horror, mystery, intimate stories told through voice.',ex:'Dracula · Carrie · The Color Purple · World War Z'},
+{id:'unreliable',fam:'form',name:'The Unreliable Narrator',origin:'Perspective shift',tag:'Two stories at once: the one told and the one that happened.',
+ about:'The narrator lies, misunderstands or hides something, and the reader slowly notices. Every scene has to work twice: once as told, and again after the reveal, when the clues fall into place.',
+ beats:[['The told story','A convincing account the reader has every reason to trust.'],['Clues','Small contradictions and odd details that point to another version.'],['The reveal','The moment the told story collapses.'],['The reread','The ending invites the reader to see every earlier scene differently.']],
+ best:'Psychological thrillers, twist endings, first-person fiction.',ex:'Gone Girl · Fight Club · The Murder of Roger Ackroyd'},
+{id:'parallel',fam:'form',name:'Parallel Timelines',origin:'Split narrative',tag:'Timelines cut against each other until they meet.',
+ about:'Two or more periods run side by side, and each cut makes the other timeline mean more. The past explains the present, the present raises questions about the past, and the story ends where they finally connect.',
+ beats:[['Open in one time','Start with a hook in the timeline that raises a question.'],['Cut away','Jump to another time that seems to answer something else.'],['Echoes','Repeat images, objects or lines across the timelines.'],['Convergence','The timelines meet and the full picture appears.']],
+ best:'Family sagas, mysteries, stories about memory.',ex:'Slumdog Millionaire · Cloud Atlas · This Is Us'},
+];
+const byId=Object.fromEntries(S.map(s=>[s.id,s]));
+
+/* ---------- language ---------- */
+let lang=DESK.eff();
+
+const LBL_ES={'Exposition':'Exposición','Inciting incident':'Detonante','Rising action':'Acción ascendente','Climax':'Clímax','Falling action':'Acción descendente','Resolution':'Resolución',
+'Beginning':'Comienzo','Complication':'Complicación','Reversal':'Peripecia','Recognition':'Agnición','Suffering':'Sufrimiento','Catharsis':'Catarsis','Desis · tying the knot':'Desis · atar el nudo','Lusis · untying':'Lisis · desatar',
+'1 · Man in a hole':'1 · Hombre en un pozo','2 · Boy meets girl':'2 · Chico conoce chica','3 · Cinderella':'3 · Cenicienta','4 · From bad to worse':'4 · De mal en peor',
+'Monster':'Monstruo','Rags to riches':'Pobreza a riqueza','The quest':'La búsqueda','Voyage &amp; return':'Viaje y regreso','Voyage & return':'Viaje y regreso','Comedy':'Comedia','Tragedy':'Tragedia','Rebirth':'Renacimiento',
+'where they began':'donde empezó','The climb':'El ascenso','Peak':'Cima','Fatal flaw':'Defecto fatal','No way back':'Sin retorno','The fall':'La caída',
+'Inciting':'Detonante','Plot point 1':'Punto de giro 1','Midpoint':'Punto medio','Plot point 2':'Punto de giro 2','Act I':'Acto I','Setup':'Planteo','Act II':'Acto II','Confrontation':'Confrontación','Act III':'Acto III',
+'Rising':'Ascenso','Falling':'Descenso','the turn':'el giro','introduction':'introducción','development':'desarrollo','twist':'giro','reconciliation':'conclusión',
+'Act 1':'Acto 1','Act 2A':'Acto 2A','Act 2B':'Acto 2B','Act 3':'Acto 3','Hook':'Gancho','Plot turn 1':'Giro 1','Pinch 1':'Presión 1','Pinch 2':'Presión 2','Plot turn 2':'Giro 2',
+'First crisis':'Primera crisis','Crises':'Crisis','Fast ending':'Final rápido','backstory arrives in fragments between crises':'el trasfondo llega en fragmentos entre crisis',
+'Sentence':'Oración','step 1':'paso 1','Paragraph':'Párrafo','steps 2–3':'pasos 2–3','One page':'Una página','steps 4–5':'pasos 4–5','Scene list':'Lista de escenas','steps 6–10':'pasos 6–10','each pass adds detail to the same shape':'cada pasada suma detalle a la misma forma',
+'Known world':'Mundo conocido','Special world':'Mundo especial','Ordinary world':'Mundo ordinario','Call':'Llamada','Refusal':'Rechazo','Mentor':'Mentor','Threshold':'Umbral','Tests &amp; allies':'Pruebas y aliados','Tests & allies':'Pruebas y aliados','Approach':'Aproximación','Ordeal':'Prueba suprema','Reward':'Recompensa','Road back':'Regreso','Resurrection':'Resurrección','Return with elixir':'Vuelta con elixir',
+'Order':'Orden','Chaos':'Caos','You':'Vos','Need':'Necesidad','Go':'Ir','Search':'Buscar','Find':'Encontrar','Take':'Pagar','Return':'Volver','Change':'Cambiar','Misread lesson':'Lección mal leída','Ruin':'Ruina',
+'Protagonist B':'Protagonista B','Protagonist A':'Protagonista A','rises':'sube','falls':'cae','the shared choice':'la decisión compartida',
+'Thread A':'Hilo A','Thread B':'Hilo B','Thread C':'Hilo C','first crossing':'primer cruce','convergence':'convergencia',
+'Letter':'Carta','Clipping':'Recorte','Envelope':'Sobre','Diary':'Diario','Message':'Mensaje','the reader assembles the story':'el lector arma la historia',
+'What the narrator tells us':'Lo que cuenta el narrador','What actually happened':'Lo que pasó en realidad','Reveal':'Revelación','Reread':'Relectura',
+'Present':'Presente','Past':'Pasado','Future':'Futuro','the lines meet':'las líneas se encuentran'};
+function tr(s){return lang==='es'&&LBL_ES[s]?LBL_ES[s]:s}
+
+const FAM_ES={arc:'Arcos y formas',act:'Estructuras en actos',beat:'Hojas de beats y métodos',cycle:'Ciclos',form:'Formas inusuales'};
+
+const ES={
+pyramid:{name:'La pirámide de Freytag',origin:'Gustav Freytag, 1863',tag:'La tensión sube hasta un único pico y después se libera.',
+ about:'Freytag sacó esta forma de la tragedia en cinco actos. Todo lo anterior al clímax ajusta la situación; todo lo posterior paga las consecuencias. Es la forma más rápida de comprobar que una historia crece en lugar de dar vueltas.',
+ beats:[['Exposición','Quién, dónde y cómo es la normalidad antes de que empiece el problema.'],['Detonante','El hecho que rompe la normalidad y le da al protagonista un problema que no puede ignorar.'],['Acción ascendente','Las complicaciones se acumulan; cada intento de arreglar las cosas las empeora.'],['Clímax','El punto de mayor tensión, donde se decide el conflicto central.'],['Acción descendente','Se despliegan las consecuencias del clímax y se atan los cabos sueltos.'],['Resolución','Una nueva normalidad, claramente distinta de la del comienzo.']],
+ best:'Cuentos, tragedias, cualquier historia con un conflicto claro.',ex:'Romeo y Julieta · Macbeth · la mayoría de los cuentos de hadas'},
+poetics:{name:'La Poética de Aristóteles',origin:'Aristóteles, c. 335 a. C.',tag:'Una sola acción unificada que gira sobre la peripecia y la agnición.',
+ about:'Aristóteles llamó a la trama el alma de la tragedia: una acción completa con principio, medio y fin, donde nada puede quitarse sin dañar el conjunto. Las mejores tramas giran sobre un cambio de fortuna y un momento de reconocimiento, idealmente en el mismo instante.',
+ beats:[['Comienzo','Una situación que no necesita nada previo para entenderse.'],['Complicación','Todo lo que ata el nudo, hasta el punto de giro (desis).'],['Peripecia','La acción produce lo contrario de lo que se buscaba.'],['Agnición','El paso de la ignorancia al conocimiento, a menudo sobre quién es realmente alguien.'],['Sufrimiento','Un acto doloroso o destructivo que el reconocimiento vuelve insoportable (pathos).'],['Catarsis','El desenlace (lisis): el público se libera a través de la compasión y el temor.']],
+ best:'Tragedia, misterio, historias construidas alrededor de una verdad oculta.',ex:'Edipo rey · Otelo · Sexto sentido'},
+vonnegut:{name:'Las formas de Vonnegut',origin:'Kurt Vonnegut, charla sobre la forma de las historias',tag:'Si graficás la fortuna en el tiempo, las historias se vuelven curvas.',
+ about:'Vonnegut dibujaba las historias sobre dos ejes: de la buena a la mala fortuna, del principio al final. Unas pocas formas se repiten en todas las culturas. Elegí primero la forma y las escenas empiezan a sugerirse solas.',
+ beats:[['Hombre en un pozo','Alguien cae en un problema y sale, mejor que como empezó.'],['Chico conoce chica','Alguien encuentra algo maravilloso, lo pierde y lo recupera para siempre.'],['Cenicienta','Un ascenso constante, una caída a la medianoche y un ascenso que se sale del gráfico.'],['De mal en peor','Alguien empieza abajo y solo se hunde. No llega ningún rescate.']],
+ best:'Elegir el recorrido emocional antes de planear escenas.',ex:'Tiburón · Cenicienta · La metamorfosis'},
+booker:{name:'Las siete tramas de Booker',origin:'Christopher Booker, The Seven Basic Plots, 2004',tag:'Siete premisas maestras en las que caen casi todas las historias.',
+ about:'Booker pasó décadas clasificando historias y concluyó que la mayoría pertenece a siete familias, y cada una le promete al lector un tipo de viaje. Usalo como filtro de premisas: elegí primero la familia y después una estructura para contarla.',
+ beats:[['Vencer al monstruo','Una amenaza para la comunidad es enfrentada y destruida. Beowulf, Tiburón.'],['De la pobreza a la riqueza','Alguien humilde gana fortuna o amor, lo pierde y lo vuelve a ganar. Cenicienta, David Copperfield.'],['La búsqueda','Un largo viaje hacia una meta lejana, con compañeros y pruebas. El Señor de los Anillos.'],['Viaje y regreso','El héroe entra en un mundo extraño y vuelve cambiado. Alicia en el país de las maravillas.'],['Comedia','La confusión separa a la gente hasta que todo se aclara. Cuando Harry conoció a Sally.'],['Tragedia','Un defecto o un error lleva al héroe a la destrucción. Macbeth, Breaking Bad.'],['Renacimiento','Un personaje atrapado en la oscuridad se redime. Cuento de Navidad.']],
+ best:'Encontrar la promesa central de una premisa.',ex:'Ver cada tipo'},
+risefall:{name:'Ascenso y caída',origin:'La caída del antihéroe, de la tragedia clásica al drama criminal',tag:'Una escalada a la cima que deshace el propio defecto del héroe.',
+ about:'El protagonista gana temprano y seguido, y eso es lo que hace doler la caída. El punto medio suele ser un éxito, y desde ahí la misma cualidad que lo hizo subir empieza a hundirlo. El final queda más abajo que el punto de partida.',
+ beats:[['Comienzo modesto','Una vida común y frustrada, y el hambre que hay debajo.'],['El ascenso','Las apuestas arriesgadas salen bien; el lector disfruta la subida mientras empieza a preocuparse.'],['Cima','El punto medio: tiene lo que quería, o cree tenerlo.'],['Defecto fatal','El orgullo, la codicia o la lealtad empiezan a decidir.'],['Sin retorno','Pasa el punto en el que todavía era posible una salida honesta.'],['La caída','Termina más abajo que donde empezó, y otros también pagan el costo.']],
+ best:'Historias criminales, relatos de advertencia, estudios de personaje.',ex:'Scarface · Breaking Bad · El lobo de Wall Street'},
+threeact:{name:'Estructura en tres actos',origin:'Syd Field, El libro del guion, 1979',tag:'Planteo, confrontación y resolución, en proporción 25 / 50 / 25.',
+ about:'La forma por defecto del cine comercial. El Acto I presenta el mundo y termina cuando el protagonista se compromete con un objetivo. El Acto II es el largo medio de obstáculos crecientes, partido por un punto medio. El Acto III fuerza la confrontación final.',
+ beats:[['Detonante','Algo altera la vida del protagonista.'],['Punto de giro 1','El protagonista se compromete; el mundo del Acto I queda atrás.'],['Punto medio','Una revelación o un giro que cambia el objetivo o sube lo que está en juego.'],['Punto de giro 2','El momento más bajo, o un descubrimiento que lanza el final.'],['Clímax','La confrontación final con el problema central.'],['Resolución','Lo que cambió la victoria o la derrota.']],
+ best:'Guiones, novelas con un objetivo externo fuerte.',ex:'Duro de matar · El mago de Oz · Volver al futuro'},
+fiveact:{name:'Estructura en cinco actos',origin:'Horacio, el teatro isabelino, Freytag',tag:'Cinco movimientos con el giro justo en el centro.',
+ about:'Las obras isabelinas tenían cinco actos, con el clímax en el Acto III y no cerca del final. Eso deja dos actos enteros para las consecuencias, ideal para historias sobre culpa, venganza y el precio de una decisión.',
+ beats:[['Exposición','Los personajes, el lugar y las tensiones que ya existen.'],['Acción ascendente','El conflicto toma forma y el protagonista se compromete.'],['Clímax','El giro: una acción decisiva cuyas consecuencias no se pueden deshacer.'],['Acción descendente','Las fuerzas contrarias se reúnen; el suspenso está en el cómo, no en el si.'],['Resolución','Catástrofe en la tragedia, reconciliación en la comedia.']],
+ best:'Teatro, tragedias, historias donde importan más las consecuencias que el hecho.',ex:'Hamlet · Romeo y Julieta · Titanic'},
+kishotenketsu:{name:'Kishōtenketsu',origin:'Composición clásica china y japonesa',tag:'Cuatro partes, sin conflicto obligatorio. El giro es un cambio de mirada.',
+ about:'Tomada de la poesía clásica china, esta forma construye sentido por yuxtaposición en lugar de lucha. Dos partes presentan y desarrollan una situación, la tercera trae algo en apariencia ajeno y la cuarta muestra cómo encajan.',
+ beats:[['Ki · introducción','Presentá a los personajes y su situación.'],['Shō · desarrollo','Seguí y profundizá esa situación sin grandes cambios.'],['Ten · giro','Introducí un elemento o un ángulo inesperado que parece no tener relación.'],['Ketsu · conclusión','Uní las dos cosas para que la primera parte se lea distinto.']],
+ best:'Ficción literaria tranquila, viñetas, microficción, historietas.',ex:'Mi vecino Totoro · tiras yonkoma de cuatro viñetas'},
+savethecat:{name:'Save the Cat',origin:'Blake Snyder, ¡Salva al gato!, 2005',tag:'Quince beats con páginas objetivo, pensados para el ritmo.',
+ about:'La hoja de beats de Snyder dice no solo qué pasa sino más o menos cuándo. Se escribió para guiones, pero los novelistas la usan para diagnosticar medios flojos: si el punto medio llega tarde, el lector lo siente.',
+ beats:[['Imagen de apertura','Una instantánea de la vida y el problema del héroe antes de la historia.'],['Tema enunciado','Alguien, casi nunca el héroe, insinúa la lección.'],['Planteo','El mundo del héroe, sus defectos y todo lo que hay que arreglar.'],['Catalizador','El hecho que cambia la vida.'],['Debate','¿Voy o no voy? El héroe duda.'],['Paso al Acto 2','El héroe elige entrar en el mundo al revés del segundo acto.'],['Trama B','Una relación nueva que lleva el tema.'],['Diversión y juegos','La promesa de la premisa; las escenas que mostraría un tráiler.'],['Punto medio','Una falsa victoria o una falsa derrota; sube lo que está en juego.'],['Los malos se acercan','La presión externa y la duda interna aprietan juntas.'],['Todo está perdido','El punto más bajo, a menudo con olor a muerte.'],['Noche oscura del alma','El héroe se hunde y después encuentra la clave.'],['Paso al Acto 3','Las tramas A y B se juntan; el héroe ve la solución.'],['Final','El héroe aplica la lección y gana, cambiado.'],['Imagen final','Un espejo de la imagen de apertura que prueba el cambio.']],
+ best:'Novelas de género, guiones, arreglar un medio lento.',ex:'Legalmente rubia · Hechizo del tiempo · Los juegos del hambre'},
+sevenpoint:{name:'Estructura de siete puntos',origin:'Dan Wells',tag:'Planeá primero el final y hacé del comienzo su opuesto.',
+ about:'Wells propone diseñar hacia atrás: decidí la resolución y hacé del gancho su imagen invertida. Los giros llevan al personaje de reaccionar a actuar, las presiones aprietan y el punto medio es donde deja de huir y empieza a empujar.',
+ beats:[['Gancho','El estado opuesto a la resolución: débil donde será fuerte.'],['Giro 1','Una idea, persona o hecho nuevo pone la historia en marcha.'],['Presión 1','La presión del antagonista obliga al personaje a actuar.'],['Punto medio','El personaje pasa de la reacción a la acción.'],['Presión 2','Todo sale muy mal; falla el plan o se pierde al mentor.'],['Giro 2','Encaja la última pieza; tiene lo que necesita para ganar.'],['Resolución','El clímax y el nuevo estado, espejo del gancho.']],
+ best:'Planear el arco de un personaje contra una trama externa.',ex:'Harry Potter y la piedra filosofal · Los juegos del hambre'},
+fichtean:{name:'Curva de Fichte',origin:'John Gardner, El arte de la ficción, 1983',tag:'Empezá en problemas y seguí subiéndolos. El trasfondo puede esperar.',
+ about:'En lugar de una exposición tranquila, la historia abre en crisis y apila una crisis sobre otra, cada una peor que la anterior. El trasfondo llega en fragmentos entre ellas. Después del clímax, el final llega rápido.',
+ beats:[['Primera crisis','Abrí dentro de un problema; saltá la introducción lenta.'],['Crisis crecientes','Cada crisis se resuelve a medias y cada solución causa la siguiente. Acá se teje el trasfondo.'],['Clímax','La crisis más grande, donde todo está en juego.'],['Final rápido','Mostrá el costo y cortá.']],
+ best:'Thrillers, terror, historias de supervivencia, cuentos.',ex:'Parque Jurásico · Misery · Los juegos del hambre'},
+snowflake:{name:'El método copo de nieve',origin:'Randy Ingermanson',tag:'Hacer crecer una novela a partir de una sola oración.',
+ about:'Es un método de planificación, no una forma. Empezás con un resumen de una oración y lo expandís por pasadas, como un copo fractal que gana detalle. Cada paso es chico, así que siempre sabés qué hacer después.',
+ beats:[['Una oración','Resumí toda la historia en unas quince palabras.'],['Un párrafo','Cinco oraciones: planteo, tres desastres, final.'],['Resúmenes de personajes','Para cada personaje principal: objetivo, conflicto, epifanía.'],['Una página','Expandí cada oración del párrafo en un párrafo.'],['Sinopsis de personajes','Contá la historia desde el punto de vista de cada personaje principal.'],['Sinopsis larga','Expandí cada párrafo en una página.'],['Fichas de personajes','Historias completas, motivaciones y cómo cambia cada uno.'],['Lista de escenas','Dividí la sinopsis en todas sus escenas.'],['Notas de escena','Un párrafo corto de intención para cada escena.'],['Primer borrador','Escribí a partir de la lista de escenas.']],
+ best:'Escritores que planifican una novela, o cualquiera trabado con una idea grande.',ex:'Cualquier novela que planifiques antes de escribir'},
+hero:{name:'El viaje del héroe',origin:'Joseph Campbell, 1949; las doce etapas de Christopher Vogler',tag:'Dejar el mundo conocido, sobrevivir a la prueba, traer algo a casa.',
+ about:'Campbell encontró un patrón común en los mitos de todo el mundo; Vogler lo condensó en doce etapas para guionistas. El héroe cruza del mundo ordinario a uno especial, se transforma en una prueba y vuelve con algo que cambia su hogar.',
+ beats:[['Mundo ordinario','La vida normal del héroe, con una carencia que quizá no admite.'],['La llamada a la aventura','Llega un problema, un mensaje o una oportunidad.'],['Rechazo de la llamada','El miedo o el deber lo hacen dudar.'],['Encuentro con el mentor','Alguien le da un consejo, una herramienta o valor.'],['Cruce del umbral','Se compromete y entra en el mundo especial.'],['Pruebas, aliados, enemigos','Aprende las reglas nuevas y en quién confiar.'],['Aproximación','La preparación para la prueba central: planes y dudas.'],['Prueba suprema','Una crisis de vida o muerte; algo tiene que morir, literalmente o no.'],['Recompensa','Se queda con el premio: un objeto, un saber o una reconciliación.'],['El camino de regreso','Las consecuencias lo persiguen; se compromete a volver.'],['Resurrección','Una prueba final que usa todo lo aprendido.'],['Regreso con el elixir','Trae a casa algo que cambia su mundo.']],
+ best:'Aventura, fantasía, historias de crecimiento.',ex:'La guerra de las galaxias (1977) · El hobbit · El rey león'},
+storycircle:{name:'El círculo narrativo',origin:'Dan Harmon, a partir de Campbell (también llamado embrión de trama)',tag:'Ocho pasos: querer, ir, encontrar, pagar, volver, cambiar.',
+ about:'Harmon redujo el viaje del héroe a ocho pasos que entran en un episodio o en un cuento. La mitad de arriba del círculo es el orden y la de abajo el caos; el personaje baja y vuelve a subir cambiado.',
+ beats:[['Vos','Un personaje en su zona de confort.'],['Necesidad','Pero quiere algo.'],['Ir','Entra en una situación desconocida.'],['Buscar','Se adapta a ella.'],['Encontrar','Consigue lo que quería.'],['Pagar','Paga un precio alto por eso.'],['Volver','Regresa a su situación conocida.'],['Cambiar','Habiendo cambiado.']],
+ best:'Cuentos, episodios de TV, arcos centrados en el personaje.',ex:'Community · Rick and Morty · Buscando a Nemo'},
+tragic:{name:'El círculo trágico',origin:'Una variante negativa del círculo de Harmon',tag:'El mismo viaje, pero la lección se lee mal y el círculo nunca se cierra.',
+ about:'El personaje recorre los mismos pasos, pero en el momento de pagar el precio saca la conclusión equivocada. Vuelve sin el cambio que necesitaba, o peor, y ya no encaja en su mundo de antes.',
+ beats:[['Vos','Un personaje en su zona de confort, con un defecto.'],['Necesidad','Quiere algo, a menudo por la razón equivocada.'],['Ir','Entra en una situación desconocida.'],['Buscar','Se adapta, a veces demasiado bien.'],['Encontrar','Consigue lo que quería.'],['Lección mal leída','Paga el precio pero aprende lo que no era.'],['Volver','Intenta regresar.'],['Ruina','Igual que antes o peor, ya no encaja; el círculo queda abierto.']],
+ best:'Tragedias, estudios oscuros de personaje, relatos de advertencia.',ex:'El gran Gatsby · El ciudadano Kane · Breaking Bad'},
+mirror:{name:'Protagonistas espejo',origin:'Estructura de dos protagonistas',tag:'Dos vidas marcadas por la misma decisión que terminan en lugares opuestos.',
+ about:'Dos protagonistas enfrentan la misma presión y responden de maneras opuestas. Cada uno comenta al otro, así que el tema se discute con acciones en lugar de explicarse. Sus caminos suelen cruzarse en el centro de la historia.',
+ beats:[['Dos comienzos','Presentá a ambos personajes, parecidos en algo crucial.'],['La decisión compartida','Se encuentran, o enfrentan la misma decisión, en el punto medio.'],['Divergencia','Sus respuestas los mandan en direcciones opuestas.'],['Finales opuestos','Uno sube, el otro cae, y cada final explica al otro.']],
+ best:'Historias de rivalidad, novelas temáticas, duplas policiales.',ex:'El gran truco · Fuego contra fuego · Crimen y castigo'},
+ensemble:{name:'Red coral',origin:'Altman, Tarantino, Curtis y la novela de varias tramas',tag:'Varias historias que se rozan y después chocan.',
+ about:'Cada hilo tiene su propio arco chico, pero el sentido aparece donde se tocan. Planeá un primer cruce cerca del medio y después una convergencia donde un solo hecho afecta a todos.',
+ beats:[['Vidas separadas','Presentá cada hilo con su deseo y su problema.'],['Primer cruce','Los hilos se tocan, a menudo sin que los personajes lo sepan.'],['Convergencia','Un hecho arrastra todos los hilos al mismo lugar.'],['Después','Mostrá cómo cada vida quedó torcida por las otras.']],
+ best:'Novelas donde el verdadero tema es una ciudad o una comunidad.',ex:'Tiempos violentos · Realmente amor · Vidas cruzadas'},
+epistolary:{name:'Collage epistolar',origin:'De las novelas en cartas de Richardson a la ficción de material encontrado',tag:'La historia contada en documentos que el lector tiene que armar.',
+ about:'Cartas, diarios, recortes, mails y transcripciones llevan la trama. El narrador desaparece y el lector se vuelve el detective que une las piezas. La tensión vive en lo que cae entre documento y documento.',
+ beats:[['Elegir los documentos','Formatos que muestren lados distintos: privado, público, oficial.'],['Los huecos','Dejá hechos entre documentos para que el lector los infiera.'],['Contradicciones','Que dos documentos no coincidan sobre el mismo hecho.'],['El último documento','Terminá con una pieza que cambie cómo se leen las demás.']],
+ best:'Terror, misterio, historias íntimas contadas a través de la voz.',ex:'Drácula · Carrie · El color púrpura · Guerra Mundial Z'},
+unreliable:{name:'El narrador no confiable',origin:'Cambio de perspectiva',tag:'Dos historias a la vez: la que se cuenta y la que pasó.',
+ about:'El narrador miente, malinterpreta u oculta algo, y el lector lo va notando. Cada escena tiene que funcionar dos veces: una como se cuenta y otra después de la revelación, cuando las pistas encajan.',
+ beats:[['La historia contada','Un relato convincente en el que el lector tiene motivos para confiar.'],['Pistas','Pequeñas contradicciones y detalles raros que apuntan a otra versión.'],['La revelación','El momento en que la historia contada se derrumba.'],['La relectura','El final invita a ver cada escena anterior de otra manera.']],
+ best:'Thrillers psicológicos, finales con giro, ficción en primera persona.',ex:'Perdida · El club de la pelea · El asesinato de Roger Ackroyd'},
+parallel:{name:'Líneas temporales paralelas',origin:'Narración dividida',tag:'Las líneas de tiempo se cortan entre sí hasta encontrarse.',
+ about:'Dos o más épocas corren lado a lado, y cada corte hace que la otra línea signifique más. El pasado explica el presente, el presente plantea preguntas sobre el pasado, y la historia termina donde por fin se conectan.',
+ beats:[['Abrir en un tiempo','Empezá con un gancho en la línea que plantea la pregunta.'],['Cortar','Saltá a otro tiempo que parece responder otra cosa.'],['Ecos','Repetí imágenes, objetos o frases entre las líneas.'],['Convergencia','Las líneas se juntan y aparece el cuadro completo.']],
+ best:'Sagas familiares, misterios, historias sobre la memoria.',ex:'¿Quién quiere ser millonario? · Cloud Atlas · This Is Us'},
+};
+const loc=(s,f)=>lang==='es'&&ES[s.id]?ES[s.id][f]:s[f];
+const famName=k=>lang==='es'?FAM_ES[k]:FAM[k];
+
+/* ---------- prompt pools: [english, spanish] ---------- */
+const POOL={
+plot:[['Overcoming the Monster','Vencer al monstruo'],['Rags to Riches','De la pobreza a la riqueza'],['Quest','La búsqueda'],['Voyage and Return','Viaje y regreso'],['Comedy','Comedia'],['Tragedy','Tragedia'],['Rebirth','Renacimiento']],
+tone:[['darkly comic','tragicómico'],['tender','tierno'],['tense','tenso'],['melancholic','melancólico'],['absurd','absurdo'],['eerie','inquietante'],['bittersweet','agridulce'],['satirical','satírico'],['hopeful','esperanzador'],['unsettling','perturbador']],
+character:[['a night-shift pharmacist','una farmacéutica del turno noche'],['a retired lighthouse keeper','un farero jubilado'],['a ghostwriter for a famous chef','el escritor fantasma de un chef famoso'],['the driver of the last bus of the night','el chofer del último colectivo de la noche'],['a translator who notices one wrong word','una traductora que detecta una palabra equivocada'],['an architect whose new building has started to lean','una arquitecta cuyo edificio nuevo empezó a inclinarse'],['a tango teacher with a bad knee','un profesor de tango con la rodilla mala'],['a grandmother with her first smartphone','una abuela con su primer celular inteligente'],["a bank teller who knows everyone's balance",'un cajero de banco que sabe el saldo de todos'],['a choir conductor who is losing his hearing','un director de coro que está perdiendo la audición'],['a debt collector with a soft heart','un cobrador de deudas de corazón blando'],['a substitute teacher on her first day','una profesora suplente en su primer día'],['a hotel receptionist on the night it closes for good','el recepcionista de un hotel la noche en que cierra para siempre'],['a locksmith who has never been locked out','un cerrajero que nunca se quedó afuera'],['a weather presenter who lies about the forecast','una presentadora del clima que miente con el pronóstico'],['twin brothers who stopped speaking ten years ago','dos hermanos gemelos que no se hablan hace diez años']],
+want:[['to buy back the family house','recuperar la casa familiar'],['to be forgiven by one person','que una sola persona lo perdone'],['to get the raise they were promised','conseguir el aumento que le prometieron'],['to finish a novel before the deadline','terminar una novela antes del plazo'],['to find out who keeps leaving gifts at the door','descubrir quién le deja regalos en la puerta'],['to leave town without anyone noticing','irse del pueblo sin que nadie se dé cuenta'],['to prove a dead friend was innocent','demostrar que un amigo muerto era inocente'],['to get through one family wedding without a scene','sobrevivir a un casamiento familiar sin escándalo'],['to recover a stolen guitar','recuperar una guitarra robada'],['to be taken seriously, just once','que lo tomen en serio, aunque sea una vez'],['to win a contest everyone thinks is rigged','ganar un concurso que todos creen arreglado'],['to return something they stole as a child','devolver algo que robó de chico'],['to keep a promise made to a stranger','cumplir una promesa hecha a un desconocido'],['to hide a mistake until Monday','esconder un error hasta el lunes']],
+obstacle:[['a sibling who knows the secret','un hermano que conoce el secreto'],['a debt that grows every week','una deuda que crece cada semana'],['a storm that closes every road','una tormenta que corta todos los caminos'],['their own pride','su propio orgullo'],['a rival who is kinder than they are','un rival más amable que él'],['a contract signed years ago','un contrato firmado hace años'],['a town that remembers everything','un pueblo que se acuerda de todo'],['a lie they told on page one','una mentira que dijo en la primera página'],['a body that is getting slower','un cuerpo cada vez más lento'],['a deadline at midnight','un plazo que vence a medianoche'],['a boss who smiles too much','un jefe que sonríe demasiado'],['an inspector who never sleeps','un inspector que nunca duerme'],['a dog that will not stop following them','un perro que no deja de seguirlo'],['a rumour that is half true','un rumor que es verdad a medias']],
+setting:[['a small town during siesta hours','un pueblo a la hora de la siesta'],['a night bus crossing empty plains','un micro nocturno que cruza la llanura vacía'],['an apartment block with one broken lift','un edificio con el único ascensor roto'],['a hotel on its final night','un hotel en su última noche'],['a school during exam week','una escuela en semana de exámenes'],['a radio station at 3 a.m.','una radio a las tres de la mañana'],['a cruise ship turned back by a storm','un crucero que una tormenta obliga a volver'],['a hospital laundry room','el lavadero de un hospital'],['an empty football stadium','una cancha de fútbol vacía'],['a family restaurant on its last weekend','un restaurante familiar en su último fin de semana'],['a mountain observatory','un observatorio en la montaña'],['a city during a power cut','una ciudad durante un apagón'],['a ferry crossing a wide brown river','una balsa que cruza un río ancho y marrón'],['an office the day after layoffs','una oficina el día después de los despidos']],
+object:[['a key that fits no door','una llave que no abre ninguna puerta'],['a voicemail never deleted','un mensaje de voz que nunca se borró'],['a borrowed coat','un abrigo prestado'],['a jar of foreign coins','un frasco de monedas extranjeras'],['a wedding photo with one face cut out','una foto de casamiento con una cara recortada'],['an unopened letter','una carta sin abrir'],['a watch stopped at 4:17','un reloj detenido a las 4:17'],['a map drawn on a napkin','un mapa dibujado en una servilleta'],['a lottery ticket','un billete de lotería'],['a typewriter with a missing letter','una máquina de escribir a la que le falta una letra'],["a recipe in someone else's handwriting",'una receta con la letra de otra persona'],['a red umbrella','un paraguas rojo']],
+twist:[['the helper caused the problem','el que ayuda causó el problema'],['the narrator is writing from years later','el narrador escribe años después'],['the goal was reached years ago and nobody told them','el objetivo se cumplió hace años y nadie se lo dijo'],['two characters are the same person at different ages','dos personajes son la misma persona a distintas edades'],['the antagonist wants the same thing for a better reason','el antagonista quiere lo mismo por una razón mejor'],['the setting is about to disappear','el lugar está por desaparecer'],['the reward turns out to be worthless','la recompensa no vale nada'],['a minor character tells the final scene','un personaje secundario cuenta la escena final'],['the whole story happens in reverse order','toda la historia ocurre en orden inverso'],['the mentor is lying about their past','el mentor miente sobre su pasado']],
+constraint:[['Keep it under 1,500 words.','Menos de 1.500 palabras.'],['Open with a line of dialogue.','Empezá con una línea de diálogo.'],['Tell it in the second person.','Contala en segunda persona.'],['The story covers no more than 24 hours.','La historia no dura más de 24 horas.'],['Write it in the present tense.','Escribila en presente.'],['End on an image, not an explanation.','Terminá con una imagen, no con una explicación.'],['No character may name the main problem aloud.','Ningún personaje puede nombrar en voz alta el problema principal.'],['Use exactly three scenes.','Usá exactamente tres escenas.'],['Include one document: a letter, receipt or text message.','Incluí un documento: una carta, un recibo o un mensaje de texto.'],['The first and last sentences must mirror each other.','La primera y la última oración tienen que reflejarse.']],
+};
+const UI={
+en:{kick:'A field guide for fiction writers',title:'The Plot Atlas',sub:'Twenty ways to shape a story, drawn as diagrams. Browse the atlas, pick a structure, then spin the generator for a writing prompt built on it.',
+ desk:'The prompt desk',spinH:'Spin a story',deskNote:'Click any line to reroll just that line. Lock the ones you like, then spin the rest.',spinBtn:'Spin the unlocked lines',unlockBtn:'Unlock all',structure:'Structure',hint:'Choosing a structure from the menu locks it in place.',
+ atlas:'The atlas',atlasH:'Plot structures',atlasNote:'Open any plate for the full diagram, the beats, and examples.',all:'All',
+ foot:'Diagrams redrawn from common plot-structure references (Freytag, Campbell, Harmon, Snyder, Wells, Booker, Vonnegut and others). Examples are illustrative; most stories mix several shapes.',
+ auto:'Auto',light:'Light',dark:'Dark',theme:'Theme',lang:'Language',yourPrompt:'Your prompt',beatsToHit:'Beats to hit',copy:'Copy prompt',about:'About this structure',copied:'Copied',selected:'Selected. Press Ctrl+C to copy.',
+ bestFor:'Works well for',examples:'Examples',use:'Use in a prompt',close:'Close',lock:'Lock',unlock:'Unlock',reroll:'Reroll',constraintL:'Constraint',beatsL:'Beats',
+ labels:{structure:'Structure',plot:'Plot type',tone:'Tone',character:'Protagonist',want:'Wants',obstacle:'Obstacle',setting:'Setting',object:'Object',twist:'Wild card',constraint:'Constraint'}},
+es:{kick:'Guía de campo para escritores de ficción',title:'El atlas de tramas',sub:'Veinte maneras de darle forma a una historia, dibujadas como diagramas. Recorré el atlas, elegí una estructura y girá el generador para obtener una consigna de escritura basada en ella.',
+ desk:'La mesa de consignas',spinH:'Girá una historia',deskNote:'Hacé clic en cualquier línea para cambiar solo esa. Bloqueá las que te gusten y girá el resto.',spinBtn:'Girar las líneas libres',unlockBtn:'Desbloquear todo',structure:'Estructura',hint:'Elegir una estructura en el menú la deja bloqueada.',
+ atlas:'El atlas',atlasH:'Estructuras de trama',atlasNote:'Abrí cualquier lámina para ver el diagrama completo, los beats y ejemplos.',all:'Todas',
+ foot:'Diagramas redibujados a partir de referencias habituales sobre estructura de trama (Freytag, Campbell, Harmon, Snyder, Wells, Booker, Vonnegut y otros). Los ejemplos son ilustrativos; la mayoría de las historias mezcla varias formas.',
+ auto:'Auto',light:'Claro',dark:'Oscuro',theme:'Tema',lang:'Idioma',yourPrompt:'Tu consigna',beatsToHit:'Beats a cubrir',copy:'Copiar consigna',about:'Sobre esta estructura',copied:'Copiado',selected:'Seleccionado. Presioná Ctrl+C para copiar.',
+ bestFor:'Sirve para',examples:'Ejemplos',use:'Usar en una consigna',close:'Cerrar',lock:'Bloquear',unlock:'Desbloquear',reroll:'Cambiar',constraintL:'Restricción',beatsL:'Beats',
+ labels:{structure:'Estructura',plot:'Tipo de trama',tone:'Tono',character:'Protagonista',want:'Quiere',obstacle:'Obstáculo',setting:'Lugar',object:'Objeto',twist:'Comodín',constraint:'Restricción'}}};
+const u=k=>UI[lang][k];
+
+/* ---------- generator state (indices, so locks survive a language switch) ---------- */
+const KEYS=['structure','plot','tone','character','want','obstacle','setting','object','twist','constraint'];
+const size=k=>k==='structure'?S.length:POOL[k].length;
+const state={v:{},lock:{}};
+const rnd=(n,not)=>{if(n<2)return 0;let x;do{x=Math.floor(Math.random()*n)}while(x===not);return x};
+const val=k=>k==='structure'?loc(S[state.v.structure],'name'):POOL[k][state.v[k]][lang==='es'?1:0];
+const an=w=>/^[aeiou]/i.test(w)?'an':'a';
+const cap=s=>s[0].toUpperCase()+s.slice(1);
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+
+const LOCK_ON='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="7" width="10" height="7" rx="1" fill="currentColor"/><path d="M5 7V5a3 3 0 0 1 6 0v2"/></svg>';
+const LOCK_OFF='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="7" width="10" height="7" rx="1"/><path d="M5 7V5a3 3 0 0 1 5.8-1"/></svg>';
+
+function spin(only){KEYS.forEach(k=>{if(only?k===only:!state.lock[k])state.v[k]=rnd(size(k),state.v[k])});render()}
+function renderSlots(){
+  const lb=u('labels');
+  document.getElementById('slots').innerHTML=KEYS.map(k=>`<div class="slot${state.lock[k]?' locked':''}">
+    <button class="slot-main" data-reroll="${k}" title="${u('reroll')}: ${lb[k].toLowerCase()}"><span class="sl">${lb[k]}</span><span class="sv">${esc(val(k))}</span></button>
+    <button class="lock" data-lock="${k}" aria-pressed="${!!state.lock[k]}" aria-label="${state.lock[k]?u('unlock'):u('lock')}: ${lb[k]}">${state.lock[k]?LOCK_ON:LOCK_OFF}</button></div>`).join('');
+  document.getElementById('structSel').value=S[state.v.structure].id;
+}
+function promptParts(){
+  const s=S[state.v.structure],v=k=>val(k);let head,body;
+  if(lang==='es'){
+    head=`Una historia en tono ${v('tone')} del tipo «${v('plot')}», construida sobre ${loc(s,'name')}`;
+    body=[['Tu protagonista es ',v('character')],[', que quiere ',v('want')],['. Lo que se interpone: ',v('obstacle')],['. Ambientala en ',v('setting')],[', y hacé que ',v('object')],[' importe al final. Comodín: ',v('twist')],['.','']];
+  }else{
+    head=`${cap(an(v('tone')))} ${v('tone')} ${v('plot')} story, built on ${loc(s,'name')}`;
+    body=[['Your protagonist is ',v('character')],[', who wants ',v('want')],['. Standing in the way: ',v('obstacle')],['. Set it in ',v('setting')],[', and make ',v('object')],[' matter by the end. Wild card: ',v('twist')],['.','']];
+  }
+  return {s,head,body,constraint:v('constraint')};
+}
+const beatList=s=>{const b=loc(s,'beats');return `<ol class="beats${b.length>6?' cols':''}">${b.map(x=>`<li><div><b>${esc(x[0])}</b><span>${esc(x[1])}</span></div></li>`).join('')}</ol>`};
+function renderResult(){
+  const {s,head,body,constraint}=promptParts();
+  document.getElementById('result').innerHTML=`
+    <span class="kicker">${u('yourPrompt')}</span>
+    <h3>${esc(head)}</h3>
+    <p>${body.map(([t,b])=>esc(t)+(b?`<b>${esc(b)}</b>`:'')).join('')}</p>
+    <p class="constraint">${esc(constraint)}</p>
+    <div class="result-fig">${DIAG[s.id]()}</div>
+    <h4>${u('beatsToHit')} · ${esc(loc(s,'name'))}</h4>
+    ${beatList(s)}
+    <div class="res-actions"><button class="btn primary" id="copy">${u('copy')}</button><button class="btn" data-open="${s.id}">${u('about')}</button><span class="copied" id="copied" role="status"></span></div>`;
+}
+function render(){renderSlots();renderResult()}
+
+/* ---------- atlas ---------- */
+let filter='all',openId=null;
+function renderFilters(){
+  const f=[['all',u('all')]].concat(Object.keys(FAM).map(k=>[k,famName(k)]));
+  document.getElementById('filters').innerHTML=f.map(([k,n])=>`<button class="chip" data-filter="${k}" aria-pressed="${filter===k}">${n}</button>`).join('');
+}
+function renderGrid(){
+  document.getElementById('grid').innerHTML=S.filter(s=>filter==='all'||s.fam===filter).map(s=>`<button class="card" data-open="${s.id}">
+    <div class="thumb">${DIAG[s.id]()}</div>
+    <span class="kicker">${famName(s.fam)}</span><h3>${esc(loc(s,'name'))}</h3><p>${esc(loc(s,'tag'))}</p></button>`).join('');
+}
+const dlg=document.getElementById('dlg');
+function openPlate(id){
+  openId=id;
+  const i=S.findIndex(s=>s.id===id),s=S[i],prev=S[(i-1+S.length)%S.length],next=S[(i+1)%S.length];
+  document.getElementById('plate').innerHTML=`
+    <div class="plate-head"><div><span class="kicker">${famName(s.fam)}</span><h2 id="dlgTitle">${esc(loc(s,'name'))}</h2><div class="origin">${esc(loc(s,'origin'))}</div></div>
+      <button class="x" data-close aria-label="${u('close')}">×</button></div>
+    <figure>${DIAG[s.id]()}</figure>
+    <p class="lede">${esc(loc(s,'about'))}</p>
+    ${beatList(s)}
+    <div class="meta"><div><h4>${u('bestFor')}</h4><p>${esc(loc(s,'best'))}</p></div><div><h4>${u('examples')}</h4><p><i>${esc(loc(s,'ex'))}</i></p></div></div>
+    <div class="plate-actions"><button class="btn primary" data-use="${s.id}">${u('use')}</button>
+      <span style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-open="${prev.id}">← ${esc(loc(prev,'name'))}</button><button class="btn" data-open="${next.id}">${esc(loc(next,'name'))} →</button></span></div>`;
+  if(!dlg.open)dlg.showModal();
+  dlg.scrollTop=0;
+}
+
+/* ---------- static text, language and theme ---------- */
+function renderStatic(){
+  document.documentElement.lang=lang;
+  document.title=u('title');
+  document.querySelectorAll('[data-i]').forEach(el=>el.textContent=u(el.dataset.i));
+  document.querySelectorAll('[data-lang]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.lang===lang));
+  document.querySelectorAll('[data-theme-set]').forEach(b=>b.textContent=u(b.dataset.themeSet));
+  const sel=document.getElementById('structSel');
+  sel.innerHTML=Object.keys(FAM).map(k=>`<optgroup label="${famName(k)}">${S.filter(s=>s.fam===k).map(s=>`<option value="${s.id}">${esc(loc(s,'name'))}</option>`).join('')}</optgroup>`).join('');
+  document.querySelector('.mast-top [data-i="kick"]').textContent=u('kick')+' · '+S.length+(lang==='es'?' estructuras':' structures');
+}
+function setLang(l){lang=l;renderStatic();renderFilters();renderGrid();render();if(dlg.open&&openId)openPlate(openId)}
+
+let theme='auto';
+try{theme=localStorage.getItem('plot-theme')||'auto'}catch(_){}
+function applyTheme(t,save){
+  theme=t;const root=document.documentElement;
+  if(t==='auto'){if(save)root.removeAttribute('data-theme')}else root.setAttribute('data-theme',t);
+  document.querySelectorAll('[data-theme-set]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.themeSet===t));
+  if(save){try{localStorage.setItem('plot-theme',t)}catch(_){}}
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click',e=>{
+  const t=e.target.closest('button');if(!t)return;
+  if(t.dataset.reroll){spin(t.dataset.reroll)}
+  else if(t.dataset.lock){const k=t.dataset.lock;state.lock[k]=!state.lock[k];renderSlots()}
+  else if(t.dataset.filter){filter=t.dataset.filter;renderFilters();renderGrid()}
+  else if(t.dataset.open){openPlate(t.dataset.open)}
+  else if(t.dataset.lang){setLang(t.dataset.lang)}
+  else if(t.dataset.themeSet){applyTheme(t.dataset.themeSet,true)}
+  else if('close' in t.dataset){dlg.close()}
+  else if(t.dataset.use){state.v.structure=S.findIndex(s=>s.id===t.dataset.use);state.lock.structure=true;render();dlg.close();document.getElementById('gen-h').scrollIntoView({behavior:'smooth',block:'start'})}
+  else if(t.id==='spin'){spin()}
+  else if(t.id==='unlock'){state.lock={};renderSlots()}
+  else if(t.id==='copy'){
+    const {s,head,body,constraint}=promptParts();
+    const txt=`${head}\n\n${body.map(x=>x[0]+x[1]).join('')}\n\n${u('constraintL')}: ${constraint}\n\n${u('beatsL')} (${loc(s,'name')}):\n`+loc(s,'beats').map((x,i)=>`${i+1}. ${x[0]}: ${x[1]}`).join('\n');
+    const msg=document.getElementById('copied');
+    const fallback=()=>{const r=document.createRange();r.selectNodeContents(document.getElementById('result'));const sl=getSelection();sl.removeAllRanges();sl.addRange(r);msg.textContent=u('selected')};
+    try{navigator.clipboard.writeText(txt).then(()=>msg.textContent=u('copied'),fallback)}catch(_){fallback()}
+  }
+});
+dlg.addEventListener('click',e=>{if(e.target===dlg)dlg.close()});
+document.getElementById('structSel').addEventListener('change',e=>{state.v.structure=S.findIndex(s=>s.id===e.target.value);state.lock.structure=true;render()});
+
+DESK.onLang=setLang;
+renderStatic();renderFilters();renderGrid();spin();
+</script>

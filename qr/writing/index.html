@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mesa de escritura</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Libre+Franklin:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap">
+<style id="desk-shared">
+/* Shared design language for the writing desk: one palette, three typefaces, one top bar. */
+:root{
+  --dk-bg:#fdfdfc; --dk-paper:#ffffff; --dk-ink:#16171a; --dk-muted:#5b5e67; --dk-rule:#d8dbe1;
+  --dk-soft:#f3f4f7; --dk-wash:#e8edf6; --dk-accent:#1f4f8a; --dk-accent-soft:#dde5f6; --dk-on-accent:#ffffff; --dk-mark:#f6eaa9;
+  --dk-display:"Libre Caslon Display","Bodoni 72",Didot,Georgia,serif;
+  --dk-body:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --dk-ui:"Libre Franklin","Helvetica Neue",Arial,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --dk-bg:#121316; --dk-paper:#1a1b20; --dk-ink:#ebeae5; --dk-muted:#a3a6ae; --dk-rule:#34363c;
+  --dk-soft:#1c1e23; --dk-wash:#1b2331; --dk-accent:#8db2e8; --dk-accent-soft:#25314f; --dk-on-accent:#0f1320; --dk-mark:#4b4321; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --dk-bg:#121316; --dk-paper:#1a1b20; --dk-ink:#ebeae5; --dk-muted:#a3a6ae; --dk-rule:#34363c;
+  --dk-soft:#1c1e23; --dk-wash:#1b2331; --dk-accent:#8db2e8; --dk-accent-soft:#25314f; --dk-on-accent:#0f1320; --dk-mark:#4b4321; color-scheme:dark}
+.dk-bar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px 16px;padding:14px 0 12px;border-bottom:1px solid var(--dk-rule)}
+.dk-crumbs{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;font:600 12px/1.3 var(--dk-ui);letter-spacing:.08em;text-transform:uppercase}
+.dk-crumbs a{color:var(--dk-ink);text-decoration:none;border-bottom:1px solid transparent}
+.dk-crumbs a:hover{color:var(--dk-accent);border-color:var(--dk-accent)}
+.dk-crumbs .dk-sep{color:var(--dk-muted)}
+.dk-prefs{display:flex;gap:8px;flex-wrap:wrap}
+.dk-seg{display:inline-flex;border:1px solid var(--dk-rule);border-radius:2px;overflow:hidden}
+.dk-seg button{background:transparent;border:0;margin:0;padding:5px 10px;cursor:pointer;font:600 11px/1.4 var(--dk-ui);letter-spacing:.08em;text-transform:uppercase;color:var(--dk-muted)}
+.dk-seg button+button{border-left:1px solid var(--dk-rule)}
+.dk-seg button:hover{color:var(--dk-ink)}
+.dk-seg button[aria-pressed="true"]{background:var(--dk-ink);color:var(--dk-bg)}
+.dk-seg button:focus-visible,.dk-crumbs a:focus-visible{outline:2px solid var(--dk-accent);outline-offset:2px}
+</style>
+<script>
+/* Shared preferences: language (Spanish by default) and theme (light by default), remembered across all pages of the desk. */
+(function(){
+  var R=document.documentElement;
+  var DEF={'desk-lang':'es','desk-theme':'light'};
+  function get(k){try{return localStorage.getItem(k)||DEF[k]}catch(e){return DEF[k]}}
+  function put(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+  function sys(){return (navigator.language||'').toLowerCase().indexOf('es')===0?'es':'en'}
+  var T={en:{auto:'Auto',light:'Light',dark:'Dark',home:'Writing desk',lang:'Language',theme:'Theme'},
+         es:{auto:'Auto',light:'Claro',dark:'Oscuro',home:'Mesa de escritura',lang:'Idioma',theme:'Tema'}};
+  var D=window.DESK={lang:get('desk-lang'),theme:get('desk-theme'),onLang:null,
+    eff:function(){return this.lang==='auto'?sys():this.lang}};
+  function applyTheme(){if(D.theme==='light'||D.theme==='dark')R.setAttribute('data-theme',D.theme);else R.removeAttribute('data-theme')}
+  function paint(){
+    var t=T[D.eff()];
+    document.querySelectorAll('[data-dk-lang]').forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-dk-lang')===D.lang)});
+    document.querySelectorAll('[data-dk-theme]').forEach(function(b){var v=b.getAttribute('data-dk-theme');b.setAttribute('aria-pressed',v===D.theme);b.textContent=t[v]});
+    document.querySelectorAll('[data-dk-t]').forEach(function(e){e.textContent=t[e.getAttribute('data-dk-t')]});
+    document.querySelectorAll('[data-dk-aria]').forEach(function(e){e.setAttribute('aria-label',t[e.getAttribute('data-dk-aria')])});
+  }
+  function fire(){paint();if(D.onLang)D.onLang(D.eff())}
+  D.setLang=function(l){D.lang=l;put('desk-lang',l);fire()};
+  D.setTheme=function(t){D.theme=t;put('desk-theme',t);applyTheme();paint()};
+  D.paint=paint;
+  document.addEventListener('click',function(e){
+    var b=e.target.closest&&e.target.closest('[data-dk-lang],[data-dk-theme]');if(!b)return;
+    if(b.hasAttribute('data-dk-lang'))D.setLang(b.getAttribute('data-dk-lang'));else D.setTheme(b.getAttribute('data-dk-theme'));
+  });
+  window.addEventListener('languagechange',function(){if(D.lang==='auto')fire()});
+  window.addEventListener('storage',function(e){
+    if(e.key==='desk-theme'){D.theme=e.newValue||'light';applyTheme();paint()}
+    if(e.key==='desk-lang'){D.lang=e.newValue||'es';fire()}
+  });
+  applyTheme();
+  R.lang=D.eff();
+})();
+</script>
+<style>
+/* Layout: broadsheet masthead; three numbered tools in a row (plot, character, scene), with Names as a small companion under Character. */
+:root{--bg:var(--dk-bg);--ink:var(--dk-ink);--muted:var(--dk-muted);--rule:var(--dk-rule);--soft:var(--dk-soft);--wash:var(--dk-wash);
+  --accent:var(--dk-accent);--accent-soft:var(--dk-accent-soft);--display:var(--dk-display);--body:var(--dk-body);--ui:var(--dk-ui)}
+html[lang="es"] .en, html[lang="en"] .es{display:none!important}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 56px}
+.kick{font:600 12px var(--ui);letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+
+.mast{text-align:center;padding:34px 0 22px;border-bottom:3px double var(--ink)}
+.mast h1{font-family:var(--display);font-weight:400;font-size:clamp(3rem,10vw,6.4rem);line-height:.95;margin:12px 0 14px;letter-spacing:-.015em;text-wrap:balance}
+.mast p{margin:0 auto;max-width:56ch;color:var(--muted);font-style:italic;font-size:18px}
+
+.tools{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:36px 32px;margin-top:34px}
+@media (max-width:900px){.tools{grid-template-columns:1fr;gap:40px}}
+.tool{display:flex;flex-direction:column;gap:10px;min-width:0}
+.card{display:flex;flex-direction:column;gap:10px;color:inherit;text-decoration:none;border-top:1px solid var(--ink);padding-top:12px}
+.thumb{background:var(--soft);padding:14px;transition:background .2s}
+.card:hover .thumb{background:var(--wash)}
+.thumb svg{display:block;width:100%;height:auto;aspect-ratio:400/220}
+.step{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.step .num{font:700 12px var(--ui);letter-spacing:.1em;color:var(--muted)}
+.card h2{font-family:var(--display);font-weight:400;font-size:clamp(1.9rem,3vw,2.4rem);line-height:1.05;margin:0;text-wrap:balance}
+.card:hover h2{color:var(--accent)}
+.card p{margin:0;color:var(--muted);font-size:16px;line-height:1.5}
+.open{font:600 13px var(--ui);color:var(--accent);margin-top:2px}
+.card:focus-visible,.companion:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+
+.companion{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;align-items:baseline;text-decoration:none;color:inherit;border-top:1px dashed var(--rule);padding-top:10px;margin-top:4px}
+.companion .tag{font:600 11px var(--ui);letter-spacing:.09em;text-transform:uppercase;color:var(--muted);grid-row:span 2}
+.companion b{font-weight:600;font-size:16px}
+.companion:hover b{color:var(--accent);text-decoration:underline;text-underline-offset:3px}
+.companion span.d{font-size:14px;color:var(--muted);line-height:1.4}
+
+/* Guide: an inverted feature band. It flips the page palette (dark band on light pages, light band on dark pages). */
+.guide{--g-bg:#16171a;--g-ink:#fdfdfc;--g-muted:#b4b7bf;--g-acc:#8db2e8;--g-rule:#3a3c43;--g-step:#25272d}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .guide{--g-bg:#ebeae5;--g-ink:#16171a;--g-muted:#4f525a;--g-acc:#1f4f8a;--g-rule:#c4c3bd;--g-step:#d9d8d2}}
+:root[data-theme="dark"] .guide{--g-bg:#ebeae5;--g-ink:#16171a;--g-muted:#4f525a;--g-acc:#1f4f8a;--g-rule:#c4c3bd;--g-step:#d9d8d2}
+.guide{margin-top:64px;background:var(--g-bg);color:var(--g-ink);border-top:6px solid var(--g-acc);
+  padding:clamp(24px,4.5vw,56px);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:32px 48px;align-items:center}
+@media (max-width:860px){.guide{grid-template-columns:1fr}}
+.g-kick{font:600 12px var(--ui);letter-spacing:.12em;text-transform:uppercase;color:var(--g-acc)}
+.guide h2{font-family:var(--display);font-weight:400;font-size:clamp(2.6rem,6vw,4.4rem);line-height:.98;margin:12px 0 16px;letter-spacing:-.01em;text-wrap:balance}
+.guide h2 a{color:inherit;text-decoration:none}
+.guide h2 a:hover{color:var(--g-acc)}
+.guide p{margin:0 0 24px;color:var(--g-muted);font-size:18px;line-height:1.5;max-width:46ch}
+.guide-links{display:flex;flex-wrap:wrap;align-items:center;gap:12px 22px}
+.g-btn{font:600 14px var(--ui);letter-spacing:.04em;background:var(--g-acc);color:var(--g-bg);text-decoration:none;padding:12px 20px;border-radius:2px;transition:filter .2s}
+.g-btn:hover{filter:brightness(1.12)}
+.g-pdf{font:600 13px var(--ui);color:var(--g-ink);text-decoration:none;border-bottom:1px solid var(--g-rule)}
+.g-pdf:hover{border-color:var(--g-acc);color:var(--g-acc)}
+.guide a:focus-visible{outline:2px solid var(--g-acc);outline-offset:3px}
+.g-art{display:block}
+.g-art svg{display:block;width:100%;height:auto}
+.guide svg .st{fill:var(--g-step)}
+.guide svg .ol{fill:none;stroke:var(--g-ink);stroke-width:2.5;stroke-linejoin:round}
+.guide svg .base{stroke:var(--g-rule);stroke-width:1.5}
+.guide svg .fl{fill:var(--g-acc)}
+.guide svg .pole{stroke:var(--g-ink);stroke-width:2.5;stroke-linecap:round}
+.guide svg text{font:600 14px var(--ui);fill:var(--g-muted);text-anchor:middle;letter-spacing:0}
+.guide svg text.top{fill:var(--g-acc);font-size:18px}
+.guide svg .top-step{fill:var(--g-acc);opacity:.28}
+
+footer{margin-top:56px;border-top:1px solid var(--rule);padding-top:12px;font:400 13px var(--ui);color:var(--muted)}
+
+svg .ln{fill:none;stroke:var(--ink);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+svg .ac{fill:none;stroke:var(--accent);stroke-width:2.5;stroke-linecap:round}
+svg .gd{fill:none;stroke:var(--muted);stroke-width:1;stroke-dasharray:3 4}
+svg .dot{fill:var(--accent)}
+svg .pap{fill:var(--bg);stroke:var(--ink);stroke-width:1.5}
+svg .sft{fill:var(--accent-soft);stroke:var(--ink);stroke-width:1.5}
+svg text{font:600 11px var(--ui);fill:var(--muted);letter-spacing:.06em}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="dk-bar">
+  <nav class="dk-crumbs" aria-label="Breadcrumb"><span data-dk-t="home">Writing desk</span></nav>
+  <div class="dk-prefs">
+    <div class="dk-seg" role="group" data-dk-aria="lang" aria-label="Language"><button type="button" data-dk-lang="auto">Auto</button><button type="button" data-dk-lang="en">EN</button><button type="button" data-dk-lang="es">ES</button></div>
+    <div class="dk-seg" role="group" data-dk-aria="theme" aria-label="Theme"><button type="button" data-dk-theme="auto">Auto</button><button type="button" data-dk-theme="light">Light</button><button type="button" data-dk-theme="dark">Dark</button></div>
+  </div>
+</div>
+<script>DESK.paint()</script>
+  <header class="mast">
+    <span class="kick"><span class="en">Fiction tools · four pages and a guide</span><span class="es">Herramientas de ficción · cuatro páginas y una guía</span></span>
+    <h1><span class="en">The Writing Desk</span><span class="es">Mesa de escritura</span></h1>
+    <p><span class="en">Shape the plot, build the people, then write the scenes. Each tool explains its ideas and rolls a writing prompt from them.</span><span class="es">Dale forma a la trama, armá a los personajes y después escribí las escenas. Cada herramienta explica sus ideas y arma una consigna de escritura a partir de ellas.</span></p>
+  </header>
+
+  <main class="tools">
+    <section class="tool">
+      <a class="card" href="plot.html">
+        <div class="step"><span class="num">01</span><span class="kick"><span class="en">Structure</span><span class="es">Estructura</span></span></div>
+        <div class="thumb"><svg viewBox="0 0 400 220" aria-hidden="true">
+          <line class="gd" x1="20" y1="190" x2="380" y2="190"/>
+          <path class="ln" d="M20,180 L80,180 L200,40 L320,180 L380,180"/>
+          <circle class="dot" cx="80" cy="180" r="7"/><circle class="dot" cx="140" cy="110" r="7"/><circle class="dot" cx="200" cy="40" r="9"/><circle class="dot" cx="260" cy="110" r="7"/><circle class="dot" cx="340" cy="180" r="7"/>
+        </svg></div>
+        <h2><span class="en">The Plot Atlas</span><span class="es">El atlas de tramas</span></h2>
+        <p><span class="en">Twenty story structures drawn as diagrams, from Freytag to kishōtenketsu, with a prompt generator built on them.</span><span class="es">Veinte estructuras de trama dibujadas como diagramas, de Freytag al kishōtenketsu, con un generador de consignas basado en ellas.</span></p>
+        <span class="open"><span class="en">Open the atlas →</span><span class="es">Abrir el atlas →</span></span>
+      </a>
+    </section>
+
+    <section class="tool">
+      <a class="card" href="character.html">
+        <div class="step"><span class="num">02</span><span class="kick"><span class="en">People</span><span class="es">Personajes</span></span></div>
+        <div class="thumb"><svg viewBox="0 0 400 220" aria-hidden="true">
+          <polygon class="sft" points="200,24 248,88 152,88"/>
+          <polygon class="pap" points="152,88 248,88 300,152 100,152"/>
+          <polygon class="pap" points="100,152 300,152 352,206 48,206"/>
+          <line class="ac" x1="200" y1="88" x2="200" y2="152"/>
+        </svg></div>
+        <h2><span class="en">Character Workbench</span><span class="es">Taller de personajes</span></h2>
+        <p><span class="en">Belief, wound, want and need, plus the surface details that make someone memorable, turned into a character prompt.</span><span class="es">Creencia, herida, deseo y necesidad, más los detalles de superficie que vuelven memorable a alguien, convertidos en una consigna.</span></p>
+        <span class="open"><span class="en">Open the workbench →</span><span class="es">Abrir el taller →</span></span>
+      </a>
+      <a class="companion" href="name.html">
+        <span class="tag"><span class="en">Also</span><span class="es">Además</span></span>
+        <b><span class="en">Names by generation</span><span class="es">Nombres por generación</span></b>
+        <span class="d"><span class="en">A name that fits the decade the character was born in. Argentina and the US.</span><span class="es">Un nombre acorde a la década en que nació el personaje. Argentina y Estados Unidos.</span></span>
+      </a>
+    </section>
+
+    <section class="tool">
+      <a class="card" href="scene.html">
+        <div class="step"><span class="num">03</span><span class="kick"><span class="en">Scenes</span><span class="es">Escenas</span></span></div>
+        <div class="thumb"><svg viewBox="0 0 400 220" aria-hidden="true">
+          <g transform="translate(20 20)"><path class="ln" d="M70 6 V70 M44 70 H96 M20 20 L120 30"/><path class="ac" d="M20 20 L8 46 H32 Z M120 30 L108 56 H132 Z"/></g>
+          <g transform="translate(210 20)"><path class="ln" d="M10 45 H60 M50 33 L64 45 L50 57 M160 45 H110 M120 33 L106 45 L120 57"/><path class="ac" d="M85 22 V32 M85 58 V68"/></g>
+          <g transform="translate(20 120)"><circle class="dot" cx="20" cy="45" r="9"/><path class="ln" d="M32 45 C60 45 64 18 88 22 C112 26 106 58 88 60 C74 61 72 46 84 42"/><circle class="pap" cx="140" cy="45" r="9"/></g>
+          <g transform="translate(230 120)"><rect class="pap" x="30" y="8" width="44" height="74"/><path class="ln" d="M74 8 L100 18 V72 L74 82"/><path class="ac" d="M100 22 L150 8 M100 45 L156 45 M100 68 L150 82"/></g>
+        </svg></div>
+        <h2><span class="en">Four Kinds of Scene</span><span class="es">Cuatro tipos de escena</span></h2>
+        <p><span class="en">Negotiation, fight, seduction or discovery: what each kind needs, six craft rules, and a scene generator.</span><span class="es">Negociación, pelea, seducción o descubrimiento: lo que necesita cada tipo, seis reglas de oficio y un generador de escenas.</span></p>
+        <span class="open"><span class="en">Open the scene selector →</span><span class="es">Abrir el selector →</span></span>
+      </a>
+    </section>
+  </main>
+
+  <section class="guide" aria-labelledby="guide-title">
+    <div>
+      <span class="g-kick"><span class="en">The guide · nine steps</span><span class="es">La guía · nueve peldaños</span></span>
+      <h2 id="guide-title"><a href="staircase.html"><span class="en">The Writing Staircase</span><span class="es">La escalera de la escritura</span></a></h2>
+      <p><span class="en">Craft advice in nine levels, from the first habit to the secret logic of the short story, with a quiz and a writing prompt at each step.</span><span class="es">Consejos de oficio en nueve niveles, del primer hábito a la lógica secreta del cuento, con un cuestionario y una consigna en cada peldaño.</span></p>
+      <div class="guide-links">
+        <a class="g-btn" href="staircase.html"><span class="en">Start climbing →</span><span class="es">Empezar a subir →</span></a>
+        <a class="g-pdf en" href="The_Writers_Staircase.pdf" download>Download the PDF ↓</a>
+        <a class="g-pdf es" href="La_escalera_de_la_escritura.pdf" download>Descargar el PDF ↓</a>
+      </div>
+    </div>
+    <a class="g-art" href="staircase.html" tabindex="-1" aria-hidden="true">
+      <svg viewBox="0 0 544 312">
+        <g transform="translate(0 26)">
+          <line class="base" x1="0" y1="280" x2="544" y2="280"/>
+          <polygon class="st" points="20,280 20,252 76,252 76,224 132,224 132,196 188,196 188,168 244,168 244,140 300,140 300,112 356,112 356,84 412,84 412,56 468,56 468,28 524,28 524,280"/>
+          <rect class="top-step" x="468" y="28" width="56" height="252"/>
+          <path class="ol" d="M20,280 V252 H76 V224 H132 V196 H188 V168 H244 V140 H300 V112 H356 V84 H412 V56 H468 V28 H524 V280"/>
+          <text x="48" y="272">1</text><text x="104" y="244">2</text><text x="160" y="216">3</text>
+          <text x="216" y="188">4</text><text x="272" y="160">5</text><text x="328" y="132">6</text>
+          <text x="384" y="104">7</text><text x="440" y="76">8</text><text class="top" x="496" y="52">9</text>
+          <line class="pole" x1="496" y1="28" x2="496" y2="-22"/>
+          <path class="fl" d="M496,-22 L524,-13 L496,-4 Z"/>
+        </g>
+      </svg>
+    </a>
+  </section>
+
+  <footer><span class="en">All pages share the language and theme settings above. Auto follows your browser and system.</span><span class="es">Todas las páginas comparten la configuración de idioma y tema de arriba. Auto sigue al navegador y al sistema.</span></footer>
+</div>
+<script>
+function setLang(l){document.documentElement.lang=l;document.title=l==='es'?'Mesa de escritura':'The Writing Desk'}
+DESK.onLang=setLang;
+setLang(DESK.eff());
+</script>
+</body>
+</html>

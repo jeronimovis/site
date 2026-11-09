@@ -1,0 +1,755 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Four Kinds of Scene</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Libre+Franklin:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Courier+Prime:wght@400;700&display=swap">
+<style id="desk-shared">
+/* Shared design language for the writing desk: one palette, three typefaces, one top bar. */
+:root{
+  --dk-bg:#fdfdfc; --dk-paper:#ffffff; --dk-ink:#16171a; --dk-muted:#5b5e67; --dk-rule:#d8dbe1;
+  --dk-soft:#f3f4f7; --dk-wash:#e8edf6; --dk-accent:#1f4f8a; --dk-accent-soft:#dde5f6; --dk-on-accent:#ffffff; --dk-mark:#f6eaa9;
+  --dk-display:"Libre Caslon Display","Bodoni 72",Didot,Georgia,serif;
+  --dk-body:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --dk-ui:"Libre Franklin","Helvetica Neue",Arial,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --dk-bg:#121316; --dk-paper:#1a1b20; --dk-ink:#ebeae5; --dk-muted:#a3a6ae; --dk-rule:#34363c;
+  --dk-soft:#1c1e23; --dk-wash:#1b2331; --dk-accent:#8db2e8; --dk-accent-soft:#25314f; --dk-on-accent:#0f1320; --dk-mark:#4b4321; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --dk-bg:#121316; --dk-paper:#1a1b20; --dk-ink:#ebeae5; --dk-muted:#a3a6ae; --dk-rule:#34363c;
+  --dk-soft:#1c1e23; --dk-wash:#1b2331; --dk-accent:#8db2e8; --dk-accent-soft:#25314f; --dk-on-accent:#0f1320; --dk-mark:#4b4321; color-scheme:dark}
+.dk-bar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px 16px;padding:14px 0 12px;border-bottom:1px solid var(--dk-rule)}
+.dk-crumbs{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;font:600 12px/1.3 var(--dk-ui);letter-spacing:.08em;text-transform:uppercase}
+.dk-crumbs a{color:var(--dk-ink);text-decoration:none;border-bottom:1px solid transparent}
+.dk-crumbs a:hover{color:var(--dk-accent);border-color:var(--dk-accent)}
+.dk-crumbs .dk-sep{color:var(--dk-muted)}
+.dk-prefs{display:flex;gap:8px;flex-wrap:wrap}
+.dk-seg{display:inline-flex;border:1px solid var(--dk-rule);border-radius:2px;overflow:hidden}
+.dk-seg button{background:transparent;border:0;margin:0;padding:5px 10px;cursor:pointer;font:600 11px/1.4 var(--dk-ui);letter-spacing:.08em;text-transform:uppercase;color:var(--dk-muted)}
+.dk-seg button+button{border-left:1px solid var(--dk-rule)}
+.dk-seg button:hover{color:var(--dk-ink)}
+.dk-seg button[aria-pressed="true"]{background:var(--dk-ink);color:var(--dk-bg)}
+.dk-seg button:focus-visible,.dk-crumbs a:focus-visible{outline:2px solid var(--dk-accent);outline-offset:2px}
+</style>
+<script>
+/* Shared preferences: language (Spanish by default) and theme (light by default), remembered across all pages of the desk. */
+(function(){
+  var R=document.documentElement;
+  var DEF={'desk-lang':'es','desk-theme':'light'};
+  function get(k){try{return localStorage.getItem(k)||DEF[k]}catch(e){return DEF[k]}}
+  function put(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+  function sys(){return (navigator.language||'').toLowerCase().indexOf('es')===0?'es':'en'}
+  var T={en:{auto:'Auto',light:'Light',dark:'Dark',home:'Writing desk',lang:'Language',theme:'Theme'},
+         es:{auto:'Auto',light:'Claro',dark:'Oscuro',home:'Mesa de escritura',lang:'Idioma',theme:'Tema'}};
+  var D=window.DESK={lang:get('desk-lang'),theme:get('desk-theme'),onLang:null,
+    eff:function(){return this.lang==='auto'?sys():this.lang}};
+  function applyTheme(){if(D.theme==='light'||D.theme==='dark')R.setAttribute('data-theme',D.theme);else R.removeAttribute('data-theme')}
+  function paint(){
+    var t=T[D.eff()];
+    document.querySelectorAll('[data-dk-lang]').forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-dk-lang')===D.lang)});
+    document.querySelectorAll('[data-dk-theme]').forEach(function(b){var v=b.getAttribute('data-dk-theme');b.setAttribute('aria-pressed',v===D.theme);b.textContent=t[v]});
+    document.querySelectorAll('[data-dk-t]').forEach(function(e){e.textContent=t[e.getAttribute('data-dk-t')]});
+    document.querySelectorAll('[data-dk-aria]').forEach(function(e){e.setAttribute('aria-label',t[e.getAttribute('data-dk-aria')])});
+  }
+  function fire(){paint();if(D.onLang)D.onLang(D.eff())}
+  D.setLang=function(l){D.lang=l;put('desk-lang',l);fire()};
+  D.setTheme=function(t){D.theme=t;put('desk-theme',t);applyTheme();paint()};
+  D.paint=paint;
+  document.addEventListener('click',function(e){
+    var b=e.target.closest&&e.target.closest('[data-dk-lang],[data-dk-theme]');if(!b)return;
+    if(b.hasAttribute('data-dk-lang'))D.setLang(b.getAttribute('data-dk-lang'));else D.setTheme(b.getAttribute('data-dk-theme'));
+  });
+  window.addEventListener('languagechange',function(){if(D.lang==='auto')fire()});
+  window.addEventListener('storage',function(e){
+    if(e.key==='desk-theme'){D.theme=e.newValue||'light';applyTheme();paint()}
+    if(e.key==='desk-lang'){D.lang=e.newValue||'es';fire()}
+  });
+  applyTheme();
+  R.lang=D.eff();
+})();
+</script>
+<style>
+/* Layout: one reading column; four index cards as a selector, a detail sheet below, a script page for prompts, then craft diagrams. */
+:root{
+  --bg:var(--dk-bg); --paper:var(--dk-paper); --ink:var(--dk-ink); --muted:var(--dk-muted); --rule:var(--dk-rule); --soft:var(--dk-soft);
+  --neg:var(--dk-accent); --fight:#A8392E; --sed:#86407A; --disc:#8F6312;
+  --display:var(--dk-display); --body:var(--dk-body); --ui:var(--dk-ui);
+  --mono:"Courier Prime","Courier New",Courier,monospace;
+  --accent:var(--neg);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--fight:#E57B70; --sed:#CF8CC0; --disc:#DDAA52}}
+:root[data-theme="dark"]{--fight:#E57B70; --sed:#CF8CC0; --disc:#DDAA52}
+
+*{box-sizing:border-box}
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 64px}
+.wrap{max-width:1040px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);font-weight:400;text-wrap:balance;margin:0}
+p{margin:0}
+.label{font-family:var(--ui);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+.bar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;padding-block:18px;border-bottom:1px solid var(--rule)}
+.toggles{display:flex;gap:8px;flex-wrap:wrap}
+.seg{display:flex;border:1px solid var(--rule);border-radius:999px;padding:2px}
+.seg button{border:0;background:none;padding:4px 12px;border-radius:999px;font-family:var(--ui);font-size:12px;cursor:pointer;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+
+.hero{padding-block:40px 28px;display:grid;gap:18px;border-bottom:3px double var(--ink)}
+.hero .kick{font:600 12px var(--ui);letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.hero h1{font-size:clamp(44px,8vw,88px);line-height:.95;letter-spacing:-.01em}
+.hero h1 em{font-style:italic;color:var(--accent);transition:color .3s}
+.rule-quote{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:start;max-width:720px}
+.rule-quote .bigq{font-family:var(--display);font-size:64px;line-height:.8;color:var(--muted)}
+.rule-quote p{font-size:19px}
+.rule-quote cite{display:block;margin-top:8px;font-style:normal}
+
+.types{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:12px}
+.type{--c:var(--neg);text-align:left;background:var(--paper);border:1px solid var(--rule);border-radius:4px;padding:16px 16px 18px;cursor:pointer;
+  display:grid;gap:10px;position:relative;transition:transform .15s,border-color .15s;align-content:start}
+.type:hover{transform:translateY(-2px)}
+.type[aria-selected="true"]{border-color:var(--c);box-shadow:inset 0 -4px 0 var(--c)}
+.type svg{width:100%;height:auto;max-height:96px;color:var(--c)}
+.type h3{font-size:26px;line-height:1.05}
+.type p{font-size:14.5px;color:var(--muted)}
+.type .num{position:absolute;top:12px;right:14px}
+@media (max-width:860px){.types{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:440px){.types{grid-template-columns:1fr}.type svg{max-height:72px}}
+
+.detail{margin-top:28px;background:var(--paper);border:1px solid var(--rule);border-radius:4px;padding:28px clamp(18px,4vw,36px);display:grid;gap:24px}
+.detail-head{display:grid;gap:8px}
+.detail-head h2{font-size:clamp(34px,5vw,52px);color:var(--accent)}
+.detail-head .tag{font-size:21px;font-style:italic;max-width:46ch}
+.cols{display:grid;grid-template-columns:1.1fr .9fr;gap:32px}
+.cols > *{min-width:0}
+@media (max-width:760px){.cols{grid-template-columns:1fr}}
+.block{display:grid;gap:8px}
+.block p{max-width:62ch}
+.changes{border-left:3px solid var(--accent);padding-left:14px}
+.changes strong{font-family:var(--display);font-weight:400;font-size:24px;display:block}
+ul.plain{margin:0;padding-left:1.1em;display:grid;gap:6px}
+.trap{background:var(--soft);padding:14px 16px;border-radius:3px}
+.chart{overflow-x:auto}
+.chart svg{display:block;width:100%;min-width:440px;height:auto}
+.example{font-size:15.5px;color:var(--muted)}
+
+section.s{margin-top:64px;display:grid;gap:18px}
+section.s > header{display:grid;gap:8px;max-width:680px}
+section.s h2{font-size:clamp(32px,4.5vw,46px)}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chip{border:1px solid var(--rule);background:var(--paper);padding:6px 14px;border-radius:999px;font-family:var(--ui);font-size:13px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.go{border:0;background:var(--accent);color:var(--paper);padding:12px 22px;border-radius:3px;font-family:var(--ui);font-weight:700;letter-spacing:.06em;cursor:pointer;transition:background .3s}
+.go:active{transform:translateY(1px)}
+.ghost{border:1px solid var(--rule);background:none;padding:11px 18px;border-radius:3px;font-family:var(--ui);cursor:pointer}
+.page{background:var(--paper);border:1px solid var(--rule);box-shadow:0 1px 0 var(--rule),0 18px 40px -28px rgba(0,0,0,.35);
+  padding:clamp(22px,5vw,56px) clamp(18px,6vw,72px);font-family:var(--ui);font-size:15.5px;line-height:1.6;max-width:820px;width:100%;justify-self:center;font-family:var(--mono)}
+.page .slug{font-weight:700;text-transform:uppercase}
+.page .kind{text-transform:uppercase;color:var(--accent);font-weight:700;letter-spacing:.06em}
+.rows{display:grid;gap:10px}
+.row{display:grid;grid-template-columns:118px 1fr 34px;gap:12px;align-items:start}
+.row .k{text-transform:uppercase;color:var(--muted);font-size:13px;padding-top:2px}
+.row .v{min-width:0}
+.lock{width:30px;height:30px;border:1px solid var(--rule);border-radius:3px;background:none;cursor:pointer;display:grid;place-items:center;color:var(--muted)}
+.lock[aria-pressed="true"]{color:var(--accent);border-color:var(--accent)}
+.lock svg{width:15px;height:15px}
+@media (max-width:520px){.row{grid-template-columns:1fr 34px}.row .k{grid-column:1/-1;padding:0}}
+.pagefoot{margin-top:22px;padding-top:14px;border-top:1px dashed var(--rule);font-size:14px;color:var(--muted)}
+.flash{animation:flash .5s ease}
+@keyframes flash{from{background:var(--soft)}to{background:transparent}}
+.toast{font-family:var(--ui);font-size:13px;color:var(--muted)}
+
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media (max-width:860px){.grid3{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:560px){.grid3{grid-template-columns:1fr}}
+figure{margin:0;background:var(--paper);border:1px solid var(--rule);border-radius:4px;padding:16px;display:grid;gap:10px;align-content:start}
+figure svg{width:100%;height:auto;display:block}
+figure h3{font-size:22px}
+figcaption{font-size:15px;color:var(--muted)}
+svg .ink{stroke:var(--ink);fill:none}
+svg .mut{stroke:var(--muted);fill:none}
+svg .acc{stroke:var(--accent);fill:none}
+svg .accf{fill:var(--accent)}
+svg .papf{fill:var(--paper)}
+svg .softf{fill:var(--soft)}
+svg text{font-family:var(--ui);font-size:11px;fill:var(--muted);letter-spacing:.04em}
+svg text.strong{fill:var(--ink);font-weight:700}
+svg text.a{fill:var(--accent);font-weight:700}
+
+.check{display:grid;max-width:760px}
+.check label{display:grid;grid-template-columns:24px 1fr;gap:12px;padding:12px 0;border-bottom:1px solid var(--rule);cursor:pointer}
+.check input{width:18px;height:18px;margin-top:4px;accent-color:var(--accent)}
+.check span b{font-weight:600}
+.check input:checked + span{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--rule)}
+footer{margin-top:56px;padding-top:16px;border-top:1px solid var(--rule);font-size:14px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="dk-bar">
+  <nav class="dk-crumbs" aria-label="Breadcrumb"><a href="index.html">← <span data-dk-t="home">Writing desk</span></a></nav>
+  <div class="dk-prefs">
+    <div class="dk-seg" role="group" data-dk-aria="lang" aria-label="Language"><button type="button" data-dk-lang="auto">Auto</button><button type="button" data-dk-lang="en">EN</button><button type="button" data-dk-lang="es">ES</button></div>
+    <div class="dk-seg" role="group" data-dk-aria="theme" aria-label="Theme"><button type="button" data-dk-theme="auto">Auto</button><button type="button" data-dk-theme="light">Light</button><button type="button" data-dk-theme="dark">Dark</button></div>
+  </div>
+</div>
+<script>DESK.paint()</script>
+
+  <header class="hero">
+    <span class="kick" data-i18n="bar">Scene selector · writing desk</span>
+    <h1 data-i18n="h1">Every scene is one of <em>four</em> things.</h1>
+    <div class="rule-quote">
+      <span class="bigq" aria-hidden="true">“</span>
+      <div>
+        <p data-i18n="quote"></p>
+        <cite class="label" data-i18n="cite"></cite>
+      </div>
+    </div>
+  </header>
+
+  <div class="types" role="tablist" aria-label="Scene types" id="types"></div>
+  <article class="detail" id="detail" role="tabpanel" aria-live="polite"></article>
+
+  <section class="s" id="gen">
+    <header>
+      <span class="label" data-i18n="genLabel"></span>
+      <h2 data-i18n="genH"></h2>
+      <p data-i18n="genP"></p>
+    </header>
+    <div class="controls" id="typeChips" role="group"></div>
+    <div class="controls">
+      <button type="button" class="go" id="roll" data-i18n="roll"></button>
+      <button type="button" class="ghost" id="copy" data-i18n="copy"></button>
+      <button type="button" class="ghost" id="unlock" data-i18n="unlock"></button>
+      <span class="toast" id="toast" aria-live="polite"></span>
+    </div>
+    <div class="page" id="page"></div>
+  </section>
+
+  <section class="s">
+    <header>
+      <span class="label" data-i18n="craftLabel"></span>
+      <h2 data-i18n="craftH"></h2>
+      <p data-i18n="craftP"></p>
+    </header>
+    <div class="grid3">
+      <figure>
+        <svg viewBox="0 0 320 170" aria-hidden="true">
+          <circle cx="40" cy="62" r="11" class="ink" stroke-width="2"/>
+          <path d="M40 73 V112 M40 84 L26 98 M40 84 L54 98 M40 112 L28 140 M40 112 L52 140" class="ink" stroke-width="2"/>
+          <path d="M66 95 H128" class="acc" stroke-width="3"/><path d="M122 87 L132 95 L122 103" class="acc" stroke-width="3"/>
+          <rect x="140" y="40" width="26" height="100" class="softf"/>
+          <path d="M140 40 h26 v100 h-26z M140 56 l26 -16 M140 76 l26 -16 M140 96 l26 -16 M140 116 l26 -16 M140 136 l26 -16" class="ink" stroke-width="1.5"/>
+          <path d="M172 82 L212 60 M172 100 L212 122" class="mut" stroke-width="2" stroke-dasharray="4 4"/>
+          <path d="M260 50 V140" class="ink" stroke-width="2"/><path d="M260 50 L292 60 L260 72Z" class="accf"/>
+          <text x="22" y="160" data-i18n="sWant">WANT</text><text x="122" y="160" data-i18n="sObst">OBSTACLE</text><text x="246" y="160" data-i18n="sGoal">GOAL</text>
+          <text x="176" y="36" class="a" data-i18n="sConf">CONFLICT</text>
+        </svg>
+        <h3 data-i18n="f1h"></h3>
+        <figcaption data-i18n="f1c"></figcaption>
+      </figure>
+
+      <figure>
+        <svg viewBox="0 0 320 170" aria-hidden="true">
+          <rect x="10" y="22" width="64" height="34" rx="3" class="papf"/><rect x="10" y="22" width="64" height="34" rx="3" class="ink" stroke-width="1.5"/>
+          <rect x="128" y="22" width="64" height="34" rx="3" class="papf"/><rect x="128" y="22" width="64" height="34" rx="3" class="ink" stroke-width="1.5"/>
+          <rect x="246" y="22" width="64" height="34" rx="3" class="papf"/><rect x="246" y="22" width="64" height="34" rx="3" class="ink" stroke-width="1.5"/>
+          <text x="38" y="44" class="strong">A</text><text x="156" y="44" class="strong">B</text><text x="274" y="44" class="strong">C</text>
+          <path d="M76 39 H124" class="acc" stroke-width="2.5"/><path d="M118 33 L126 39 L118 45" class="acc" stroke-width="2.5"/>
+          <path d="M194 39 H242" class="acc" stroke-width="2.5"/><path d="M236 33 L244 39 L236 45" class="acc" stroke-width="2.5"/>
+          <text x="100" y="16" class="a" text-anchor="middle" data-i18n="sBut">BUT</text><text x="218" y="16" class="a" text-anchor="middle" data-i18n="sThere">THEREFORE</text>
+          <rect x="10" y="108" width="64" height="34" rx="3" class="mut" stroke-dasharray="3 3"/>
+          <rect x="128" y="108" width="64" height="34" rx="3" class="mut" stroke-dasharray="3 3"/>
+          <path d="M76 125 H124" class="mut" stroke-width="2" stroke-dasharray="3 4"/>
+          <text x="100" y="100" text-anchor="middle" data-i18n="sAnd">AND THEN</text>
+          <path d="M70 92 L148 118 M148 92 L70 118" class="ink" stroke-width="2"/>
+          <text x="206" y="122" data-i18n="sList1">a list,</text><text x="206" y="138" data-i18n="sList2">not a story</text>
+        </svg>
+        <h3 data-i18n="f2h"></h3>
+        <figcaption data-i18n="f2c"></figcaption>
+      </figure>
+
+      <figure>
+        <svg viewBox="0 0 320 170" aria-hidden="true">
+          <path d="M14 150 H70 V122 H130 V94 H190 V62 H250 V28 H306" class="ink" stroke-width="2.5"/>
+          <path d="M14 150 H306" class="mut" stroke-width="1"/>
+          <circle cx="42" cy="150" r="5" class="accf"/>
+          <path d="M60 136 L290 34" class="acc" stroke-width="1.5" stroke-dasharray="5 5"/>
+          <text x="16" y="166" data-i18n="sInc">INCITING</text><text x="74" y="140" data-i18n="sH1">HARDER</text><text x="134" y="112" data-i18n="sH2">HARDER</text><text x="194" y="80" data-i18n="sH3">COSTLIER</text>
+          <text x="254" y="20" class="a" data-i18n="sFin">FINAL</text>
+        </svg>
+        <h3 data-i18n="f3h"></h3>
+        <figcaption data-i18n="f3c"></figcaption>
+      </figure>
+
+      <figure>
+        <svg viewBox="0 0 320 170" aria-hidden="true">
+          <rect x="14" y="70" width="292" height="28" class="softf"/>
+          <rect x="96" y="70" width="140" height="28" class="accf" opacity=".85"/>
+          <path d="M14 70 h292 v28 h-292z" class="mut" stroke-width="1"/>
+          <path d="M210 98 L218 40 L226 98" class="ink" stroke-width="2"/>
+          <text x="218" y="32" class="strong" text-anchor="middle" data-i18n="sTurn">TURN</text>
+          <path d="M96 56 V112 M236 56 V112" class="ink" stroke-width="2" stroke-dasharray="4 3"/>
+          <text x="18" y="128" data-i18n="sHel1">hellos,</text><text x="18" y="142" data-i18n="sHel2">coffee</text>
+          <text x="242" y="128" data-i18n="sBye1">goodbyes,</text><text x="242" y="142" data-i18n="sBye2">recap</text>
+          <text x="100" y="128" class="a" data-i18n="sLate">IN LATE</text><text x="232" y="160" class="a" text-anchor="end" data-i18n="sEarly">OUT EARLY</text>
+        </svg>
+        <h3 data-i18n="f4h"></h3>
+        <figcaption data-i18n="f4c"></figcaption>
+      </figure>
+
+      <figure>
+        <svg viewBox="0 0 320 170" aria-hidden="true">
+          <path d="M20 85 H300" class="mut" stroke-width="1" stroke-dasharray="3 4"/>
+          <path d="M30 40 C110 40, 150 40, 170 85 S 240 130, 292 130" class="ink" stroke-width="2.5"/>
+          <circle cx="30" cy="40" r="15" class="papf"/><circle cx="30" cy="40" r="15" class="acc" stroke-width="2"/>
+          <path d="M23 40 H37 M30 33 V47" class="acc" stroke-width="2"/>
+          <circle cx="292" cy="130" r="15" class="papf"/><circle cx="292" cy="130" r="15" class="acc" stroke-width="2"/>
+          <path d="M285 130 H299" class="acc" stroke-width="2"/>
+          <text x="14" y="76" data-i18n="sEnt">ENTERS</text><text x="270" y="104" text-anchor="end" data-i18n="sLea">LEAVES</text>
+          <text x="160" y="160" text-anchor="middle" data-i18n="sFlip">charge flips</text>
+        </svg>
+        <h3 data-i18n="f5h"></h3>
+        <figcaption data-i18n="f5c"></figcaption>
+      </figure>
+
+      <figure>
+        <svg viewBox="0 0 320 170" aria-hidden="true">
+          <rect x="6" y="68" width="104" height="32" rx="16" class="papf"/><rect x="6" y="68" width="104" height="32" rx="16" class="ink" stroke-width="1.5"/>
+          <text x="58" y="88" class="strong" text-anchor="middle" data-i18n="sCoin">COINCIDENCE</text>
+          <path d="M110 78 L168 38 M110 90 L168 130" class="ink" stroke-width="2"/>
+          <text x="174" y="34" data-i18n="sHelp">helps the hero?</text>
+          <text x="174" y="134" data-i18n="sHurt">hurts the hero?</text>
+          <path d="M176 44 H310" class="mut" stroke-width="1"/>
+          <text x="254" y="62" class="strong" data-i18n="sCut">CUT IT</text>
+          <path d="M240 54 L248 62 M248 54 L240 62" class="ink" stroke-width="2"/>
+          <text x="254" y="154" class="a" data-i18n="sKeep">KEEP IT</text>
+          <path d="M238 149 L243 154 L250 144" class="acc" stroke-width="2.5"/>
+        </svg>
+        <h3 data-i18n="f6h"></h3>
+        <figcaption data-i18n="f6c"></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="s">
+    <header>
+      <span class="label" data-i18n="chkLabel"></span>
+      <h2 data-i18n="chkH"></h2>
+    </header>
+    <div class="check">
+      <label><input type="checkbox" id="c1"><span data-i18n="c1"></span></label>
+      <label><input type="checkbox" id="c2"><span data-i18n="c2"></span></label>
+      <label><input type="checkbox" id="c3"><span data-i18n="c3"></span></label>
+      <label><input type="checkbox" id="c4"><span data-i18n="c4"></span></label>
+      <label><input type="checkbox" id="c5"><span data-i18n="c5"></span></label>
+      <label><input type="checkbox" id="c6"><span data-i18n="c6"></span></label>
+    </div>
+  </section>
+
+  <footer data-i18n="footer"></footer>
+</div>
+
+<script>
+/* ---------- interface text ---------- */
+const UI={
+en:{
+  bar:"Scene selector · four kinds", tAuto:"Auto", tLight:"Light", tDark:"Dark",
+  h1:"Every scene is one of <em>four</em> things.",
+  quote:"A scene is a negotiation, a fight, a seduction or a discovery. If you can't say which one you're writing, the scene probably isn't doing anything yet.",
+  cite:"Mike Nichols, as Aaron Sorkin tells it",
+  genLabel:"Prompt generator", genH:"Roll a scene",
+  genP:"Pick a type or leave it on Any. Lock the pieces you like and roll the rest until the scene has a problem worth writing.",
+  roll:"ROLL A SCENE", copy:"Copy prompt", unlock:"Unlock all", any:"Any",
+  craftLabel:"Craft notes", craftH:"What every type still needs",
+  craftP:"The four types tell you what kind of exchange the scene is. These six rules keep the exchange moving.",
+  sWant:"WANT", sObst:"OBSTACLE", sGoal:"GOAL", sConf:"CONFLICT", sBut:"BUT", sThere:"THEREFORE", sAnd:"AND THEN",
+  sList1:"a list,", sList2:"not a story", sInc:"INCITING", sH1:"HARDER", sH2:"HARDER", sH3:"COSTLIER", sFin:"FINAL",
+  sTurn:"TURN", sHel1:"hellos,", sHel2:"coffee", sBye1:"goodbyes,", sBye2:"recap", sLate:"IN LATE", sEarly:"OUT EARLY",
+  sEnt:"ENTERS", sLea:"LEAVES", sFlip:"charge flips", sCoin:"COINCIDENCE", sHelp:"helps the hero?", sHurt:"hurts the hero?", sCut:"CUT IT", sKeep:"KEEP IT",
+  f1h:"Want meets wall", f1c:"Someone wants something and something stands in the way: a person, a relationship, nature, an object. No wall, no scene.",
+  f2h:"But / therefore", f2c:"Each scene should exist because of the one before it. If the honest link between two scenes is “and then”, one of them is loose.",
+  f3h:"Each step costs more", f3c:"Small obstacles first, the biggest barrier last. If a problem is solved, the solution should open a bigger one.",
+  f4h:"In late, out early", f4c:"Enter as close to the conflict as you can. Leave right after the turn. Pleasantries and recaps belong to the reader's imagination.",
+  f5h:"The charge flips", f5c:"Name the emotional value at the start and at the end. Hope to fear, trust to suspicion. If both ends match, nothing happened.",
+  f6h:"Coincidence only against", f6c:"Chance that rescues a character feels cheap. Chance that makes their problem worse reads as fate, and readers accept it.",
+  chkLabel:"Before you keep the scene", chkH:"Six questions",
+  c1:"<b>Which of the four is it?</b> Negotiation, fight, seduction or discovery. Two at once is fine; none is not.",
+  c2:"<b>Who or what is this scene's antagonist?</b> It can change from scene to scene.",
+  c3:"<b>What is different at the end?</b> A term, a relationship, a belief, a piece of knowledge.",
+  c4:"<b>Does it start late and end early?</b> Cut to the first line with tension in it, and stop after the turn.",
+  c5:"<b>Is it connected by “but” or “therefore”?</b> The next scene should need this one.",
+  c6:"<b>Can an action or an object carry what the dialogue says?</b> People rarely state what they feel; they do something with their hands.",
+  footer:"Built from your scene-craft cheat sheets: conflict, causality, scene attack and the first-draft process.",
+  typeN:(n)=>`Scene type ${n} of 4`, whatChanges:"What changes", signs:"Signs it's working", shape:"The beat shape", trap:"The trap",
+  F:{slug:"Scene",type:"Type",pair:"Who",goal:"Want",resist:"Why not",prop:"Prop",constraint:"Constraint",turn:"The turn"},
+  lock:"Lock", unlockOne:"Unlock",
+  copied:"Prompt copied", selected:"Selected — press Ctrl/Cmd+C", unlocked:"All unlocked",
+  foot:(b,c)=>`Beat shape: ${b}. What must be different at the end: ${c}.`,
+  mustChange:"By the end, this must change", beatsW:"Beats",
+  wants:(s,o,g)=>`${s} wants ${o} to ${g}.`,
+  disc:(w,x)=>`Discovered by ${w}: ${x}.`,
+  buried:(r)=>`It stays buried because ${r}.`,
+  propS:"Let it carry the subtext.", turnP:"Halfway in, "
+},
+es:{
+  bar:"Selector de escenas · cuatro tipos", tAuto:"Auto", tLight:"Claro", tDark:"Oscuro",
+  h1:"Toda escena es una de <em>cuatro</em> cosas.",
+  quote:"Una escena es una negociación, una pelea, una seducción o un descubrimiento. Si no podés decir cuál estás escribiendo, probablemente la escena todavía no está haciendo nada.",
+  cite:"Mike Nichols, según lo cuenta Aaron Sorkin",
+  genLabel:"Generador de consignas", genH:"Tirá una escena",
+  genP:"Elegí un tipo o dejalo en Cualquiera. Bloqueá las piezas que te gustan y volvé a tirar el resto hasta que la escena tenga un problema que valga la pena escribir.",
+  roll:"TIRAR UNA ESCENA", copy:"Copiar consigna", unlock:"Desbloquear todo", any:"Cualquiera",
+  craftLabel:"Notas de oficio", craftH:"Lo que todo tipo de escena necesita",
+  craftP:"Los cuatro tipos te dicen qué clase de intercambio es la escena. Estas seis reglas lo mantienen en movimiento.",
+  sWant:"DESEO", sObst:"OBSTÁCULO", sGoal:"META", sConf:"CONFLICTO", sBut:"PERO", sThere:"POR LO TANTO", sAnd:"Y ENTONCES",
+  sList1:"una lista,", sList2:"no un cuento", sInc:"DETONANTE", sH1:"DIFÍCIL", sH2:"MÁS DIFÍCIL", sH3:"MÁS CARO", sFin:"FINAL",
+  sTurn:"GIRO", sHel1:"saludos,", sHel2:"café", sBye1:"despedidas,", sBye2:"resumen", sLate:"ENTRÁ TARDE", sEarly:"SALÍ TEMPRANO",
+  sEnt:"ENTRA", sLea:"SALE", sFlip:"la carga se invierte", sCoin:"COINCIDENCIA", sHelp:"¿ayuda al héroe?", sHurt:"¿lo complica?", sCut:"CORTALA", sKeep:"DEJALA",
+  f1h:"El deseo contra el muro", f1c:"Alguien quiere algo y algo se interpone: una persona, una relación, la naturaleza, un objeto. Sin muro no hay escena.",
+  f2h:"Pero / por lo tanto", f2c:"Cada escena debería existir por la anterior. Si el vínculo honesto entre dos escenas es «y entonces», una de las dos está suelta.",
+  f3h:"Cada escalón cuesta más", f3c:"Primero los obstáculos chicos, el más grande al final. Si un problema se resuelve, la solución debería abrir uno mayor.",
+  f4h:"Entrá tarde, salí temprano", f4c:"Entrá lo más cerca posible del conflicto. Salí justo después del giro. Los saludos y los resúmenes quedan a cargo de la imaginación del lector.",
+  f5h:"La carga se invierte", f5c:"Nombrá el valor emocional al principio y al final. Esperanza a miedo, confianza a sospecha. Si los dos extremos coinciden, no pasó nada.",
+  f6h:"Coincidencias, solo en contra", f6c:"El azar que rescata a un personaje se siente barato. El azar que le empeora el problema se lee como destino, y el lector lo acepta.",
+  chkLabel:"Antes de quedarte con la escena", chkH:"Seis preguntas",
+  c1:"<b>¿Cuál de las cuatro es?</b> Negociación, pelea, seducción o descubrimiento. Dos a la vez está bien; ninguna, no.",
+  c2:"<b>¿Quién o qué es el antagonista de esta escena?</b> Puede cambiar de una escena a otra.",
+  c3:"<b>¿Qué es distinto al final?</b> Un término, una relación, una creencia, un dato.",
+  c4:"<b>¿Empieza tarde y termina temprano?</b> Cortá hasta la primera línea con tensión y frená después del giro.",
+  c5:"<b>¿Se conecta con «pero» o «por lo tanto»?</b> La escena siguiente debería necesitar esta.",
+  c6:"<b>¿Puede una acción o un objeto cargar lo que dice el diálogo?</b> La gente rara vez dice lo que siente; hace algo con las manos.",
+  footer:"Hecho a partir de tus apuntes de escena: conflicto, causalidad, ataque de escena y el proceso del primer borrador.",
+  typeN:(n)=>`Tipo de escena ${n} de 4`, whatChanges:"Qué cambia", signs:"Señales de que funciona", shape:"La curva de la escena", trap:"La trampa",
+  F:{slug:"Escena",type:"Tipo",pair:"Quiénes",goal:"Deseo",resist:"Por qué no",prop:"Objeto",constraint:"Restricción",turn:"El giro"},
+  lock:"Bloquear", unlockOne:"Desbloquear",
+  copied:"Consigna copiada", selected:"Seleccionado: apretá Ctrl/Cmd+C", unlocked:"Todo desbloqueado",
+  foot:(b,c)=>`Curva: ${b}. Lo que tiene que ser distinto al final: ${c}.`,
+  mustChange:"Al final tiene que cambiar", beatsW:"Momentos",
+  wants:(s,o,g)=>`${s} quiere que ${o} ${g}.`,
+  disc:(w,x)=>`Lo descubre ${w}: ${x}.`,
+  buried:(r)=>`Sigue enterrado porque ${r}.`,
+  propS:"Que cargue con el subtexto.", turnP:"A mitad de camino, "
+}};
+
+/* ---------- the four types ---------- */
+const ICONS={
+  negotiation:`<svg viewBox="0 0 200 100" aria-hidden="true"><path d="M100 18 V86 M70 86 H130" stroke="currentColor" stroke-width="3" fill="none"/><path d="M40 30 L160 42" stroke="currentColor" stroke-width="3"/><circle cx="100" cy="36" r="5" fill="currentColor"/><path d="M40 30 L26 62 H54 Z M160 42 L146 74 H174 Z" stroke="currentColor" stroke-width="2.5" fill="none"/><rect x="34" y="52" width="12" height="9" fill="currentColor"/></svg>`,
+  fight:`<svg viewBox="0 0 200 100" aria-hidden="true"><path d="M14 50 H82" stroke="currentColor" stroke-width="3"/><path d="M70 38 L88 50 L70 62" stroke="currentColor" stroke-width="3" fill="none"/><path d="M186 50 H118" stroke="currentColor" stroke-width="3"/><path d="M130 38 L112 50 L130 62" stroke="currentColor" stroke-width="3" fill="none"/><path d="M100 22 L100 34 M84 28 L92 38 M116 28 L108 38 M100 78 L100 66 M84 72 L92 62 M116 72 L108 62" stroke="currentColor" stroke-width="2.5"/></svg>`,
+  seduction:`<svg viewBox="0 0 200 100" aria-hidden="true"><circle cx="40" cy="50" r="10" fill="currentColor"/><path d="M52 50 C80 50 86 22 112 26 C140 30 132 64 112 66 C96 68 94 50 108 46 C118 43 124 52 118 56" stroke="currentColor" stroke-width="2.5" fill="none"/><circle cx="168" cy="50" r="10" stroke="currentColor" stroke-width="2.5" fill="none"/><path d="M156 50 H136" stroke="currentColor" stroke-width="2" stroke-dasharray="3 4"/></svg>`,
+  discovery:`<svg viewBox="0 0 200 100" aria-hidden="true"><rect x="62" y="14" width="56" height="76" stroke="currentColor" stroke-width="2.5" fill="none"/><path d="M118 14 L148 24 V84 L118 90" stroke="currentColor" stroke-width="2.5" fill="none"/><path d="M118 24 L186 6 M118 50 L196 50 M118 76 L186 94" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 4"/><circle cx="138" cy="54" r="2.5" fill="currentColor"/></svg>`
+};
+const COLORS={negotiation:"--neg",fight:"--fight",seduction:"--sed",discovery:"--disc"};
+const PTS={negotiation:[0.1,-0.45,0.55,-0.3,0.15],fight:[-0.6,-0.1,0.35,0.85,-0.2],seduction:[0.8,0.45,0.05,0.4,-0.7],discovery:[-0.75,-0.6,-0.65,0.8,0.8]};
+
+const TYPES={
+en:{
+  negotiation:{name:"Negotiation",
+    tag:"Two people each want something the other has. The scene is the price moving.",
+    what:"Each side has something to give and something to hold back. Nobody needs to raise their voice: a son asking his mother for the car is a negotiation. The talk can sound like small talk while every line is an offer, a refusal or a counter.",
+    change:"The terms", changeNote:"Someone leaves with more, or less, than they came for.",
+    signs:["Every line is an offer or a refusal, even when it sounds polite.","Leverage moves at least once: a card nobody knew about goes on the table.","The silence after an offer does as much work as the offer."],
+    trap:"Both characters are agreeable. If neither can lose anything, there is nothing to bargain over and the scene goes flat.",
+    example:"Try it: a tenant who needs one more month, a landlord who needs the flat empty by Friday. Neither may say the real reason.",
+    beats:["Opening ask","Counter","Leverage shown","Concession","Deal or walkout"],
+    g:{y:"leverage",top:"A ahead",bot:"B ahead"}},
+  fight:{name:"Fight",
+    tag:"Two wills collide. Nobody wants a deal; each wants the other to give up.",
+    what:"Words or fists, the core is incompatible goals with no room to trade. That is the difference from a negotiation: there is no middle price. Each exchange should cost more than the last, until someone says the thing that can't be taken back.",
+    change:"The relationship", changeNote:"A bond breaks, or a pecking order settles.",
+    signs:["Each exchange escalates: the stakes, the volume, or how personal it gets.","There is a point of no return, a line that can't be unsaid.","The loser's reaction matters more than the winner's last word."],
+    trap:"Shouting in circles. If the fourth insult costs the same as the first, the fight has stopped moving and the reader stops caring.",
+    example:"Try it: two brothers clearing out their dead father's house, arguing over who keeps a watch that is worth nothing.",
+    beats:["Provocation","Escalation","Low blow","No way back","Fallout"],
+    g:{y:"intensity",top:"boiling",bot:"calm"}},
+  seduction:{name:"Seduction",
+    tag:"One character draws another toward something they would otherwise refuse.",
+    what:"Not only romance. A recruiter, a con artist, a child talking a parent into a dog, a friend pulling another into a lie. The seducer shows the reward and hides the cost. The target needs a real reason to say no, or there is nothing to overcome.",
+    change:"A line is crossed", changeNote:"The target agrees to something they walked in determined to refuse, or escapes at the last moment.",
+    signs:["The seducer mirrors the target: their words, their wounds, their wants.","The target resists at least once, for a reason we believe.","What is being offered and what is being asked are never quite the same thing."],
+    trap:"A target with no resistance. If they wanted it all along, it's a transaction, not a seduction.",
+    example:"Try it: a former teacher visits a star student who quit, to talk her into one more competition. He needs the win more than she does.",
+    beats:["Approach","Mirror","Offer","Doubt","Yield or escape"],
+    g:{y:"distance",top:"far apart",bot:"close"}},
+  discovery:{name:"Discovery",
+    tag:"Someone learns something, and nothing after it reads the same. Sometimes that someone is the reader.",
+    what:"For a character, it's a letter found, a lie exposed, a face recognised. For the audience, it's knowing what the characters don't: the bomb under the table that turns a dull conversation into suspense. Withhold it as long as you can, and let it land through an object or an action, not an explanation.",
+    change:"What is known", changeNote:"Knowledge shifts, and everything before it has to be reread.",
+    signs:["The clue is planted before the reveal, in plain sight.","The character resists the truth for a moment before accepting it.","The reveal arrives through a thing: a photo, a receipt, a second toothbrush."],
+    trap:"Discovery by exposition. If a character explains the secret in a speech, the reader is told instead of finding out.",
+    example:"Try it: a woman fixing her late husband's phone finds he kept paying rent every month on a flat she never knew existed.",
+    beats:["Normal","Clue","Denial","Reveal","Reframe"],
+    g:{y:"what is known",top:"knows",bot:"in the dark"}}
+},
+es:{
+  negotiation:{name:"Negociación",
+    tag:"Dos personas quieren algo que tiene la otra. La escena es el precio que se mueve.",
+    what:"Cada parte tiene algo para dar y algo que se guarda. Nadie necesita levantar la voz: un hijo que le pide el auto a su madre está negociando. La charla puede sonar trivial mientras cada línea es una oferta, un rechazo o una contraoferta.",
+    change:"Los términos", changeNote:"Alguien se va con más, o con menos, de lo que vino a buscar.",
+    signs:["Cada línea es una oferta o un rechazo, aunque suene cortés.","La ventaja cambia de manos al menos una vez: aparece una carta que nadie conocía.","El silencio después de una oferta trabaja tanto como la oferta."],
+    trap:"Los dos personajes son complacientes. Si ninguno puede perder nada, no hay nada que negociar y la escena se aplana.",
+    example:"Probá: una inquilina que necesita un mes más y un dueño que necesita el departamento vacío para el viernes. Ninguno puede decir el motivo real.",
+    beats:["Pedido","Contraoferta","Carta oculta","Concesión","Trato o portazo"],
+    g:{y:"ventaja",top:"gana A",bot:"gana B"}},
+  fight:{name:"Pelea",
+    tag:"Dos voluntades chocan. Nadie busca un trato: cada uno quiere que el otro se rinda.",
+    what:"Con palabras o con golpes, el centro son objetivos incompatibles sin margen para negociar. Esa es la diferencia con la negociación: no hay precio intermedio. Cada intercambio debería costar más que el anterior, hasta que alguien dice lo que ya no se puede retirar.",
+    change:"La relación", changeNote:"Un vínculo se rompe o se acomoda una jerarquía.",
+    signs:["Cada intercambio escala: lo que está en juego, el volumen o lo personal.","Hay un punto sin retorno, una frase que no se puede desdecir.","La reacción del que pierde importa más que la última palabra del que gana."],
+    trap:"Gritos en círculo. Si el cuarto insulto cuesta lo mismo que el primero, la pelea dejó de avanzar y al lector deja de importarle.",
+    example:"Probá: dos hermanos vaciando la casa del padre muerto, peleando por quién se queda con un reloj que no vale nada.",
+    beats:["Provocación","Escalada","Golpe bajo","Sin vuelta","Secuelas"],
+    g:{y:"intensidad",top:"hirviendo",bot:"calma"}},
+  seduction:{name:"Seducción",
+    tag:"Un personaje arrastra a otro hacia algo que, de otro modo, rechazaría.",
+    what:"No solo romance. Un reclutador, un estafador, un chico que convence a sus padres de tener un perro, una amiga que arrastra a otra a una mentira. El seductor muestra la recompensa y esconde el costo. El otro necesita un motivo real para decir que no, o no hay nada que vencer.",
+    change:"Se cruza una línea", changeNote:"El otro acepta algo que había venido decidido a rechazar, o se escapa en el último momento.",
+    signs:["El seductor refleja al otro: sus palabras, sus heridas, sus deseos.","El otro se resiste al menos una vez, por un motivo creíble.","Lo que se ofrece y lo que se pide nunca son exactamente lo mismo."],
+    trap:"Alguien que no se resiste. Si lo quería desde el principio, es una transacción, no una seducción.",
+    example:"Probá: un exprofesor visita a una alumna brillante que abandonó, para convencerla de una última competencia. Él necesita ganar más que ella.",
+    beats:["Acercamiento","Espejo","Oferta","Duda","Cede o escapa"],
+    g:{y:"distancia",top:"lejos",bot:"cerca"}},
+  discovery:{name:"Descubrimiento",
+    tag:"Alguien se entera de algo y nada de lo que sigue se lee igual. A veces ese alguien es el lector.",
+    what:"Para un personaje, es una carta encontrada, una mentira expuesta, una cara reconocida. Para el público, es saber lo que los personajes no saben: la bomba debajo de la mesa que convierte una charla aburrida en suspenso. Retenelo todo lo que puedas y hacelo llegar a través de un objeto o una acción, no de una explicación.",
+    change:"Lo que se sabe", changeNote:"El conocimiento cambia y todo lo anterior hay que releerlo.",
+    signs:["La pista se planta antes de la revelación, a la vista.","El personaje se resiste a la verdad un momento antes de aceptarla.","La revelación llega a través de una cosa: una foto, un ticket, un segundo cepillo de dientes."],
+    trap:"Descubrimiento por exposición. Si un personaje explica el secreto en un discurso, al lector se lo cuentan en vez de dejarlo descubrir.",
+    example:"Probá: una mujer que arregla el celular de su marido muerto descubre que él pagaba todos los meses el alquiler de un departamento que ella no conocía.",
+    beats:["Normalidad","Pista","Negación","Revelación","Relectura"],
+    g:{y:"lo que se sabe",top:"sabe",bot:"a oscuras"}}
+}};
+const ORDER=["negotiation","fight","seduction","discovery"];
+
+/* ---------- prompt pools (same length and order in both languages) ---------- */
+const POOLS={
+en:{
+  slug:["INT. HOSPITAL CAFETERIA — 3 A.M.","EXT. BUS TERMINAL — DAWN","INT. A KITCHEN AFTER THE FUNERAL — NIGHT","INT. CAR STOPPED AT A TOLL BOOTH — DAY","INT. EMPTY CLASSROOM — LATE AFTERNOON","EXT. ROOFTOP DURING A POWER CUT — NIGHT","INT. PAWN SHOP — CLOSING TIME","INT. WEDDING VENUE BATHROOM — NIGHT","EXT. PETROL STATION ON A DESERT ROUTE — NOON","INT. LAUNDROMAT — SUNDAY MORNING","INT. LIFT STUCK BETWEEN FLOORS — DAY","INT. NOTARY'S WAITING ROOM — MORNING","EXT. CEMETERY CAR PARK — DUSK","INT. BACK OFFICE OF A BAKERY — 5 A.M.","INT. MOVING VAN, HALF PACKED — DAY","INT. TELEVISION STUDIO GREEN ROOM — NIGHT"],
+  pair:[
+    {who:"a mother and her adult son",s:"the mother",o:"her son"},
+    {who:"two sisters",s:"one sister",o:"the other"},
+    {who:"a landlord and his tenant",s:"the landlord",o:"the tenant"},
+    {who:"a boss and the employee she just denied a raise",s:"the boss",o:"the employee"},
+    {who:"a retired teacher and his best former student",s:"the teacher",o:"his former student"},
+    {who:"an ex-husband and his ex-wife's new partner",s:"the ex-husband",o:"the new partner"},
+    {who:"a priest and a parishioner who stopped coming",s:"the priest",o:"the parishioner"},
+    {who:"a night nurse and a patient's daughter",s:"the nurse",o:"the daughter"},
+    {who:"two old friends, twenty years later",s:"one friend",o:"the other"},
+    {who:"a con artist and a widower",s:"the con artist",o:"the widower"},
+    {who:"a police officer and her informant",s:"the officer",o:"the informant"},
+    {who:"a grandmother and her granddaughter",s:"the grandmother",o:"her granddaughter"},
+    {who:"a band's singer and its drummer",s:"the singer",o:"the drummer"},
+    {who:"a shop owner and a teenage shoplifter",s:"the shop owner",o:"the teenager"}],
+  goal:{
+    negotiation:["sign over the house","lend money without asking why","take back what was said at dinner","keep quiet for one more week","swap the Christmas shift","give up custody of the dog","hand over a letter they promised to burn","cut the price in half"],
+    fight:["admit they lied","leave and never come back","take the blame in front of everyone","stop pretending everything is fine","choose a side, now","give back what they took","apologise to someone who is dead","say out loud what happened that summer"],
+    seduction:["join a scheme that is almost legal","come back to a life they escaped","forgive someone they shouldn't","quit a safe job for a risky one","lie to their own family","get into a stranger's car","trust them one more time","give up the one thing they are proud of"]},
+  secret:["the will was changed last month","the baby is not who everyone thinks","the money has been gone for a year","their father had a second family","the accident was not an accident","the house was sold weeks ago","the diagnosis came back clean and they kept pretending","the friend they are mourning is alive"],
+  disc:["the reader only, not the characters","both of them at the same moment"],
+  resist:["saying yes means admitting they were wrong for years","someone is listening on the other side of the door","they promised a dead person they never would","it would cost them the only job they have","they said yes once before and it ruined them","pride: the other one asked in the wrong tone","they don't have it to give and can't admit it","the last time they gave in, someone got hurt"],
+  prop:["a set of keys that no longer open anything","a plate of food going cold","a lottery ticket","a phone that keeps lighting up face down","an unpaid electricity bill","a child's drawing","a wedding ring in a pocket, not on a finger","a borrowed coat","a cake with the wrong name on it","an urn","a cigarette nobody lights","a cheque already signed"],
+  constraint:["no more than ten lines of dialogue","nobody may name the real subject","it has to happen during a household chore","start mid-sentence and end before the goodbye","one of the characters cannot speak","a third person is in the room and must not find out","it has to be over before the kettle boils","nobody may sit down"],
+  turn:["someone neither of them expected calls","one of them reveals they already knew","the prop breaks, spills or goes missing","the weaker side suddenly holds the stronger card","the person they are fighting about walks in","one of them laughs at the wrong moment","the power goes out","a lie from the first line is caught"]
+},
+es:{
+  slug:["INT. CAFETERÍA DE HOSPITAL — 3 A. M.","EXT. TERMINAL DE ÓMNIBUS — AMANECER","INT. UNA COCINA DESPUÉS DEL VELORIO — NOCHE","INT. AUTO FRENADO EN UN PEAJE — DÍA","INT. AULA VACÍA — ÚLTIMA HORA DE LA TARDE","EXT. TERRAZA DURANTE UN CORTE DE LUZ — NOCHE","INT. CASA DE EMPEÑOS — HORA DE CIERRE","INT. BAÑO DE UN SALÓN DE FIESTAS — NOCHE","EXT. ESTACIÓN DE SERVICIO EN UNA RUTA DESIERTA — MEDIODÍA","INT. LAVADERO AUTOMÁTICO — DOMINGO A LA MAÑANA","INT. ASCENSOR TRABADO ENTRE PISOS — DÍA","INT. SALA DE ESPERA DE UNA ESCRIBANÍA — MAÑANA","EXT. ESTACIONAMIENTO DEL CEMENTERIO — ATARDECER","INT. TRASTIENDA DE UNA PANADERÍA — 5 A. M.","INT. CAMIÓN DE MUDANZA, A MEDIO CARGAR — DÍA","INT. CAMARÍN DE UN CANAL DE TELEVISIÓN — NOCHE"],
+  pair:[
+    {who:"una madre y su hijo adulto",s:"la madre",o:"su hijo"},
+    {who:"dos hermanas",s:"una de ellas",o:"la otra"},
+    {who:"un dueño y su inquilina",s:"el dueño",o:"la inquilina"},
+    {who:"una jefa y el empleado al que acaba de negarle un aumento",s:"la jefa",o:"el empleado"},
+    {who:"un profesor jubilado y su mejor exalumna",s:"el profesor",o:"su exalumna"},
+    {who:"un exmarido y la nueva pareja de su exmujer",s:"el exmarido",o:"la nueva pareja"},
+    {who:"un cura y una feligresa que dejó de ir",s:"el cura",o:"la feligresa"},
+    {who:"una enfermera de guardia y la hija de un paciente",s:"la enfermera",o:"la hija"},
+    {who:"dos viejos amigos, veinte años después",s:"uno de ellos",o:"el otro"},
+    {who:"una estafadora y un viudo",s:"la estafadora",o:"el viudo"},
+    {who:"una policía y su informante",s:"la policía",o:"el informante"},
+    {who:"una abuela y su nieta",s:"la abuela",o:"su nieta"},
+    {who:"la cantante de una banda y su baterista",s:"la cantante",o:"el baterista"},
+    {who:"un comerciante y una adolescente que le roba",s:"el comerciante",o:"la adolescente"}],
+  goal:{
+    negotiation:["le firme la cesión de la casa","le preste plata sin preguntar para qué","retire lo que dijo en la cena","se calle una semana más","le cambie el turno de Navidad","le ceda la tenencia del perro","le entregue una carta que prometió quemar","le baje el precio a la mitad"],
+    fight:["admita que mintió","se vaya y no vuelva nunca","cargue con la culpa delante de todos","deje de hacer como que todo está bien","elija un bando, ya","devuelva lo que se llevó","le pida perdón a alguien que está muerto","diga en voz alta qué pasó aquel verano"],
+    seduction:["se sume a un negocio casi legal","vuelva a una vida de la que escapó","perdone a alguien que no debería","deje un trabajo seguro por uno arriesgado","le mienta a su propia familia","se suba al auto de un desconocido","confíe una vez más","renuncie a lo único que le da orgullo"]},
+  secret:["el testamento se cambió el mes pasado","el bebé no es de quien todos creen","la plata no está desde hace un año","su padre tenía otra familia","el accidente no fue un accidente","la casa se vendió hace semanas","el diagnóstico dio bien y siguieron fingiendo","el amigo al que lloran está vivo"],
+  disc:["solo el lector, no los personajes","los dos, en el mismo momento"],
+  resist:["decir que sí es admitir que se equivocaron durante años","alguien escucha del otro lado de la puerta","se lo prometieron a un muerto","les costaría el único trabajo que tienen","ya dijeron que sí una vez y les arruinó la vida","orgullo: el otro lo pidió en el tono equivocado","no lo tienen para dar y no pueden admitirlo","la última vez que cedieron, alguien salió lastimado"],
+  prop:["unas llaves que ya no abren nada","un plato de comida que se enfría","un billete de lotería","un celular que no para de iluminarse boca abajo","una factura de luz impaga","un dibujo de un chico","un anillo de casamiento en el bolsillo, no en el dedo","un saco prestado","una torta con el nombre equivocado","una urna","un cigarrillo que nadie prende","un cheque ya firmado"],
+  constraint:["no más de diez líneas de diálogo","nadie puede nombrar el tema real","tiene que pasar durante una tarea doméstica","empezá en mitad de una frase y terminá antes de la despedida","uno de los personajes no puede hablar","hay un tercero en la habitación que no puede enterarse","tiene que terminar antes de que hierva la pava","nadie puede sentarse"],
+  turn:["llama alguien que ninguno de los dos esperaba","uno revela que ya lo sabía","el objeto se rompe, se derrama o desaparece","el lado débil de pronto tiene la carta más fuerte","entra la persona por la que discuten","uno se ríe en el momento equivocado","se corta la luz","se descubre una mentira de la primera línea"]
+}};
+
+/* ---------- state ---------- */
+const root=document.documentElement;
+let lang="es", current="negotiation", genType="any";
+const locks={}, state={};
+const FIELDS=["slug","type","pair","goal","resist","prop","constraint","turn"];
+const L=()=>UI[lang], T=k=>TYPES[lang][k], P=()=>POOLS[lang];
+const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+const rnd=n=>Math.floor(Math.random()*n);
+
+/* theme */
+function setTheme(t){
+  if(t==="auto") root.removeAttribute("data-theme"); else root.setAttribute("data-theme",t);
+  document.querySelectorAll("#themeSeg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.t===t));
+  try{localStorage.setItem("scene-theme",t)}catch(e){}
+}
+document.querySelectorAll("#themeSeg button").forEach(b=>b.addEventListener("click",()=>setTheme(b.dataset.t)));
+
+/* language */
+function setLang(l){
+  lang=l; root.lang=l;
+  document.querySelectorAll("#langSeg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.l===l));
+  document.querySelectorAll("[data-i18n]").forEach(el=>{const v=L()[el.dataset.i18n]; if(typeof v==="string") el.innerHTML=v;});
+  document.title=l==="es"?"Cuatro tipos de escena":"Four Kinds of Scene";
+  buildCards(); select(current,true); paintChips(); renderPage(false);
+}
+document.querySelectorAll("#langSeg button").forEach(b=>b.addEventListener("click",()=>setLang(b.dataset.l)));
+
+/* cards */
+function buildCards(){
+  const el=document.getElementById("types"); el.innerHTML="";
+  ORDER.forEach((k,i)=>{
+    const t=T(k), b=document.createElement("button");
+    b.type="button"; b.className="type"; b.id="tab-"+k; b.setAttribute("role","tab");
+    b.setAttribute("aria-selected",k===current);
+    b.style.setProperty("--c",`var(${COLORS[k]})`);
+    b.innerHTML=`<span class="label num">${i+1}/4</span>${ICONS[k]}<h3>${t.name}</h3><p>${t.tag.split(/[.:]/)[0]}.</p>`;
+    b.addEventListener("click",()=>select(k));
+    el.appendChild(b);
+  });
+}
+
+function graph(k){
+  const t=T(k), pts=PTS[k], W=560,H=220,Lm=96,R=34,Tm=24,B=48,n=pts.length;
+  const x=i=>Lm+i*(W-Lm-R)/(n-1), mid=Tm+(H-Tm-B)/2, amp=(H-Tm-B)/2-6, y=v=>mid-v*amp;
+  let d=`M${x(0)} ${y(pts[0])}`;
+  for(let i=1;i<n;i++){
+    if(k==="discovery") d+=` L${x(i)} ${y(pts[i-1])} L${x(i)} ${y(pts[i])}`;
+    else{const cx=(x(i-1)+x(i))/2; d+=` C${cx} ${y(pts[i-1])}, ${cx} ${y(pts[i])}, ${x(i)} ${y(pts[i])}`;}
+  }
+  const ticks=t.beats.map((b,i)=>`<path d="M${x(i)} ${Tm} V${H-B}" class="mut" stroke-width=".6" stroke-dasharray="2 4"/><text x="${x(i)}" y="${H-B+20}" text-anchor="middle">${b.toUpperCase()}</text><text x="${x(i)}" y="${H-B+34}" text-anchor="middle">${i+1}</text>`).join("");
+  const dots=pts.map((v,i)=>i===n-1?`<circle cx="${x(i)}" cy="${y(v)}" r="6" class="accf"/>`:`<circle cx="${x(i)}" cy="${y(v)}" r="4" class="papf"/><circle cx="${x(i)}" cy="${y(v)}" r="4" class="acc" stroke-width="2"/>`).join("");
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${t.name}: ${t.g.y}">
+    <path d="M${Lm} ${mid} H${W-R}" class="mut" stroke-width="1"/>
+    <text x="${Lm-12}" y="${Tm+8}" text-anchor="end">${t.g.top.toUpperCase()}</text>
+    <text x="${Lm-12}" y="${mid+4}" text-anchor="end" class="strong">${t.g.y.toUpperCase()}</text>
+    <text x="${Lm-12}" y="${H-B}" text-anchor="end">${t.g.bot.toUpperCase()}</text>
+    ${ticks}<path d="${d}" class="acc" stroke-width="3" stroke-linecap="round"/>${dots}</svg>`;
+}
+
+function select(k,quiet){
+  current=k; const t=T(k), u=L();
+  root.style.setProperty("--accent",`var(${COLORS[k]})`);
+  document.querySelectorAll(".type").forEach(b=>b.setAttribute("aria-selected",b.id==="tab-"+k));
+  const det=document.getElementById("detail");
+  det.setAttribute("aria-labelledby","tab-"+k);
+  det.innerHTML=`
+    <div class="detail-head"><span class="label">${u.typeN(ORDER.indexOf(k)+1)}</span><h2>${t.name}</h2><p class="tag">${t.tag}</p></div>
+    <div class="cols">
+      <div class="block" style="gap:18px">
+        <p>${t.what}</p>
+        <div class="changes"><span class="label">${u.whatChanges}</span><strong>${t.change}</strong><p>${t.changeNote}</p></div>
+        <div class="block"><span class="label">${u.signs}</span><ul class="plain">${t.signs.map(s=>`<li>${s}</li>`).join("")}</ul></div>
+      </div>
+      <div class="block" style="gap:18px">
+        <div class="block"><span class="label">${u.shape}</span><div class="chart">${graph(k)}</div></div>
+        <div class="trap"><span class="label">${u.trap}</span><p style="margin-top:6px">${t.trap}</p></div>
+        <p class="example">${t.example}</p>
+      </div>
+    </div>`;
+  if(!quiet && genType!=="any"){genType=k; paintChips(); roll(true);}
+}
+
+/* ---------- generator ---------- */
+function paintChips(){
+  const el=document.getElementById("typeChips"); el.innerHTML="";
+  ["any",...ORDER].forEach(k=>{
+    const c=document.createElement("button"); c.type="button"; c.className="chip";
+    c.textContent=k==="any"?L().any:T(k).name; c.setAttribute("aria-pressed",genType===k);
+    c.addEventListener("click",()=>{genType=k; locks.type=false; paintChips(); if(k!=="any") select(k,true); roll(true);});
+    el.appendChild(c);
+  });
+}
+function rollField(f){
+  const p=POOLS.en;
+  switch(f){
+    case "type": return genType==="any"?ORDER[rnd(4)]:genType;
+    case "goal": return state.type==="discovery"?{d:rnd(4),s:rnd(p.secret.length)}:rnd(8);
+    default: return rnd(p[f].length);
+  }
+}
+function roll(typeOnly){
+  const prev=state.type;
+  FIELDS.forEach(f=>{
+    if(locks[f]) return;
+    if(typeOnly && f!=="type" && f!=="goal") return;
+    state[f]=rollField(f);
+  });
+  if((state.type==="discovery")!==(typeof state.goal==="object")) state.goal=rollField("goal");
+  renderPage(true);
+}
+function value(f){
+  const p=P(), u=L(), s=state, pr=p.pair[s.pair];
+  switch(f){
+    case "slug": return p.slug[s.slug];
+    case "type": return `<span class="kind">${T(s.type).name}</span> — ${T(s.type).tag}`;
+    case "pair": return cap(pr.who)+".";
+    case "goal":
+      if(s.type==="discovery"){const who=s.goal.d<2?[pr.s,pr.o][s.goal.d]:p.disc[s.goal.d-2]; return u.disc(who,p.secret[s.goal.s]);}
+      return u.wants(cap(pr.s),pr.o,p.goal[s.type][s.goal]);
+    case "resist": return s.type==="discovery"?u.buried(p.resist[s.resist]):cap(p.resist[s.resist])+".";
+    case "prop": return `${cap(p.prop[s.prop])}. ${u.propS}`;
+    case "constraint": return cap(p.constraint[s.constraint])+".";
+    case "turn": return u.turnP+p.turn[s.turn]+".";
+  }
+}
+const lockSvg=on=>on?`<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="7" width="10" height="8" rx="1" fill="currentColor"/><path d="M5 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>`
+  :`<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="7" width="10" height="8" rx="1" stroke="currentColor" stroke-width="1.4" fill="none"/><path d="M5 7V5a3 3 0 0 1 6 0" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>`;
+
+function renderPage(flash){
+  if(state.type===undefined) return;
+  const page=document.getElementById("page"), t=T(state.type), u=L();
+  page.style.setProperty("--accent",`var(${COLORS[state.type]})`);
+  page.innerHTML=`<div class="rows">${FIELDS.map(f=>`
+    <div class="row" data-f="${f}"><span class="k">${u.F[f]}</span><span class="v${f==="slug"?" slug":""}">${value(f)}</span>
+    <button type="button" class="lock" data-lock="${f}" aria-pressed="${!!locks[f]}" aria-label="${locks[f]?u.unlockOne:u.lock}: ${u.F[f]}">${lockSvg(locks[f])}</button></div>`).join("")}
+  </div>
+  <div class="pagefoot">${u.foot(t.beats.join(" → "),t.change.toLowerCase())}</div>`;
+  page.querySelectorAll("[data-lock]").forEach(b=>b.addEventListener("click",()=>{locks[b.dataset.lock]=!locks[b.dataset.lock]; renderPage(false);}));
+  if(flash) page.querySelectorAll(".row").forEach(r=>{if(!locks[r.dataset.f]){r.classList.remove("flash"); void r.offsetWidth; r.classList.add("flash");}});
+}
+const strip=h=>h.replace(/<[^>]+>/g,"");
+function promptText(){
+  const u=L(), t=T(state.type);
+  return [value("slug"),"",strip(value("type")),
+    ...["pair","goal","resist","prop","constraint","turn"].map(f=>`${u.F[f]}: ${strip(value(f))}`),
+    `${u.beatsW}: ${t.beats.join(" → ")}`,
+    `${u.mustChange}: ${t.change.toLowerCase()}.`].join("\n");
+}
+function toast(m){const el=document.getElementById("toast"); el.textContent=m; clearTimeout(toast.t); toast.t=setTimeout(()=>el.textContent="",2200);}
+
+document.getElementById("roll").addEventListener("click",()=>roll(false));
+document.getElementById("unlock").addEventListener("click",()=>{FIELDS.forEach(f=>locks[f]=false); renderPage(false); toast(L().unlocked);});
+document.getElementById("copy").addEventListener("click",()=>{
+  const fallback=()=>{const r=document.createRange(); r.selectNodeContents(document.getElementById("page")); const s=getSelection(); s.removeAllRanges(); s.addRange(r); toast(L().selected);};
+  try{navigator.clipboard.writeText(promptText()).then(()=>toast(L().copied),fallback);}catch(e){fallback();}
+});
+
+/* ---------- start with a filled example ---------- */
+FIELDS.forEach(f=>state[f]=rollField(f));
+state.goal=rollField("goal");
+DESK.onLang=setLang;
+setLang(DESK.eff());
+</script>
+</body>
+</html>
