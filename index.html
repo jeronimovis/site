@@ -56,6 +56,17 @@ h1,h2,h3{font-family:var(--serif);font-weight:500;margin:0;text-wrap:balance;let
 .nav{margin-left:auto;display:flex;align-items:center;gap:1.4rem;flex-wrap:wrap}
 .nav a{font:600 .74rem/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;text-decoration:none;padding-block:.4rem;border-bottom:1px solid transparent;transition:border-color .2s}
 .nav a:hover{border-color:var(--ink)}
+/* hobby dropdown */
+.drop{position:relative}
+.drop summary{list-style:none;display:inline-flex;align-items:center;gap:.4rem;cursor:pointer;font:600 .74rem/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;padding-block:.4rem;border-bottom:1px solid transparent;transition:border-color .2s}
+.drop summary::-webkit-details-marker{display:none}
+.drop summary:hover,.drop[open] summary{border-color:var(--ink)}
+.drop summary svg{width:10px;height:10px;transition:transform .2s}
+.drop[open] summary svg{transform:rotate(180deg)}
+.drop .menu{position:absolute;right:0;top:calc(100% + .6rem);min-width:10rem;display:grid;background:var(--surface);border:1px solid var(--rule);border-top:2px solid var(--ink);box-shadow:0 18px 40px -20px #0006;padding:.35rem 0;z-index:20}
+.drop .menu a{padding:.75rem 1.1rem;border-bottom:0}
+.drop .menu a+a{border-top:1px solid var(--rule)}
+.drop .menu a:hover{background:var(--tint);color:var(--accent)}
 .toggle{display:inline-flex;align-items:center;gap:.45rem;font:600 .72rem/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--ink);background:transparent;border:1px solid var(--rule);border-radius:999px;padding:.5rem .85rem;cursor:pointer;transition:border-color .2s}
 .toggle:hover{border-color:var(--ink)}
 .toggle svg{width:14px;height:14px}
@@ -227,7 +238,13 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.5rem
       <a href="#feedback">Reviews</a>
       <a href="#books">Books</a>
       <a href="#about">CV</a>
-      <a data-umami-event="Hobbyf" target="_blank" rel="noopener" href="https://www.deviantart.com/jeronimov/gallery">Hobby</a>
+      <details class="drop" id="hobby">
+        <summary>Hobby <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5"/></svg></summary>
+        <div class="menu">
+          <a data-umami-event="Hobbyf" target="_blank" rel="noopener" href="https://www.deviantart.com/jeronimov/gallery">Drawing</a>
+          <a data-umami-event="Hobby_writing" target="_blank" rel="noopener" href="https://jeronimov.org/qr/writing">Writing</a>
+        </div>
+      </details>
       <button class="toggle" id="theme" type="button" aria-pressed="false">
         <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
         <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
@@ -412,6 +429,10 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.5rem
     try{localStorage.setItem('jv-theme',isDark()?'dark':'light')}catch(e){}
     sync();
   });
+  var hobby=document.getElementById('hobby');
+  document.addEventListener('click',function(e){if(hobby.open&&!hobby.contains(e.target))hobby.open=false});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&hobby.open){hobby.open=false;hobby.querySelector('summary').focus()}});
+  hobby.querySelectorAll('.menu a').forEach(function(a){a.addEventListener('click',function(){hobby.open=false})});
 })();
 </script>
 </body>
