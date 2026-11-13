@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Essay Writing Ruined · Jerónimo Visñovezky</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+<script>
+  (function () {
+    var t = 'light';
+    try { t = localStorage.getItem('ewr-theme') || 'light'; } catch (e) {}
+    document.documentElement.setAttribute('data-theme-choice', t);
+    var dark = t === 'dark' || (t === 'auto' && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches);
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  })();
+</script>
+<style>
+:root {
+  --bg: #fbfaf8; --surface: #ffffff; --text: #1d1b1e; --muted: #6d676e; --accent: #7f007e;
+  --accent-soft: #f6eef6; --rule: #e3dce3; --rule-strong: #1d1b1e; --box: #f7f3f7;
+  --ok: #1f7a4a; --ok-bg: #e9f5ee; --bad: #b3261e; --bad-bg: #fbeceb; --shadow: 0 1px 2px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.06);
+  --serif: "EB Garamond", Garamond, "Iowan Old Style", Georgia, serif;
+  --side: 300px;
+}
+[data-theme="dark"] {
+  --bg: #161417; --surface: #1d1a1e; --text: #ece6ec; --muted: #a8a0a9; --accent: #d68fd5;
+  --accent-soft: #2a2129; --rule: #352f36; --rule-strong: #8a818b; --box: #221d23;
+  --ok: #7fd3a2; --ok-bg: #16281e; --bad: #f2a29c; --bad-bg: #2e1a19; --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+}
+* { box-sizing: border-box; }
+html { scroll-padding-top: 76px; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--serif); font-size: 20px; line-height: 1.6;
+  -webkit-font-smoothing: antialiased; transition: background .2s, color .2s; }
+a { color: var(--accent); }
+button { font-family: inherit; }
+
+/* Header */
+.topbar { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 12px; height: 60px; padding: 0 16px;
+  background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--rule); }
+.brand { font-size: 1.05rem; font-weight: 600; color: var(--text); text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.brand em { color: var(--accent); font-style: italic; }
+.spacer { flex: 1; }
+.icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 10px;
+  border: 1px solid var(--rule); background: var(--surface); color: var(--text); cursor: pointer; }
+.icon-btn:hover { border-color: var(--accent); }
+.theme { display: inline-flex; border: 1px solid var(--rule); border-radius: 999px; padding: 3px; background: var(--surface); }
+.theme button { border: 0; background: transparent; color: var(--muted); font-size: .8rem; letter-spacing: .04em; padding: 5px 12px;
+  border-radius: 999px; cursor: pointer; }
+.theme button[aria-pressed="true"] { background: var(--accent); color: var(--bg); }
+.theme button:focus-visible, .icon-btn:focus-visible, .opt:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Sidebar */
+.layout { display: flex; }
+.sidebar { position: fixed; top: 60px; bottom: 0; left: 0; width: var(--side); overflow-y: auto; padding: 22px 14px 40px;
+  background: var(--bg); border-right: 1px solid var(--rule); transform: translateX(-100%); transition: transform .25s ease; z-index: 25; }
+body.nav-open .sidebar { transform: none; box-shadow: var(--shadow); }
+.scrim { position: fixed; inset: 60px 0 0 0; background: rgba(0,0,0,.3); z-index: 20; display: none; }
+body.nav-open .scrim { display: block; }
+.sidebar .home-link { display: block; padding: 8px 12px; margin-bottom: 8px; color: var(--muted); text-decoration: none; font-size: .9rem; border-radius: 8px; }
+.sidebar .home-link:hover { background: var(--accent-soft); color: var(--text); }
+.sidebar ol { list-style: none; margin: 0; padding: 0; }
+.sidebar li a { display: grid; grid-template-columns: 1fr auto; padding: 9px 12px; border-radius: 10px; text-decoration: none; color: var(--text); }
+.sidebar li a:hover { background: var(--accent-soft); }
+.sidebar li a[aria-current="page"] { background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); }
+.nav-eyebrow { grid-column: 1; font-size: .62rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+.nav-title { grid-column: 1; font-size: 1.02rem; line-height: 1.3; }
+.nav-score { grid-column: 2; grid-row: 1 / span 2; align-self: center; font-size: .75rem; color: var(--muted); padding-left: 8px; white-space: nowrap; }
+.nav-score.done { color: var(--ok); }
+@media (min-width: 1100px) {
+  .sidebar { transform: none; }
+  .menu-btn { display: none; }
+  .scrim { display: none !important; }
+  main { margin-left: var(--side); }
+}
+
+/* Content */
+main { flex: 1; min-width: 0; }
+.page { max-width: 720px; margin: 0 auto; padding: 48px 24px 96px; }
+.eyebrow { margin: 0 0 6px; font-size: .72rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--accent); }
+h1 { font-size: clamp(2.1rem, 5vw, 2.9rem); font-weight: 500; line-height: 1.1; margin: 0 0 10px; letter-spacing: -.01em; }
+.subtitle { font-style: italic; color: var(--muted); font-size: 1.15rem; margin: 0 0 18px; }
+hr.rule { width: 64px; border: 0; border-top: 2px solid var(--accent); margin: 0 0 32px; }
+h2 { font-size: 1.55rem; font-weight: 600; line-height: 1.25; margin: 2.2em 0 .5em; }
+h2 .num { color: var(--accent); margin-right: .2em; }
+h3 { font-size: 1.2rem; font-style: italic; font-weight: 700; margin: 1.8em 0 .5em; }
+p { margin: 0 0 1em; }
+ul, ol { padding-left: 1.4em; margin: 0 0 1.1em; }
+li { margin-bottom: .35em; }
+li > p { margin: 0; }
+ul li::marker { color: var(--accent); }
+ol li::marker { color: var(--accent); font-weight: 600; }
+blockquote { margin: .6em 0 1.2em; padding: .2em 0 .2em 1.1em; border-left: 3px solid var(--accent); color: var(--text); }
+blockquote p { margin: 0 0 .4em; }
+blockquote p:last-child { margin-bottom: 0; }
+blockquote.example { font-size: .95em; border-left-width: 2px; margin: .6em 0 .4em; }
+blockquote.example em { font-style: italic; color: var(--muted); }
+strong.conn { color: var(--accent); font-weight: 600; font-style: normal; }
+.tw { overflow-x: auto; margin: .8em 0 1.4em; }
+table { width: 100%; border-collapse: collapse; font-size: .88em; line-height: 1.45; }
+th { text-align: left; font-size: .68rem; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); font-weight: 700;
+  padding: 8px 12px 8px 0; border-bottom: 1.5px solid var(--rule-strong); vertical-align: bottom; }
+td { padding: 7px 14px 7px 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+tbody tr:last-child td { border-bottom: 1.5px solid var(--rule-strong); }
+table.conn-table td:first-child { width: 28%; }
+table.conn-table td:first-child strong { font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+.box { border-radius: 14px; padding: 20px 24px; margin: 1.4em 0; }
+.box.activity { background: var(--accent-soft); border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent); }
+.box.activity > p:first-child strong { font-size: .75rem; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); }
+.box.essay { background: var(--box); border: 1px solid var(--rule); }
+.box.essay p { text-align: justify; hyphens: auto; }
+.box > :last-child { margin-bottom: 0; }
+
+/* Home */
+.home { display: grid; grid-template-columns: 1fr; gap: 40px; }
+.home img { width: 100%; height: auto; border-radius: 6px; box-shadow: var(--shadow); }
+.cover-title { margin: 0; font-family: var(--serif); font-weight: 600; text-transform: uppercase; font-size: clamp(3rem, 11vw, 6.4rem);
+  line-height: .92; letter-spacing: -.01em; color: var(--text); border-left: 6px solid var(--accent); padding: 6px 0 10px 22px; }
+.home .author { color: var(--muted); font-size: .95rem; margin-top: 10px; }
+.toc { list-style: none; padding: 0; margin: 0; }
+.toc li { margin: 0; border-bottom: 1px solid var(--rule); }
+.toc a { display: block; padding: 10px 0; text-decoration: none; color: var(--text); }
+.toc a:hover .toc-title { color: var(--accent); }
+.toc-eyebrow { display: block; font-size: .62rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); }
+.toc-title { font-size: 1.15rem; }
+.btn { display: inline-block; margin-top: 22px; padding: 10px 22px; border-radius: 999px; background: var(--accent); color: var(--bg);
+  text-decoration: none; font-weight: 600; border: 0; cursor: pointer; font-size: 1rem; }
+@media (max-width: 680px) {
+  body { font-size: 18px; }
+  .home { grid-template-columns: 1fr; gap: 24px; }
+  .home img { max-width: 240px; }
+  .page { padding: 32px 18px 80px; }
+  .brand-long { display: none; }
+  .theme button { padding: 5px 9px; }
+}
+
+/* Quiz */
+.quiz { margin: 3.2em 0 0; padding: 26px 26px 20px; border-radius: 18px; background: var(--surface); border: 1px solid var(--rule); box-shadow: var(--shadow); }
+.quiz-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.quiz h2 { margin: 0 0 .6em; font-size: 1.4rem; }
+.quiz-score { font-size: .9rem; color: var(--muted); }
+.q { padding: 16px 0 6px; border-top: 1px solid var(--rule); }
+.q:first-child { border-top: 0; padding-top: 4px; }
+.q-text { font-weight: 600; margin: 0 0 10px; }
+.q-text .q-n { color: var(--accent); margin-right: .35em; }
+.opts { display: grid; gap: 8px; margin: 0 0 10px; }
+.opt { display: flex; gap: 10px; align-items: flex-start; text-align: left; width: 100%; padding: 10px 14px; border-radius: 10px;
+  border: 1px solid var(--rule); background: var(--bg); color: var(--text); font-size: 1rem; line-height: 1.4; cursor: pointer; transition: border-color .15s, background .15s; }
+.opt:hover:not([disabled]) { border-color: var(--accent); }
+.opt .key { flex: none; width: 1.6em; height: 1.6em; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
+  font-size: .8rem; font-weight: 700; border: 1px solid var(--rule); color: var(--muted); }
+.opt[disabled] { cursor: default; }
+.opt.correct { border-color: var(--ok); background: var(--ok-bg); }
+.opt.correct .key { background: var(--ok); color: var(--bg); border-color: var(--ok); }
+.opt.wrong { border-color: var(--bad); background: var(--bad-bg); }
+.opt.wrong .key { background: var(--bad); color: var(--bg); border-color: var(--bad); }
+.opt.dim { opacity: .55; }
+.expl { margin: 0 0 8px; font-size: .95rem; color: var(--muted); }
+.expl b.ok { color: var(--ok); } .expl b.bad { color: var(--bad); }
+.quiz-reset { margin-top: 8px; border: 1px solid var(--rule); background: transparent; color: var(--muted); border-radius: 999px; padding: 6px 16px; cursor: pointer; font-size: .9rem; }
+.quiz-reset:hover { color: var(--text); border-color: var(--accent); }
+
+
+/* Ordering exercise */
+.order { margin: 2.4em 0 0; padding: 26px 26px 22px; border-radius: 18px; background: var(--surface); border: 1px solid var(--rule); box-shadow: var(--shadow); }
+.order h2 { margin: 0 0 .4em; font-size: 1.4rem; }
+.order-intro { color: var(--muted); font-size: .98rem; }
+.order-list { list-style: none; padding: 0; margin: 14px 0 8px; display: grid; gap: 8px; counter-reset: ord; }
+.order-item { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; padding: 10px 10px 10px 14px; border-radius: 10px;
+  border: 1px solid var(--rule); background: var(--bg); cursor: grab; line-height: 1.45; font-size: 1rem; transition: border-color .15s, background .15s, transform .15s; margin: 0; }
+.order-item.dragging { opacity: .5; }
+.order-item.over { border-color: var(--accent); }
+.order-item::before { counter-increment: ord; content: counter(ord); width: 1.7em; height: 1.7em; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
+  font-size: .8rem; font-weight: 700; color: var(--accent); border: 1px solid var(--rule); }
+.order-item .moves { display: flex; flex-direction: column; gap: 4px; }
+.order-item .moves button { width: 30px; height: 26px; border-radius: 6px; border: 1px solid var(--rule); background: var(--surface); color: var(--text); cursor: pointer; font-size: .8rem; line-height: 1; }
+.order-item .moves button:hover:not([disabled]) { border-color: var(--accent); }
+.order-item .moves button[disabled] { opacity: .35; cursor: default; }
+.order-item .role { display: none; font-size: .68rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; margin-top: 6px; }
+.order-item .why { display: none; font-size: .9rem; color: var(--muted); margin-top: 2px; }
+.order.checked .order-item .role, .order.checked .order-item .why { display: block; }
+.order.checked .order-item { cursor: default; }
+.order-item.correct { border-color: var(--ok); background: var(--ok-bg); } .order-item.correct .role { color: var(--ok); }
+.order-item.wrong { border-color: var(--bad); background: var(--bad-bg); } .order-item.wrong .role { color: var(--bad); }
+.order-result { min-height: 1.4em; margin: 6px 0 0; font-weight: 600; }
+.order-result.ok { color: var(--ok); } .order-result.bad { color: var(--bad); }
+.order-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.order-actions .btn { margin-top: 6px; }
+
+/* Pager */
+.pager { display: flex; justify-content: space-between; gap: 16px; margin-top: 48px; padding-top: 22px; border-top: 1px solid var(--rule); }
+.pager a { display: flex; flex-direction: column; text-decoration: none; color: var(--text); max-width: 48%; }
+.pager a.next { text-align: right; margin-left: auto; }
+.pager small { font-size: .7rem; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+.pager span { font-size: 1.1rem; }
+.pager a:hover span { color: var(--accent); }
+@media print { .topbar, .sidebar, .pager, .quiz, .order { display: none !important; } main { margin: 0 !important; } .section { display: block !important; } #home { display: none; } }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <button class="icon-btn menu-btn" type="button" aria-label="Open sections menu" aria-expanded="false" aria-controls="sidebar">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+  </button>
+  <a class="brand" href="#home"><em>Essay Writing</em> Ruined<span class="brand-long"> · Jerónimo Visñovezky</span></a>
+  <span class="spacer"></span>
+  <div class="theme" role="group" aria-label="Colour theme">
+    <button type="button" data-theme-set="light">Light</button>
+    <button type="button" data-theme-set="dark">Dark</button>
+    <button type="button" data-theme-set="auto">Auto</button>
+  </div>
+</header>
+<div class="scrim"></div>
+<div class="layout">
+  <nav class="sidebar" id="sidebar" aria-label="Sections">
+    <a class="home-link" href="#home">← Cover and contents</a>
+    <ol>
+<li><a href="#the-recipe-and-the-secret-sauce" data-id="the-recipe-and-the-secret-sauce"><span class="nav-eyebrow">Start here</span><span class="nav-title">The recipe and the secret sauce</span><span class="nav-score" aria-hidden="true"></span></a></li>
+<li><a href="#before-you-write" data-id="before-you-write"><span class="nav-eyebrow">The first five minutes</span><span class="nav-title">Before you write</span><span class="nav-score" aria-hidden="true"></span></a></li>
+<li><a href="#the-introduction" data-id="the-introduction"><span class="nav-eyebrow">Lesson 1</span><span class="nav-title">The introduction</span><span class="nav-score" aria-hidden="true"></span></a></li>
+<li><a href="#the-body-paragraphs" data-id="the-body-paragraphs"><span class="nav-eyebrow">Lesson 2</span><span class="nav-title">The body paragraphs</span><span class="nav-score" aria-hidden="true"></span></a></li>
+<li><a href="#the-conclusion" data-id="the-conclusion"><span class="nav-eyebrow">Lesson 3</span><span class="nav-title">The conclusion</span><span class="nav-score" aria-hidden="true"></span></a></li>
+<li><a href="#the-final-check" data-id="the-final-check"><span class="nav-eyebrow">The last five minutes</span><span class="nav-title">The final check</span><span class="nav-score" aria-hidden="true"></span></a></li>
+<li><a href="#essay-type-structures" data-id="essay-type-structures"><span class="nav-eyebrow">Appendix A</span><span class="nav-title">Essay type structures</span><span class="nav-score" aria-hidden="true"></span></a></li>
+<li><a href="#connectors-by-function" data-id="connectors-by-function"><span class="nav-eyebrow">Appendix B</span><span class="nav-title">Connectors by function</span><span class="nav-score" aria-hidden="true"></span></a></li>
+<li><a href="#bibliography" data-id="bibliography"><span class="nav-eyebrow">Credit where it&#x27;s due</span><span class="nav-title">Bibliography</span><span class="nav-score" aria-hidden="true"></span></a></li>
+    </ol>
+  </nav>
+  <main>
+    <div class="page">
+      <article class="section" id="sec-home" data-id="home">
+        <div class="home">
+          <div>
+            <p class="cover-title" role="heading" aria-level="1">Essay<br>Writing<br>Ruined</p>
+            <p class="author">Jerónimo Visñovezky · <a href="https://jeronimov.org">jeronimov.org</a></p>
+          </div>
+          <div>
+            <p class="eyebrow">Contents</p>
+            <ol class="toc">
+<li><a href="#the-recipe-and-the-secret-sauce"><span class="toc-eyebrow">Start here</span><span class="toc-title">The recipe and the secret sauce</span></a></li>
+<li><a href="#before-you-write"><span class="toc-eyebrow">The first five minutes</span><span class="toc-title">Before you write</span></a></li>
+<li><a href="#the-introduction"><span class="toc-eyebrow">Lesson 1</span><span class="toc-title">The introduction</span></a></li>
+<li><a href="#the-body-paragraphs"><span class="toc-eyebrow">Lesson 2</span><span class="toc-title">The body paragraphs</span></a></li>
+<li><a href="#the-conclusion"><span class="toc-eyebrow">Lesson 3</span><span class="toc-title">The conclusion</span></a></li>
+<li><a href="#the-final-check"><span class="toc-eyebrow">The last five minutes</span><span class="toc-title">The final check</span></a></li>
+<li><a href="#essay-type-structures"><span class="toc-eyebrow">Appendix A</span><span class="toc-title">Essay type structures</span></a></li>
+<li><a href="#connectors-by-function"><span class="toc-eyebrow">Appendix B</span><span class="toc-title">Connectors by function</span></a></li>
+<li><a href="#bibliography"><span class="toc-eyebrow">Credit where it&#x27;s due</span><span class="toc-title">Bibliography</span></a></li>
+            </ol>
+            <a class="btn" href="#the-recipe-and-the-secret-sauce">Start reading</a>
+          </div>
+        </div>
+      </article>
+<article class="section" id="sec-the-recipe-and-the-secret-sauce" data-id="the-recipe-and-the-secret-sauce" hidden><p class="eyebrow">Start here</p><h1>The recipe and the secret sauce</h1><p class="subtitle">The whole method fits on one page. This is that page.</p><hr class="rule">
+<p>This is a small book for people who keep failing essays. Usually it
+isn't laziness, and usually their English isn't terrible either. They
+fail because they sit down in an exam with forty minutes on the clock,
+two half-remembered facts about school uniforms, and no idea where to
+start.</p>
+<p>We know the feeling. We wrote these lessons for a younger version of
+ourselves: teacher-training students who were still learning English
+while being asked to write academic texts in it. Later we kept them for
+our own students. In all these years the <em>New York Times</em> has
+never asked for our services. We've never failed a writing task,
+though.</p>
+<p>Five steps. That's the lot:</p>
+<ol type="1">
+<li><p><strong>Hook.</strong> Open with a general statement, a question
+to the reader or a quote.</p></li>
+<li><p><strong>Count, don't name.</strong> In the thesis, say how many
+ideas you have, not what they are: <em>“School uniforms are a good idea
+for three main reasons.”</em></p></li>
+<li><p><strong>One idea per paragraph.</strong> Name each idea in the
+first sentence of its own paragraph: <em>“The first reason is that
+uniforms simplify students' lives.”</em></p></li>
+<li><p><strong>Reorder in the conclusion.</strong> Sum the ideas up in a
+different order, so you don't sound like a broken record.</p></li>
+<li><p><strong>Nothing new at the end.</strong> The conclusion sums up
+and gives your opinion. Full stop.</p></li>
+</ol>
+<p>If that already makes sense, you can close the book. Really.
+Everything after this page is those five steps in slow motion.</p>
+<h2 id="who-this-is-for">Who this is for</h2>
+<p>It's for students of English as a foreign language who have to
+produce 250 to 400 words in 40 to 60 minutes, usually after reading one
+or two texts on the topic. If time, ideas and vocabulary all run out at
+once, keep reading. If you're already fluent and paraphrase in your
+sleep, you don't need training wheels. Lend the book to a friend.</p>
+<h2 id="the-straight-arrow">The straight arrow</h2>
+<p>Spanish speakers like the scenic route. We set the scene, wander into
+a related story and get back to the point eventually. In Spanish that
+can read as rich. In an English essay it reads as lost.</p>
+<p>English academic writing is usually drawn as a straight arrow
+pointing down: one point per paragraph, every sentence pushing that
+point forward. So a teacher can fail an essay with decent ideas and
+decent grammar simply because its shape looks wrong to them.</p>
+<p>Getting the shape right won't hide serious grammar mistakes. It does
+make them easier to forgive, because the reader always knows where
+you're going.</p>
+<h2 id="one-rule-above-the-rest">One rule above the rest</h2>
+<p>Your teacher wins. Always. What follows is a structure an essay
+<em>can</em> have, not one it <em>must</em> have. If a tip clashes with
+your teacher's criteria or your exam's rubric, bend it or drop it.</p>
+<nav class="pager"></nav></article>
+<article class="section" id="sec-before-you-write" data-id="before-you-write" hidden><p class="eyebrow">The first five minutes</p><h1>Before you write</h1><p class="subtitle">Plenty of essays are lost before the first sentence.</p><hr class="rule">
+<p>Some students answer a slightly different question from the one on
+the paper. Others run dry halfway through paragraph two. Five minutes of
+thinking before you write fixes most of that.</p>
+<h2 id="read-the-question-twice"><span class="num">1</span> Read the question twice</h2>
+<p>Underline the topic: <em>school uniforms</em>. Then underline the
+instruction, because that's the part people skip. Agree or disagree?
+Discuss both views? Advantages and disadvantages? Each one wants a
+different shape.</p>
+<div class="tw"><table>
+
+<thead><tr>
+<th>The question says…</th>
+<th>You must…</th>
+<th>Structure</th>
+</tr></thead>
+<tbody><tr>
+<td>“Do you agree?” / “What is your opinion?”</td>
+<td>Take a side and defend it</td>
+<td>Opinion</td>
+</tr><tr>
+<td>“Discuss both views and give your opinion”</td>
+<td>Show both sides, then choose</td>
+<td>Both views</td>
+</tr><tr>
+<td>“What are the advantages and disadvantages?”</td>
+<td>Weigh both sides</td>
+<td>Pros and cons</td>
+</tr><tr>
+<td>“What problems… and what solutions?”</td>
+<td>Answer both parts</td>
+<td>Problem / solution</td>
+</tr><tr>
+<td>“Why does this happen?” / “What are the effects?”</td>
+<td>Explain causes or results</td>
+<td>Cause / effect</td>
+</tr><tr>
+<td>“Compare…”</td>
+<td>Show similarities and differences</td>
+<td>Comparison</td>
+</tr>
+</tbody>
+</table></div>
+<p>Two-part questions are a trap. If the paper asks for problems
+<em>and</em> solutions, an essay about problems gets half the marks at
+best. Appendix A has a layout for each type.</p>
+<h2 id="find-three-ideas-fast"><span class="num">2</span> Find three ideas fast</h2>
+<p>Blank mind? Look at the question from other angles, and stop as soon
+as you have three ideas:</p>
+<ul>
+<li><p><strong>People.</strong> What does it mean for students? Parents?
+Teachers? Everyone else?</p></li>
+<li><p><strong>Areas of life.</strong> Money, time, health, behaviour,
+relationships, learning.</p></li>
+<li><p><strong>Time.</strong> What happens next week? In ten
+years?</p></li>
+</ul>
+<p>Try it with uniforms. Money gives you “they hide differences in
+income”. Time gives you “nobody wastes the morning choosing clothes”.
+Behaviour gives you “kids behave better when the whole street can see
+which school they go to”. And there's your essay. Two ideas will carry a
+short one; for 250 words or more, three is safer.</p>
+<h2 id="plan-then-write"><span class="num">3</span> Plan, then write</h2>
+<p>Jot an outline in the margin: your opinion, your ideas and one
+example for each. It takes two minutes, and it's what keeps you on the
+arrow when panic sets in. For a 40-minute essay we'd split the time like
+this:</p>
+<div class="tw"><table>
+
+<thead><tr>
+<th>Step</th>
+<th>Minutes</th>
+</tr></thead>
+<tbody><tr>
+<td>Read the question and plan</td>
+<td>5</td>
+</tr><tr>
+<td>Introduction</td>
+<td>5</td>
+</tr><tr>
+<td>Body paragraphs</td>
+<td>20</td>
+</tr><tr>
+<td>Conclusion</td>
+<td>5</td>
+</tr><tr>
+<td>Final check</td>
+<td>5</td>
+</tr>
+</tbody>
+</table></div>
+<p>Got an hour? Stretch every step by half.</p>
+<nav class="pager"></nav></article>
+<article class="section" id="sec-the-introduction" data-id="the-introduction" hidden><p class="eyebrow">Lesson 1</p><h1>The introduction</h1><p class="subtitle">How to say what your essay is about without saying what it is about.</p><hr class="rule">
+<p>An introduction has two jobs. It catches the reader's attention, and
+it tells them what the essay is about. We build ours in three parts:</p>
+<div class="tw"><table>
+
+<thead><tr>
+<th>Part</th>
+<th>Job</th>
+<th>Length</th>
+</tr></thead>
+<tbody><tr>
+<td>Hook</td>
+<td>Catch the reader's attention</td>
+<td>1 sentence</td>
+</tr><tr>
+<td>Bridge</td>
+<td>Move from the hook to the debate</td>
+<td>1–2 sentences</td>
+</tr><tr>
+<td>Thesis</td>
+<td>Give your opinion and say how many ideas follow</td>
+<td>1 sentence</td>
+</tr>
+</tbody>
+</table></div>
+<p>Our running example is an old classic: <em>“Are school uniforms still
+a good idea? Write 250 words.”</em></p>
+<h2 id="the-hook">The hook</h2>
+<p>Pick one of these five. They're old tricks, and they still work.</p>
+<ol type="1">
+<li><p><strong>A general statement.</strong></p></li>
+</ol>
+<blockquote>
+<p><em>School uniforms are under scrutiny, and this time they may not
+survive.</em></p>
+</blockquote>
+<ol start="2" type="1">
+<li><p><strong>Talking to the reader.</strong></p></li>
+</ol>
+<blockquote>
+<p><em>If you went to school, you probably wore a uniform.</em></p>
+</blockquote>
+<ol start="3" type="1">
+<li><p><strong>A quotation.</strong></p></li>
+</ol>
+<blockquote>
+<p><em>Philip Slater once said that “a person in a uniform is merely an
+extension of another person's will.”</em></p>
+</blockquote>
+<ol start="4" type="1">
+<li><p><strong>A rhetorical question.</strong></p></li>
+</ol>
+<blockquote>
+<p><em>Have you ever wondered why we wear uniforms at school?</em></p>
+</blockquote>
+<ol start="5" type="1">
+<li><p><strong>A fact or a number.</strong> Only if the fact is real.
+Making one up (“a recent poll in Springfield showed 87%…”) is tempting,
+and plenty of teachers will mark you down for it.</p></li>
+</ol>
+<h2 id="the-bridge">The bridge</h2>
+<p>Hook plus thesis gives you a two-sentence introduction, and that
+looks thin. A thin introduction makes teachers read more carefully,
+which is the last thing you want. So add a sentence or two in between. A
+good bridge moves from the hook to the debate: why it matters, or who
+disagrees.</p>
+<blockquote>
+<p><em>Some parents and students now see them as an unnecessary rule,
+while others defend them fiercely.</em></p>
+</blockquote>
+<p>Two warnings. Don't copy the question word for word, because some
+exams don't give credit for language lifted from the prompt. And keep
+your best vocabulary in your pocket for now. You'll need it in the
+body.</p>
+<h2 id="the-thesis-count-dont-name">The thesis: count, don't name</h2>
+<p>This is the most important sentence in the essay. It tells the reader
+what's coming, and if your plan is fuzzy, this is where it shows first.
+The textbook thesis names every idea:</p>
+<blockquote>
+<p><em>School uniforms are a good choice because they simplify students'
+lives, make them act responsibly and help them feel equal.</em></p>
+</blockquote>
+<p>Nothing wrong with it. The trouble is what it does to you later. With
+a small vocabulary on the topic, you'll have to mention each idea four
+times:</p>
+<ol type="1">
+<li><p>in the thesis;</p></li>
+<li><p>in the first sentence of its paragraph;</p></li>
+<li><p>in the sentence that supports it;</p></li>
+<li><p>in the summary at the end.</p></li>
+</ol>
+<p>Write “they simplify students' lives” four times and nobody is giving
+you a prize for vocabulary range. So don't spend your ideas yet. Just
+count them:</p>
+<blockquote>
+<p><em>I believe school uniforms are still a good choice for three main
+reasons.</em></p>
+</blockquote>
+<p>That one sentence gives your opinion, says what the essay is about
+and even shows its shape: three reasons, so three paragraphs. Two small
+details make it work.</p>
+<ul>
+<li><p><strong>A precise noun.</strong> <em>Reasons, advantages,
+factors, effects, steps.</em> Never <em>things</em> or <em>stuff</em>;
+those can cost you a pass.</p></li>
+<li><p><strong>A hedge.</strong> <em>Main, key</em> or <em>major</em>
+covers you, since there may be reasons you didn't think of.</p></li>
+</ul>
+<h3 id="when-to-name-them-after-all">When to name them after all</h3>
+<p>Some teachers and some exam rubrics expect the thesis to preview the
+points. If yours does, name them here and switch to synonyms in the
+topic sentences. Not sure which kind you've got? Ask. It's a
+thirty-second question.</p>
+<h2 id="the-finished-introduction">The finished introduction</h2>
+<blockquote>
+<p><em>School uniforms are under scrutiny, and this time they may not
+survive. Some parents and students now see them as an unnecessary rule,
+while others defend them fiercely. I believe school uniforms are still a
+good choice for three main reasons.</em></p>
+</blockquote>
+<p>Planning a paragraph on the other side's view? Warn the reader in the
+thesis:</p>
+<blockquote>
+<p><em>Although critics raise valid points, I believe school uniforms
+are still a good choice for two main reasons.</em></p>
+</blockquote>
+<div class="box activity"><p><strong>Activity 1</strong></p>
+<ol type="1">
+<li><p>Find an essay question you like (or hate).</p></li>
+<li><p>Write a hook using one of the five openings.</p></li>
+<li><p>Add a bridge of one or two sentences without copying the
+question.</p></li>
+<li><p>Write a thesis that counts your ideas without naming
+them.</p></li>
+<li><p>Read it aloud and fix whatever sounds off.</p></li>
+</ol></div>
+<section class="quiz" aria-labelledby="q-the-introduction"><div class="quiz-head"><h2 id="q-the-introduction">Check yourself</h2><span class="quiz-score"></span></div><div class="quiz-body"></div><button class="quiz-reset" type="button">Start again</button></section><section class="order" aria-labelledby="o-the-introduction"><p class="eyebrow">Exercise</p><h2 id="o-the-introduction">Put the introduction in order</h2><p class="order-intro">The question: <em>Should homework be banned in elementary and middle schools?</em> Drag the sentences, or use the arrows, to build the introduction. Then check your answer.</p><ol class="order-list"></ol><p class="order-result" aria-live="polite"></p><div class="order-actions"><button type="button" class="btn order-check">Check my order</button><button type="button" class="quiz-reset order-show">Show me</button><button type="button" class="quiz-reset order-shuffle">Shuffle again</button></div></section><nav class="pager"></nav></article>
+<article class="section" id="sec-the-body-paragraphs" data-id="the-body-paragraphs" hidden><p class="eyebrow">Lesson 2</p><h1>The body paragraphs</h1><p class="subtitle">Where you finally spend your ideas, one paragraph each.</p><hr class="rule">
+<h2 id="one-idea-per-paragraph">One idea per paragraph</h2>
+<p>Every textbook definition of a paragraph says the same thing in
+different words: a group of sentences about one central idea. So start a
+new paragraph when you start a new idea, and only then. Pressing Enter
+halfway through an idea doesn't make a paragraph. It makes loose
+sentences.</p>
+<p>Keep them roughly the same size, around 50 to 70 words each in a
+250-word essay. A 20-word paragraph next to a 120-word one looks like an
+accident.</p>
+<h2 id="the-four-step-paragraph">The four-step paragraph</h2>
+<p>A paragraph goes from general to specific. When you get stuck halfway
+through one, remembering what comes next is often enough to get you
+moving again.</p>
+<div class="tw"><table>
+
+<thead><tr>
+<th>Step</th>
+<th>What it does</th>
+<th>Example</th>
+</tr></thead>
+<tbody><tr>
+<td>1. Topic sentence</td>
+<td>Names the idea</td>
+<td><em>The first reason is that school uniforms simplify students'
+lives.</em></td>
+</tr><tr>
+<td>2. Support</td>
+<td>Explains it</td>
+<td><em>Students do not need to decide what to wear every
+morning.</em></td>
+</tr><tr>
+<td>3. Evidence</td>
+<td>Gives an example or detail</td>
+<td><em>Choosing clothes is a common source of stress for
+teenagers.</em></td>
+</tr><tr>
+<td>4. Closing sentence</td>
+<td>Optional</td>
+<td><em>In short, uniforms make school life simpler.</em></td>
+</tr>
+</tbody>
+</table></div>
+<p>Spend your best words on the topic sentence; that's where the teacher
+looks. The closing sentence is optional in an essay. There's a whole
+concluding paragraph waiting at the end anyway, and skipping it means
+one less time you have to say the same idea with new words (wink,
+wink).</p>
+<p>Bigger idea? Repeat steps 2 and 3: a second supporting point with its
+own example.</p>
+<h2 id="evidence-when-you-have-none">Evidence when you have none</h2>
+<p>In an exam you almost never have real data. You still need examples,
+though, and these are honest and free:</p>
+<ul>
+<li><p><strong>A hypothetical.</strong> <em>Imagine a class where some
+students wear designer brands and others wear
+hand-me-downs.</em></p></li>
+<li><p><strong>Something familiar.</strong> <em>In many Argentine
+schools, students wear a white smock over their clothes.</em></p></li>
+<li><p><strong>A general truth.</strong> <em>Teenagers are often judged
+by their appearance.</em></p></li>
+<li><p><strong>A consequence.</strong> <em>As a result, they can spend
+that energy on homework instead.</em></p></li>
+</ul>
+<p>Avoid invented surveys. Some teachers let them slide. Many don't, and
+you won't know which kind you've got until the mark comes back.</p>
+<h2 id="the-other-sides-paragraph">The other side's paragraph</h2>
+<p>Admitting the other side usually makes an opinion essay stronger. In
+a “discuss both views” essay it's compulsory. Three moves:</p>
+<ol type="1">
+<li><p><strong>State their view.</strong> <em>Critics argue that
+uniforms limit students' freedom of expression.</em></p></li>
+<li><p><strong>Give them what's true.</strong> <em>It is true that
+students cannot choose their own colours or style.</em></p></li>
+<li><p><strong>Answer it.</strong> <em>However, school is mainly a place
+for learning, and students can express themselves outside
+it.</em></p></li>
+</ol>
+<p>Put it right after the introduction or just before the conclusion.
+And keep the count honest: two reasons plus the other side means the
+thesis says <em>two</em>.</p>
+<h2 id="linking-paragraphs">Linking paragraphs</h2>
+<p>Each body paragraph should open with a signal that tells the reader
+how it relates to the last one. For independent reasons, skip <em>first,
+second, third</em>; it makes your reasons sound like steps in a recipe.
+Try these instead:</p>
+<ul>
+<li><p><em>The first reason is that…</em></p></li>
+<li><p><em>Another reason is that… / In addition,… /
+Moreover,…</em></p></li>
+<li><p><em>Most importantly,… / Finally,…</em></p></li>
+</ul>
+<p>For the other side, use <em>Critics argue that…</em> or <em>Some
+people believe that…</em>, then come back with <em>However</em> or
+<em>Nevertheless</em>. Save <em>Consequently</em> and <em>Therefore</em>
+for paragraphs that really are a result of the one before. There's a
+fuller list in Appendix B.</p>
+<h2 id="sentence-variety">Sentence variety</h2>
+<p>An essay can be grammatically spotless and still lose marks if every
+sentence looks the same, because most rubrics reward range. Aim for at
+least one of each:</p>
+<ul>
+<li><p><strong>Negative.</strong> <em>Students do not need to think
+about what to wear.</em></p></li>
+<li><p><strong>Compound</strong> (and, but, so). <em>Students save time,
+so they can focus on homework.</em></p></li>
+<li><p><strong>Complex</strong> (because, although, when, which).
+<em>Although uniforms limit choice, they reduce stress.</em></p></li>
+<li><p><strong>Passive.</strong> <em>Uniforms are being questioned in
+many countries.</em></p></li>
+</ul>
+<p>Teachers love complex sentences, so write plenty of them. But a
+correct simple sentence beats a broken complex one.</p>
+<h2 id="the-body-so-far">The body so far</h2>
+<div class="box essay"><p><em>The first reason is that school uniforms simplify students'
+lives. Students do not need to decide what to wear every morning, which
+removes a common source of stress for teenagers. As a result, they can
+focus their energy on attending class, doing homework and preparing for
+tests.</em></p>
+<p><em>In addition, uniforms make students act responsibly outside
+school. A student in a uniform is never anonymous: anyone can recognise
+the school, and neighbours or other parents may report bad behaviour.
+Moreover, students themselves feel that they represent their school, so
+they tend to behave better while wearing it. In this way, the uniform
+works as a reminder of good manners.</em></p>
+<p><em>Finally, school uniforms help students feel equal. Their simple
+design avoids comparisons about body shape. More importantly, expensive
+clothes are a sign of economic status, which can create unfair
+relationships among classmates. Imagine a class where some students wear
+designer brands and others wear second-hand clothes. With uniforms,
+these differences disappear and every student starts on a level playing
+field.</em></p></div>
+<div class="box activity"><p><strong>Activity 2</strong></p>
+<ol type="1">
+<li><p>Take your introduction from Activity 1 and write the
+body.</p></li>
+<li><p>Follow the four steps in each paragraph.</p></li>
+<li><p>Give each paragraph an honest example and an opening
+connector.</p></li>
+<li><p>Fit in a negative, a compound, a complex and a passive
+sentence.</p></li>
+<li><p>Check that your paragraphs are about the same size.</p></li>
+</ol></div>
+<section class="quiz" aria-labelledby="q-the-body-paragraphs"><div class="quiz-head"><h2 id="q-the-body-paragraphs">Check yourself</h2><span class="quiz-score"></span></div><div class="quiz-body"></div><button class="quiz-reset" type="button">Start again</button></section><section class="order" aria-labelledby="o-the-body-paragraphs"><p class="eyebrow">Exercise</p><h2 id="o-the-body-paragraphs">Put the body paragraph in order</h2><p class="order-intro">Same question: <em>Should homework be banned in elementary and middle schools?</em> This is the first body paragraph of the essay. Put the sentences in order, from general to specific.</p><ol class="order-list"></ol><p class="order-result" aria-live="polite"></p><div class="order-actions"><button type="button" class="btn order-check">Check my order</button><button type="button" class="quiz-reset order-show">Show me</button><button type="button" class="quiz-reset order-shuffle">Shuffle again</button></div></section><nav class="pager"></nav></article>
+<article class="section" id="sec-the-conclusion" data-id="the-conclusion" hidden><p class="eyebrow">Lesson 3</p><h1>The conclusion</h1><p class="subtitle">Includes an automatic, self-writing conclusion. As promised on the cover.</p><hr class="rule">
+<p>Picture the room. The clock has nearly run out, the teacher is pacing
+and announcing that papers go in soon, and you still have no conclusion.
+Good news: it's the easiest paragraph in the whole essay, because every
+word you need is already on the page.</p>
+<p>A conclusion does two things. It sums up, and it gives a final
+opinion. That's it.</p>
+<h2 id="nothing-new">Nothing new</h2>
+<p>The rookie mistake is a brand-new reason in the last paragraph. If a
+great idea hits you at minute 38, it belongs in the body. Or
+nowhere.</p>
+<h2 id="the-self-writing-conclusion">The self-writing conclusion</h2>
+<p>Look at what the essay has said so far:</p>
+<div class="tw"><table>
+
+<thead><tr>
+<th>Part</th>
+<th>Idea</th>
+</tr></thead>
+<tbody><tr>
+<td>Thesis</td>
+<td>Uniforms are a good choice for three main reasons</td>
+</tr><tr>
+<td>Paragraph 1</td>
+<td>They simplify students' lives</td>
+</tr><tr>
+<td>Paragraph 2</td>
+<td>They make students act responsibly</td>
+</tr><tr>
+<td>Paragraph 3</td>
+<td>They help students feel equal</td>
+</tr>
+</tbody>
+</table></div>
+<p>Now shuffle it so you don't sound like a broken record:</p>
+<ol type="1">
+<li><p><strong>Open with a connector.</strong> <em>In conclusion</em> or
+<em>To sum up</em>. Surprise, surprise.</p></li>
+<li><p><strong>Flip the sentence.</strong> Instead of <em>uniforms are
+good because of 1, 2 and 3</em>, write <em>because of 1, 2 and 3,
+uniforms are good</em>.</p></li>
+<li><p><strong>Change the order.</strong> Go 2, 3, 1 instead of 1, 2,
+3.</p></li>
+</ol>
+<blockquote>
+<p><em>In conclusion, because they help students act responsibly, feel
+equal and live simpler lives, school uniforms are still a good
+choice.</em></p>
+</blockquote>
+<p>Want more variety? Change the word forms. Turn the verbs into nouns,
+for instance:</p>
+<blockquote>
+<p><em>To sum up, school uniforms are an excellent choice because they
+bring simplicity, responsibility and equality to students'
+lives.</em></p>
+</blockquote>
+<h2 id="the-final-opinion">The final opinion</h2>
+<p>Finish with a sentence or two of opinion or recommendation. It should
+follow from your reasons, not sneak a new one in.</p>
+<blockquote>
+<p><em>In my opinion, they should remain compulsory in primary and
+secondary schools.</em></p>
+</blockquote>
+<p>And keep the voice you started with. If the introduction said <em>I
+believe</em>, the end says <em>In my opinion</em>. Switching to <em>We
+believe</em> halfway through looks careless.</p>
+<h2 id="the-complete-essay">The complete essay</h2>
+<div class="box essay"><p><strong>Are school uniforms still a good idea? (250
+words)</strong></p>
+<p><em>School uniforms are under scrutiny, and this time they may not
+survive. Some parents and students now see them as an unnecessary rule,
+while others defend them fiercely. I believe school uniforms are still a
+good choice for three main reasons.</em></p>
+<p><em>The first reason is that school uniforms simplify students'
+lives. Students do not need to decide what to wear every morning, which
+removes a common source of stress for teenagers. As a result, they can
+focus their energy on attending class, doing homework and preparing for
+tests.</em></p>
+<p><em>In addition, uniforms make students act responsibly outside
+school. A student in a uniform is never anonymous: anyone can recognise
+the school, and neighbours or other parents may report bad behaviour.
+Moreover, students themselves feel that they represent their school, so
+they tend to behave better while wearing it. In this way, the uniform
+works as a reminder of good manners.</em></p>
+<p><em>Finally, school uniforms help students feel equal. Their simple
+design avoids comparisons about body shape. More importantly, expensive
+clothes are a sign of economic status, which can create unfair
+relationships among classmates. Imagine a class where some students wear
+designer brands and others wear second-hand clothes. With uniforms,
+these differences disappear and every student starts on a level playing
+field.</em></p>
+<p><em>In conclusion, because they help students act responsibly, feel
+equal and live simpler lives, school uniforms are still a good choice.
+Rather than a relic of the past, they are a simple tool that keeps
+students focused on what matters. In my opinion, they should remain
+compulsory in primary and secondary schools.</em></p></div>
+<p>Word count: 260. Phew. For a 250-word task, aim a little over so
+you're never short, and try not to pass 300.</p>
+<div class="box activity"><p><strong>Activity 3</strong></p>
+<ol type="1">
+<li><p>Write the conclusion for your essay.</p></li>
+<li><p>Sum up your ideas in a new order, with different word
+forms.</p></li>
+<li><p>Add your opinion in one or two sentences.</p></li>
+<li><p>Make sure nothing in it is new.</p></li>
+</ol></div>
+<section class="quiz" aria-labelledby="q-the-conclusion"><div class="quiz-head"><h2 id="q-the-conclusion">Check yourself</h2><span class="quiz-score"></span></div><div class="quiz-body"></div><button class="quiz-reset" type="button">Start again</button></section><nav class="pager"></nav></article>
+<article class="section" id="sec-the-final-check" data-id="the-final-check" hidden><p class="eyebrow">The last five minutes</p><h1>The final check</h1><p class="subtitle">Every item on this list costs marks, even in essays with good English.</p><hr class="rule">
+<ul>
+<li><p>The essay answers every part of the question.</p></li>
+<li><p>The number in the thesis matches the essay: “three reasons” means
+three body paragraphs.</p></li>
+<li><p>Each body paragraph has one idea, named in its first
+sentence.</p></li>
+<li><p>Each paragraph opens with a connector that fits.</p></li>
+<li><p>The conclusion has nothing new in it.</p></li>
+<li><p>The voice stays the same: <em>I</em> or <em>we</em>, not
+both.</p></li>
+<li><p>No contractions or informal words (<em>don't, stuff, a lot
+of</em>) in a formal essay. Yes, we use them in this book. You're not
+being graded on it.</p></li>
+<li><p>The word count is inside the limit.</p></li>
+</ul>
+<h2 id="how-to-practise">How to practise</h2>
+<p>Accuracy first. Write slowly, with no timer, and check every
+sentence. Speed comes later, and sooner than you'd think. After a
+handful of timed essays the structure runs on autopilot, and your head
+is free for the ideas and the language.</p>
+<p>Now go and write one.</p>
+<nav class="pager"></nav></article>
+<article class="section" id="sec-essay-type-structures" data-id="essay-type-structures" hidden><p class="eyebrow">Appendix A</p><h1>Essay type structures</h1><p class="subtitle">Same three parts every time. What changes is the job of each body paragraph.</p><hr class="rule">
+<p>The thesis templates below all use the count-don't-name trick from
+Lesson 1.</p>
+<h2 id="opinion"><span class="num">1</span> Opinion</h2>
+<p><em>“To what extent do you agree?” / “What is your opinion?”</em></p>
+<div class="tw"><table>
+
+<thead><tr>
+<th>Paragraph</th>
+<th>Content</th>
+</tr></thead>
+<tbody><tr>
+<td>Introduction</td>
+<td>Hook, bridge, thesis with your opinion</td>
+</tr><tr>
+<td>Body 1</td>
+<td>First reason + example</td>
+</tr><tr>
+<td>Body 2</td>
+<td>Second reason + example</td>
+</tr><tr>
+<td>Body 3 (optional)</td>
+<td>Third reason, or the other side and your answer to it</td>
+</tr><tr>
+<td>Conclusion</td>
+<td>Summary in a new order + final opinion</td>
+</tr>
+</tbody>
+</table></div>
+<p>Thesis: <em>I strongly believe that… for two main reasons.</em></p>
+<h2 id="discuss-both-views"><span class="num">2</span> Discuss both views</h2>
+<p><em>“Some people think…, while others believe… Discuss both views and
+give your opinion.”</em></p>
+<div class="tw"><table>
+
+<thead><tr>
+<th>Paragraph</th>
+<th>Content</th>
+</tr></thead>
+<tbody><tr>
+<td>Introduction</td>
+<td>Hook, the debate, thesis with your opinion</td>
+</tr><tr>
+<td>Body 1</td>
+<td>The view you disagree with: its supporters' reasons</td>
+</tr><tr>
+<td>Body 2</td>
+<td>The view you agree with: reasons + examples</td>
+</tr><tr>
+<td>Conclusion</td>
+<td>Both views in brief + your final opinion</td>
+</tr>
+</tbody>
+</table></div>
+<p>Thesis: <em>While both views have merit, I believe that…</em> Put
+your side second, so your argument gets the last word.</p>
+<h2 id="advantages-and-disadvantages"><span class="num">3</span> Advantages and
+disadvantages</h2>
+<p><em>“What are the advantages and disadvantages of…?” / “Do the
+advantages outweigh the disadvantages?”</em></p>
+<div class="tw"><table>
+
+<thead><tr>
+<th>Paragraph</th>
+<th>Content</th>
+</tr></thead>
+<tbody><tr>
+<td>Introduction</td>
+<td>Hook, bridge, thesis</td>
+</tr><tr>
+<td>Body 1</td>
+<td>Main advantages + examples</td>
+</tr><tr>
+<td>Body 2</td>
+<td>Main disadvantages + examples</td>
+</tr><tr>
+<td>Conclusion</td>
+<td>Summary + which side weighs more, if asked</td>
+</tr>
+</tbody>
+</table></div>
+<p>Thesis: <em>This trend has some clear advantages, but also some
+important drawbacks.</em> If the question asks which side wins, answer
+it in the thesis. Sitting on the fence doesn't count as an answer.</p>
+<h2 id="problem-and-solution"><span class="num">4</span> Problem and solution</h2>
+<p><em>“What problems does this cause, and what can be done about
+them?”</em></p>
+<div class="tw"><table>
+
+<thead><tr>
+<th>Paragraph</th>
+<th>Content</th>
+</tr></thead>
+<tbody><tr>
+<td>Introduction</td>
+<td>Hook, bridge, thesis</td>
+</tr><tr>
+<td>Body 1</td>
+<td>Main problems + examples</td>
+</tr><tr>
+<td>Body 2</td>
+<td>Solutions, one for each problem</td>
+</tr><tr>
+<td>Conclusion</td>
+<td>Summary + the solution that matters most</td>
+</tr>
+</tbody>
+</table></div>
+<p>Thesis: <em>This situation causes two main problems, but there are
+practical ways to solve them.</em> Pair every solution with a problem. A
+solution to something you never mentioned looks random.</p>
+<h2 id="cause-and-effect"><span class="num">5</span> Cause and effect</h2>
+<p><em>“Why is this happening?” / “What effects will it have?”</em></p>
+<p>Two layouts. In a <strong>block</strong> essay, the causes go
+together and then the effects:</p>
+<div class="tw"><table>
+
+<thead><tr>
+<th>Paragraph</th>
+<th>Content</th>
+</tr></thead>
+<tbody><tr>
+<td>Introduction</td>
+<td>Hook, bridge, thesis</td>
+</tr><tr>
+<td>Body 1</td>
+<td>Main causes</td>
+</tr><tr>
+<td>Body 2</td>
+<td>Main effects</td>
+</tr><tr>
+<td>Conclusion</td>
+<td>Summary + final comment</td>
+</tr>
+</tbody>
+</table></div>
+<p>In a <strong>chain</strong> essay, each effect causes the next one,
+and each paragraph follows one link: A leads to B, which leads to C. Use
+the chain only when the events really are linked. Otherwise the block is
+safer.</p>
+<p>Thesis: <em>There are two key reasons for this trend, and its effects
+are already visible.</em></p>
+<h2 id="compare-and-contrast"><span class="num">6</span> Compare and contrast</h2>
+<p><em>“Compare… and…” / “What are the similarities and
+differences?”</em></p>
+<p>Two layouts again. In a <strong>block</strong> essay, similarities
+get one paragraph and differences another:</p>
+<div class="tw"><table>
+
+<thead><tr>
+<th>Paragraph</th>
+<th>Content</th>
+</tr></thead>
+<tbody><tr>
+<td>Introduction</td>
+<td>Hook, both subjects, thesis</td>
+</tr><tr>
+<td>Body 1</td>
+<td>Similarities</td>
+</tr><tr>
+<td>Body 2</td>
+<td>Differences</td>
+</tr><tr>
+<td>Conclusion</td>
+<td>Summary + which is better, if asked</td>
+</tr>
+</tbody>
+</table></div>
+<p>In a <strong>point-by-point</strong> essay, each paragraph compares
+both subjects on one point: cost, say, then convenience, then health. It
+reads more clearly once you have three points or more.</p>
+<p>Thesis: <em>Although city life and country life share some features,
+they differ in three key aspects.</em></p>
+<h2 id="process"><span class="num">7</span> Process</h2>
+<p><em>“Describe the steps…” / “How can someone…?”</em></p>
+<div class="tw"><table>
+
+<thead><tr>
+<th>Paragraph</th>
+<th>Content</th>
+</tr></thead>
+<tbody><tr>
+<td>Introduction</td>
+<td>Hook, why the process matters, thesis</td>
+</tr><tr>
+<td>Body 1–3</td>
+<td>Groups of steps, in time order</td>
+</tr><tr>
+<td>Conclusion</td>
+<td>The stages in brief + the final result</td>
+</tr>
+</tbody>
+</table></div>
+<p>Thesis: <em>Preparing for an exam involves three main stages.</em>
+This is the one place where <em>first, second, third</em> and <em>then,
+next, finally</em> are exactly right.</p>
+<section class="quiz" aria-labelledby="q-essay-type-structures"><div class="quiz-head"><h2 id="q-essay-type-structures">Check yourself</h2><span class="quiz-score"></span></div><div class="quiz-body"></div><button class="quiz-reset" type="button">Start again</button></section><nav class="pager"></nav></article>
+<article class="section" id="sec-connectors-by-function" data-id="connectors-by-function" hidden><p class="eyebrow">Appendix B</p><h1>Connectors by function</h1><p class="subtitle">Pick a connector for what it does, not for how clever it sounds.</p><hr class="rule">
+<p>Using one in every sentence is as confusing as using none.</p>
+<p>Connectors work in three ways, and each way has its own
+punctuation:</p>
+<ul>
+<li><p><strong>Start a sentence.</strong> The connector opens a new
+sentence and takes a comma: <em>Students save time. As a result, they
+can focus on homework.</em></p></li>
+<li><p><strong>Join two clauses.</strong> The connector links two
+clauses inside one sentence: <em>Students save time, so they can focus
+on homework.</em></p></li>
+<li><p><strong>Other patterns.</strong> Prepositions take a noun
+(<em>despite the cost</em>), and some verbs and nouns do the same job as
+a connector (<em>result in, the reason for</em>).</p></li>
+</ul>
+<h3 id="adding">Adding</h3>
+<div class="tw"><table class="conn-table">
+
+<tbody>
+<tr>
+<td><strong>Start a sentence</strong></td>
+<td>In addition, Moreover, Furthermore, Also,</td>
+</tr>
+<tr>
+<td><strong>Join two clauses</strong></td>
+<td>and; both… and; not only… but also</td>
+</tr>
+<tr>
+<td><strong>Other patterns</strong></td>
+<td>in addition to + noun (<em>in addition to maths and
+science</em>)</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote class="example"><p><em>Uniforms save time.</em><strong class="conn"> In addition, </strong><em>they save
+money.</em></p></blockquote>
+<h3 id="listing-reasons">Listing reasons</h3>
+<div class="tw"><table class="conn-table">
+
+<tbody>
+<tr>
+<td><strong>Start a sentence</strong></td>
+<td>First, First of all, Second, Third, Next, Last, Finally, Most
+importantly,</td>
+</tr>
+<tr>
+<td><strong>Other patterns</strong></td>
+<td>The first reason is that…; Another reason is that…; the first
+(second, third) reason, cause, factor, problem, result, advantage; one
+reason, problem, important factor; another way, reason, disadvantage; an
+additional problem, result</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote class="example"><p><strong class="conn">Another reason is that </strong><em>uniforms help students feel
+equal.</em></p></blockquote>
+<p>For separate reasons, the noun phrases work better than <em>first,
+second, third</em>, which make reasons sound like steps (see Lesson
+2).</p>
+<h3 id="giving-examples">Giving examples</h3>
+<div class="tw"><table class="conn-table">
+
+<tbody>
+<tr>
+<td><strong>Start a sentence</strong></td>
+<td>For example, For instance, Imagine…</td>
+</tr>
+<tr>
+<td><strong>Other patterns</strong></td>
+<td>such as + noun, like + noun</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote class="example"><p><em>Some items,</em><strong class="conn"> such as </strong><em>ties and blazers, are
+expensive.</em></p></blockquote>
+<h3 id="similarity">Similarity</h3>
+<div class="tw"><table class="conn-table">
+
+<tbody>
+<tr>
+<td><strong>Start a sentence</strong></td>
+<td>Similarly, Likewise, Also, … too</td>
+</tr>
+<tr>
+<td><strong>Join two clauses</strong></td>
+<td>as, just as; and; both… and; not only… but also; neither… nor</td>
+</tr>
+<tr>
+<td><strong>Other patterns</strong></td>
+<td>like + noun, just like + noun, similar to + noun; be like, be
+similar (to), be the same (as), be alike; compare (to/with)</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote class="example"><p><strong class="conn">Just as </strong><em>uniforms hide differences in income, they hide
+differences in body shape.</em></p></blockquote>
+<h3 id="contrast">Contrast</h3>
+<div class="tw"><table class="conn-table">
+
+<tbody>
+<tr>
+<td><strong>Start a sentence</strong></td>
+<td>However, In contrast, In comparison, By comparison, On the other
+hand, On the contrary,</td>
+</tr>
+<tr>
+<td><strong>Join two clauses</strong></td>
+<td>while, whereas, but</td>
+</tr>
+<tr>
+<td><strong>Other patterns</strong></td>
+<td>compared to/with + noun; differ (from), be different (from), be
+dissimilar to, be unlike</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote class="example"><p><em>Some students like the uniform,</em><strong class="conn"> whereas </strong><em>others hate
+it.</em></p></blockquote>
+<p><em>On the contrary</em> rejects what came before. Use it to correct
+an idea, not to compare two things.</p>
+<h3 id="concession">Concession</h3>
+<div class="tw"><table class="conn-table">
+
+<tbody>
+<tr>
+<td><strong>Start a sentence</strong></td>
+<td>However, Nevertheless, Nonetheless, Even so, Still,</td>
+</tr>
+<tr>
+<td><strong>Join two clauses</strong></td>
+<td>although, even though, though; but, yet</td>
+</tr>
+<tr>
+<td><strong>Other patterns</strong></td>
+<td>despite + noun, in spite of + noun</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote class="example"><p><strong class="conn">Despite </strong><em>the cost, many parents prefer uniforms.</em></p></blockquote>
+<p>Concession means the second idea is unexpected after the first.</p>
+<h3 id="cause">Cause</h3>
+<div class="tw"><table class="conn-table">
+
+<tbody>
+<tr>
+<td><strong>Join two clauses</strong></td>
+<td>because, since, as; for</td>
+</tr>
+<tr>
+<td><strong>Other patterns</strong></td>
+<td>because of + noun, due to + noun, as a result of + noun, as a
+consequence of + noun; result from, be the result of; the effect of, the
+consequence of</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote class="example"><p><em>Some students arrive late</em><strong class="conn"> because </strong><em>they cannot decide
+what to wear.</em></p></blockquote>
+<h3 id="result">Result</h3>
+<div class="tw"><table class="conn-table">
+
+<tbody>
+<tr>
+<td><strong>Start a sentence</strong></td>
+<td>As a result, As a consequence, Consequently, Therefore, Thus,
+Hence,</td>
+</tr>
+<tr>
+<td><strong>Join two clauses</strong></td>
+<td>so, which means that</td>
+</tr>
+<tr>
+<td><strong>Other patterns</strong></td>
+<td>result in, cause, have an effect on, affect; the cause of, the
+reason for; thereby + -ing</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote class="example"><p><em>Students save time.</em><strong class="conn"> As a result, </strong><em>they can focus on
+homework.</em></p></blockquote>
+<p><em>Affect</em> is the verb; <em>effect</em> is the noun.</p>
+<h3 id="time-and-steps">Time and steps</h3>
+<div class="tw"><table class="conn-table">
+
+<tbody>
+<tr>
+<td><strong>Start a sentence</strong></td>
+<td>First, First of all, Second, Third, Then, Next, After that, Soon,
+Later, Later on, Meanwhile, At the same time, Now, Gradually,
+Eventually, Finally, Last, Last of all,</td>
+</tr>
+<tr>
+<td><strong>Join two clauses</strong></td>
+<td>after, before, when, while, as, since, until, as soon as</td>
+</tr>
+<tr>
+<td><strong>Other patterns</strong></td>
+<td>the first (second, last, final) step; on the third day; after
+leaving home; later that morning; for five minutes; in 2004; several
+years ago; a few weeks later; in the next (past, last) 15 years</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote class="example"><p><strong class="conn">As soon as </strong><em>the bell rings, students line up.</em></p></blockquote>
+<h3 id="other-views">Other views</h3>
+<div class="tw"><table class="conn-table">
+
+<tbody>
+<tr>
+<td><strong>Start a sentence</strong></td>
+<td>Critics argue that…, Some people believe that…</td>
+</tr>
+<tr>
+<td><strong>People</strong></td>
+<td>supporters / opponents; proponents / opponents; those in favour of…
+/ those opposed to…; defenders of… / critics of…; advocates of… /
+objectors; pro-… / anti-… (<em>pro-uniform, anti-uniform</em>)</td>
+</tr>
+<tr>
+<td><strong>Verbs + that</strong></td>
+<td>say, argue, claim, maintain, contend, allege, insist, suggest, point
+out</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote class="example"><p><strong class="conn">Critics of </strong><em>uniforms</em><strong class="conn"> point out that </strong><em>they limit
+self-expression.</em></p></blockquote>
+<h3 id="concluding">Concluding</h3>
+<div class="tw"><table class="conn-table">
+
+<tbody>
+<tr>
+<td><strong>Start a sentence</strong></td>
+<td>In conclusion, To sum up, All things considered,</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote class="example"><p><strong class="conn">All things considered, </strong><em>uniforms are still a good choice.</em></p></blockquote>
+<section class="quiz" aria-labelledby="q-connectors-by-function"><div class="quiz-head"><h2 id="q-connectors-by-function">Check yourself</h2><span class="quiz-score"></span></div><div class="quiz-body"></div><button class="quiz-reset" type="button">Start again</button></section><nav class="pager"></nav></article>
+<article class="section" id="sec-bibliography" data-id="bibliography" hidden><p class="eyebrow">Credit where it&#x27;s due</p><h1>Bibliography</h1><p class="subtitle">The appendix layouts lean mostly on Oshima and Hogue.</p><hr class="rule">
+<p>Dalla Costa, N., Massa, A., &amp; Martínez, J. (2019). <em>Academic
+Paragraph Writing.</em> Córdoba: Facultad de Lenguas, Universidad
+Nacional de Córdoba.</p>
+<p>E2 IELTS Writing. (2018, June 11). <em>How to score 8+ in Writing
+Task 2</em> [Video]. YouTube. youtube.com/watch?v=Zx-JcXsbUqQ</p>
+<p>Evans, V. (2011). <em>Successful Writing: Upper-Intermediate.</em>
+Newbury: Express Publishing.</p>
+<p>Hogue, A., &amp; Oshima, A. (2008). <em>Introduction to Academic
+Writing.</em> White Plains, NY: Pearson Longman.</p>
+<p>Kane, T. S. (2003). <em>The Oxford Essential Guide to Writing.</em>
+Oxford: Oxford University Press.</p>
+<p>Morchio, M. J. (2019). <em>Paragraph Writing Activities.</em>
+Córdoba: Facultad de Lenguas, Universidad Nacional de Córdoba.</p>
+<p>Oshima, A., &amp; Hogue, A. (1998, 2009). <em>Writing Academic
+English.</em> White Plains, NY: Pearson Longman.</p>
+<p>Zemach, D. E., &amp; Rumisek, L. A. (2015). <em>Academic Writing:
+From Paragraph to Essay.</em> Oxford: Macmillan Education.</p>
+<nav class="pager"></nav></article>
+    </div>
+  </main>
+</div>
+<script>
+(function () {
+  var DATA = [{"id": "the-recipe-and-the-secret-sauce", "quiz": [], "order": null}, {"id": "before-you-write", "quiz": [], "order": null}, {"id": "the-introduction", "quiz": [["What is the order of the three parts of the introduction?", ["Thesis, hook, bridge", "Hook, bridge, thesis", "Bridge, hook, thesis", "Hook, thesis, bridge"], 1, "The hook catches attention, the bridge moves to the debate, and the thesis gives your opinion and the number of ideas."], ["Which thesis follows the book’s advice?", ["In this essay I will talk about school uniforms.", "School uniforms are good for three things.", "I believe school uniforms are still a good choice for three main reasons.", "School uniforms are good because they are simple, fair and responsible."], 2, "It gives an opinion, uses a precise noun (reasons), a hedge (main) and counts the ideas without naming them."], ["Why does the book prefer counting your ideas to naming them in the thesis?", ["Teachers prefer short theses", "Otherwise you repeat each idea four times with the same words", "Naming ideas is grammatically wrong", "It saves time in the conclusion"], 1, "Thesis, topic sentence, support and summary: four mentions of the same idea eat up your vocabulary."], ["When can you use a fact or a number as a hook?", ["Always", "Only if it is real", "Only in the conclusion", "Only if it is a percentage"], 1, "Invented statistics are tempting, and many teachers will mark you down for them."], ["What should the bridge avoid?", ["Mentioning the debate", "Copying the question word for word", "Being longer than one sentence", "Using full stops"], 1, "Some exams give no credit for language lifted from the prompt."]], "order": ["Put the introduction in order", "The question: <em>Should homework be banned in elementary and middle schools?</em> Drag the sentences, or use the arrows, to build the introduction. Then check your answer.", [["If you went to primary school, you probably remember a worksheet that ruined your Sunday afternoon.", "Hook", "It talks to the reader, one of the five openings."], ["In recent years, however, more and more parents and teachers have started to question this routine.", "Bridge 1", "“This routine” points back to the homework in the hook, so it can’t come first."], ["Those who question it complain about tired children and lost playtime, while its defenders say practice at home builds good habits.", "Bridge 2", "“Those who question it” refers to the people in the sentence before. It shows both sides of the debate without copying the question."], ["I believe homework should disappear from the first years of school for three main reasons.", "Thesis", "It gives an opinion and counts the ideas without naming them: a precise noun (reasons) and a hedge (main)."]]]}, {"id": "the-body-paragraphs", "quiz": [["When should you start a new paragraph?", ["Every three sentences", "When you start a new idea", "When the paragraph reaches 50 words", "Whenever it looks too long"], 1, "A paragraph is a group of sentences about one central idea."], ["What is the order of the four-step paragraph?", ["Evidence, support, topic sentence, closing", "Topic sentence, support, evidence, closing", "Support, topic sentence, closing, evidence", "Topic sentence, closing, support, evidence"], 1, "From general to specific. The closing sentence is optional."], ["You have no real data. Which example is honest?", ["“A 2023 survey showed 87% of students love uniforms.”", "“Imagine a class where some students wear designer brands and others wear hand-me-downs.”", "“Scientists agree that uniforms improve marks.”", "“Everyone knows uniforms are better.”"], 1, "A hypothetical, something familiar, a general truth or a consequence: honest and free."], ["How does the book suggest linking independent reasons?", ["First, Second, Third", "Consequently, Therefore", "The first reason is that… / Another reason is that… / Finally,…", "No connectors at all"], 2, "First, second, third make reasons sound like steps in a recipe. Save Consequently for real results."], ["What are the three moves in the other side’s paragraph?", ["State their view, give them what’s true, answer it", "Ignore it, mention it, reject it", "Quote, explain, conclude", "Agree, disagree, agree"], 0, "Critics argue that… It is true that… However…"]], "order": ["Put the body paragraph in order", "Same question: <em>Should homework be banned in elementary and middle schools?</em> This is the first body paragraph of the essay. Put the sentences in order, from general to specific.", [["The first reason is that homework takes away time that young children need for play and rest.", "Topic sentence", "It names the idea and opens with a connector. Everything else in the paragraph depends on it."], ["After six or seven hours at school, a ten-year-old who sits down to do worksheets has little time left for sport, hobbies or family.", "Support", "It explains the topic sentence in more detail."], ["Imagine a child who gets home at five, does an hour of maths and spelling, and then has dinner and goes straight to bed.", "Evidence", "An honest hypothetical example: no invented surveys."], ["As a result, the child starts the next day tired, and learning becomes harder instead of easier.", "Evidence", "A consequence of the example, so it has to come right after it."], ["In short, homework uses up hours that children need in order to grow.", "Closing sentence", "Optional in an essay. It sums up the paragraph, so it goes last."]]]}, {"id": "the-conclusion", "quiz": [["A great new idea hits you at minute 38. Where does it go?", ["In the conclusion", "In the body, or nowhere", "In the introduction", "In a P.S."], 1, "The conclusion only sums up and gives a final opinion."], ["Which is part of the self-writing conclusion?", ["Copy the thesis word for word", "Add one more example", "Change the order of the ideas", "Ask the reader a question"], 2, "Open with a connector, flip the sentence and change the order, so you don’t sound like a broken record."], ["The introduction said “I believe”. How should the final opinion start?", ["We believe", "In my opinion", "People think", "It is believed"], 1, "Keep the voice you started with. Switching from I to we looks careless."], ["For a 250-word task, how long should the essay be?", ["Exactly 250", "A little over, but not past 300", "Around 200", "As long as possible"], 1, "Aim a little over so you’re never short."]], "order": null}, {"id": "the-final-check", "quiz": [], "order": null}, {"id": "essay-type-structures", "quiz": [["In a “discuss both views” essay, where does your own view go?", ["First", "Second, so it gets the last word", "In the introduction only", "Nowhere"], 1, "Body 1 is the view you disagree with; body 2 is the one you agree with."], ["In a problem and solution essay, what does the book insist on?", ["One solution for all problems", "Pairing every solution with a problem", "More solutions than problems", "Starting with the solutions"], 1, "A solution to something you never mentioned looks random."], ["When should you use a chain layout in a cause and effect essay?", ["Always", "When the events really are linked", "When you have many causes", "Never"], 1, "Otherwise the block layout is safer."], ["In which essay type are first, second, third exactly right?", ["Opinion", "Compare and contrast", "Process", "Discuss both views"], 2, "A process happens in time order, so sequence words fit."], ["When does a point-by-point comparison read more clearly?", ["With one point", "With two points", "With three points or more", "Never"], 2, "Each paragraph compares both subjects on one point."]], "order": null}, {"id": "connectors-by-function", "quiz": [["Complete: “___ the cost, many parents prefer uniforms.”", ["Although", "Despite", "However", "Even though"], 1, "Despite and in spite of take a noun. Although and even though need a full clause."], ["Which connector starts a new sentence and takes a comma?", ["so", "because", "Consequently,", "due to"], 2, "Students save time. Consequently, they can focus on homework."], ["Complete: “Some students like the uniform, ___ others hate it.”", ["whereas", "therefore", "for instance", "likewise"], 0, "Whereas and while join two clauses that show direct opposition."], ["Complete: “Comparing clothes can ___ bullying.”", ["result from", "result in", "due to", "the cause of"], 1, "Result in points to the effect; result from points to the cause."], ["Complete: “Uniforms have a positive ___ on behaviour.”", ["affect", "effect", "effective", "affection"], 1, "Affect is the verb; effect is the noun."], ["What is “On the contrary” for?", ["Comparing two things", "Adding a reason", "Rejecting or correcting what came before", "Giving an example"], 2, "“Uniforms are not expensive. On the contrary, they save money.”"]], "order": null}, {"id": "bibliography", "quiz": [], "order": null}];
+  var KEY = 'ewr-answers';
+  var answers = {};
+  try { answers = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { answers = {}; }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(answers)); } catch (e) {} }
+
+  /* Theme */
+  var root = document.documentElement;
+  var mq = window.matchMedia ? matchMedia('(prefers-color-scheme: dark)') : null;
+  function applyTheme(choice) {
+    root.setAttribute('data-theme-choice', choice);
+    var dark = choice === 'dark' || (choice === 'auto' && mq && mq.matches);
+    root.setAttribute('data-theme', dark ? 'dark' : 'light');
+    document.querySelectorAll('[data-theme-set]').forEach(function (b) {
+      b.setAttribute('aria-pressed', b.getAttribute('data-theme-set') === choice ? 'true' : 'false');
+    });
+  }
+  document.querySelectorAll('[data-theme-set]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var c = b.getAttribute('data-theme-set');
+      try { localStorage.setItem('ewr-theme', c); } catch (e) {}
+      applyTheme(c);
+    });
+  });
+  if (mq) {
+    var onChange = function () { if (root.getAttribute('data-theme-choice') === 'auto') applyTheme('auto'); };
+    mq.addEventListener ? mq.addEventListener('change', onChange) : mq.addListener(onChange);
+  }
+  applyTheme(root.getAttribute('data-theme-choice') || 'light');
+
+  /* Menu */
+  var body = document.body, menuBtn = document.querySelector('.menu-btn');
+  function setNav(open) { body.classList.toggle('nav-open', open); menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false'); }
+  menuBtn.addEventListener('click', function () { setNav(!body.classList.contains('nav-open')); });
+  document.querySelector('.scrim').addEventListener('click', function () { setNav(false); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') setNav(false); });
+
+  /* Quiz */
+  var ids = DATA.map(function (s) { return s.id; });
+  var byId = {}; DATA.forEach(function (s) { byId[s.id] = s; });
+  var LETTERS = 'ABCD';
+  function esc(t) { var d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+
+  function renderQuiz(id) {
+    var s = byId[id]; if (!s || !s.quiz.length) return;
+    var sec = document.getElementById('sec-' + id);
+    var box = sec.querySelector('.quiz-body');
+    var given = answers[id] || {};
+    box.innerHTML = '';
+    s.quiz.forEach(function (q, qi) {
+      var wrap = document.createElement('div'); wrap.className = 'q';
+      var html = '<p class="q-text"><span class="q-n">' + (qi + 1) + '.</span>' + esc(q[0]) + '</p><div class="opts">';
+      q[1].forEach(function (o, oi) {
+        html += '<button type="button" class="opt" data-q="' + qi + '" data-o="' + oi + '"><span class="key">' + LETTERS[oi] + '</span><span>' + esc(o) + '</span></button>';
+      });
+      html += '</div><p class="expl" hidden></p>';
+      wrap.innerHTML = html;
+      box.appendChild(wrap);
+      if (given[qi] !== undefined) mark(wrap, q, given[qi]);
+    });
+    box.querySelectorAll('.opt').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var qi = +b.getAttribute('data-q'), oi = +b.getAttribute('data-o');
+        answers[id] = answers[id] || {};
+        if (answers[id][qi] !== undefined) return;
+        answers[id][qi] = oi; save();
+        mark(b.closest('.q'), s.quiz[qi], oi);
+        updateScore(id);
+      });
+    });
+    updateScore(id);
+  }
+  function mark(wrap, q, oi) {
+    var right = q[2];
+    wrap.querySelectorAll('.opt').forEach(function (b, k) {
+      b.disabled = true;
+      if (k === right) b.classList.add('correct');
+      else if (k === oi) b.classList.add('wrong');
+      else b.classList.add('dim');
+    });
+    var ex = wrap.querySelector('.expl');
+    ex.innerHTML = (oi === right ? '<b class="ok">Right.</b> ' : '<b class="bad">Not quite.</b> The answer is ' + LETTERS[right] + '. ') + esc(q[3]);
+    ex.hidden = false;
+  }
+  function scoreOf(id) {
+    var s = byId[id], a = answers[id] || {}, n = 0, c = 0;
+    s.quiz.forEach(function (q, qi) { if (a[qi] !== undefined) { n++; if (a[qi] === q[2]) c++; } });
+    return { n: n, c: c, total: s.quiz.length };
+  }
+  function updateScore(id) {
+    var s = byId[id]; if (!s.quiz.length) return;
+    var r = scoreOf(id);
+    var el = document.querySelector('#sec-' + id + ' .quiz-score');
+    el.textContent = r.n === 0 ? s.quiz.length + ' questions' : r.n < r.total ? r.c + ' right, ' + (r.total - r.n) + ' to go' : 'Score: ' + r.c + ' / ' + r.total;
+    var badge = document.querySelector('.sidebar a[data-id="' + id + '"] .nav-score');
+    badge.textContent = r.n === r.total ? r.c + '/' + r.total : '';
+    badge.classList.toggle('done', r.n === r.total && r.c === r.total);
+  }
+  document.querySelectorAll('.quiz-reset').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var id = b.closest('.section').getAttribute('data-id');
+      delete answers[id]; save(); renderQuiz(id);
+    });
+  });
+  ids.forEach(renderQuiz);
+
+  /* Ordering exercises */
+  function shuffled(n) {
+    var a, ok;
+    do {
+      a = []; for (var i = 0; i < n; i++) a.push(i);
+      for (var j = n - 1; j > 0; j--) { var k = Math.floor(Math.random() * (j + 1)); var tmp = a[j]; a[j] = a[k]; a[k] = tmp; }
+      ok = a[0] !== 0 && a[n - 1] !== n - 1;
+    } while (!ok);
+    return a;
+  }
+  function setupOrder(id) {
+    var s = byId[id]; if (!s.order) return;
+    var box = document.querySelector('#sec-' + id + ' .order');
+    var list = box.querySelector('.order-list'), result = box.querySelector('.order-result');
+    var checkBtn = box.querySelector('.order-check');
+    var items = s.order[2], dragEl = null;
+    function locked() { return box.classList.contains('checked'); }
+    function refresh() {
+      var lis = list.children;
+      for (var i = 0; i < lis.length; i++) {
+        lis[i].querySelector('.up').disabled = i === 0 || locked();
+        lis[i].querySelector('.down').disabled = i === lis.length - 1 || locked();
+        lis[i].draggable = !locked();
+      }
+    }
+    function unmark() {
+      box.classList.remove('checked'); result.textContent = ''; result.className = 'order-result';
+      list.querySelectorAll('.order-item').forEach(function (li) { li.classList.remove('correct', 'wrong'); });
+      checkBtn.textContent = 'Check my order'; checkBtn.removeAttribute('data-mode');
+    }
+    function render(seq) {
+      list.innerHTML = '';
+      seq.forEach(function (idx) {
+        var li = document.createElement('li');
+        li.className = 'order-item'; li.setAttribute('data-i', idx);
+        li.innerHTML = '<div><span class="txt">' + esc(items[idx][0]) + '</span><span class="role">' + esc(items[idx][1]) + '</span><span class="why">' + esc(items[idx][2]) + '</span></div>' +
+          '<div class="moves"><button type="button" class="up" aria-label="Move up">▲</button><button type="button" class="down" aria-label="Move down">▼</button></div>';
+        list.appendChild(li);
+      });
+      unmark(); refresh();
+    }
+    list.addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b || locked()) return;
+      var li = b.closest('.order-item');
+      if (b.classList.contains('up') && li.previousElementSibling) list.insertBefore(li, li.previousElementSibling);
+      if (b.classList.contains('down') && li.nextElementSibling) list.insertBefore(li.nextElementSibling, li);
+      refresh(); if (!b.disabled) b.focus();
+    });
+    list.addEventListener('dragstart', function (e) {
+      dragEl = e.target.closest('.order-item'); if (!dragEl || locked()) return;
+      dragEl.classList.add('dragging');
+      try { e.dataTransfer.setData('text/plain', ''); e.dataTransfer.effectAllowed = 'move'; } catch (x) {}
+    });
+    list.addEventListener('dragend', function () { if (dragEl) dragEl.classList.remove('dragging'); dragEl = null; refresh(); });
+    list.addEventListener('dragover', function (e) {
+      if (!dragEl) return; e.preventDefault();
+      var over = e.target.closest('.order-item'); if (!over || over === dragEl) return;
+      var r = over.getBoundingClientRect();
+      list.insertBefore(dragEl, e.clientY > r.top + r.height / 2 ? over.nextElementSibling : over);
+    });
+    list.addEventListener('drop', function (e) { e.preventDefault(); });
+    checkBtn.addEventListener('click', function () {
+      if (checkBtn.getAttribute('data-mode') === 'retry') { unmark(); refresh(); return; }
+      var lis = list.querySelectorAll('.order-item'), right = 0;
+      lis.forEach(function (li, pos) {
+        var ok = +li.getAttribute('data-i') === pos;
+        li.classList.toggle('correct', ok); li.classList.toggle('wrong', !ok);
+        if (ok) right++;
+      });
+      box.classList.add('checked'); refresh();
+      if (right === lis.length) { result.textContent = 'All in the right order.'; result.className = 'order-result ok'; }
+      else {
+        result.textContent = right + ' of ' + lis.length + ' in the right place. Read the notes, then try again.'; result.className = 'order-result bad';
+        checkBtn.textContent = 'Try again'; checkBtn.setAttribute('data-mode', 'retry');
+      }
+    });
+    box.querySelector('.order-shuffle').addEventListener('click', function () { render(shuffled(items.length)); });
+    box.querySelector('.order-show').addEventListener('click', function () {
+      var seq = []; for (var i = 0; i < items.length; i++) seq.push(i);
+      render(seq);
+      list.querySelectorAll('.order-item').forEach(function (li) { li.classList.add('correct'); });
+      box.classList.add('checked'); refresh();
+      result.textContent = 'Here is the right order. Shuffle and try it yourself.'; result.className = 'order-result ok';
+    });
+    render(shuffled(items.length));
+  }
+  ids.forEach(setupOrder);
+
+  /* Pager */
+  var titles = {};
+  document.querySelectorAll('.sidebar li a').forEach(function (a) { titles[a.getAttribute('data-id')] = a.querySelector('.nav-title').textContent; });
+  ids.forEach(function (id, i) {
+    var p = document.querySelector('#sec-' + id + ' .pager'), h = '';
+    if (i > 0) h += '<a class="prev" href="#' + ids[i - 1] + '"><small>← Previous</small><span>' + esc(titles[ids[i - 1]]) + '</span></a>';
+    else h += '<a class="prev" href="#home"><small>← Back</small><span>Cover and contents</span></a>';
+    if (i < ids.length - 1) h += '<a class="next" href="#' + ids[i + 1] + '"><small>Next →</small><span>' + esc(titles[ids[i + 1]]) + '</span></a>';
+    p.innerHTML = h;
+  });
+
+  /* Routing: one section at a time; inner anchors (h2/h3 ids) open their section and scroll */
+  function route() {
+    var h = decodeURIComponent(location.hash.slice(1)) || 'home';
+    var target = null, sid = 'home';
+    if (h === 'home' || byId[h]) sid = h;
+    else {
+      target = document.getElementById(h);
+      var sec = target && target.closest('.section');
+      sid = sec ? sec.getAttribute('data-id') : 'home';
+    }
+    document.querySelectorAll('.section').forEach(function (s) { s.hidden = s.getAttribute('data-id') !== sid; });
+    document.querySelectorAll('.sidebar li a').forEach(function (a) {
+      if (a.getAttribute('data-id') === sid) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+    });
+    var t = sid === 'home' ? 'Essay Writing Ruined' : titles[sid] + ' · Essay Writing Ruined';
+    document.title = t;
+    setNav(false);
+    if (target && !byId[h]) target.scrollIntoView(); else window.scrollTo(0, 0);
+  }
+  window.addEventListener('hashchange', route);
+  route();
+})();
+</script>
+</body>
+</html>
