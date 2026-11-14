@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Distancia cercana en clases de inglés · 2da edición</title>
+<meta name="description" content="Distancia cercana en clases de inglés, de Jerónimo Visñovezky. Segunda edición.">
+<meta name="color-scheme" content="light dark">
+<script>
+  // aplicar el tema guardado antes de pintar, para evitar el destello
+  (function () {
+    try {
+      var t = localStorage.getItem("dc-theme");
+      if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+    } catch (e) {}
+  })();
+</script>
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-soft: #f6f4ef;
+    --ink: #1f1f1f;
+    --ink-soft: #5c5c5c;
+    --rule: #e3e0d8;
+    --accent: #2f5f8f;
+    --accent-soft: #eef3f8;
+    --badge: #f4c430;
+    --badge-ink: #1d3557;
+    --shadow: 0 1px 2px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.06);
+    --fig-bg: transparent;
+    --serif: Georgia, "Iowan Old Style", "Palatino Linotype", "Times New Roman", serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --measure: 36rem;
+    --side: 19rem;
+  }
+  :root[data-theme="dark"] {
+    --bg: #15171a;
+    --bg-soft: #1d2024;
+    --ink: #e6e3dc;
+    --ink-soft: #a3a09a;
+    --rule: #2e3237;
+    --accent: #8db6e0;
+    --accent-soft: #1e2a36;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    --fig-bg: #f4f2ec;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #15171a;
+      --bg-soft: #1d2024;
+      --ink: #e6e3dc;
+      --ink-soft: #a3a09a;
+      --rule: #2e3237;
+      --accent: #8db6e0;
+      --accent-soft: #1e2a36;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+      --fig-bg: #f4f2ec;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-padding-top: 4.5rem; -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: var(--serif); font-size: 1.125rem; line-height: 1.65;
+    text-rendering: optimizeLegibility;
+    transition: background-color .2s ease, color .2s ease;
+  }
+  a { color: var(--accent); }
+  img { max-width: 100%; height: auto; display: block; }
+
+  /* ---------- barra superior ---------- */
+  .topbar {
+    position: sticky; top: 0; z-index: 30;
+    display: flex; align-items: center; gap: .75rem;
+    height: 3.5rem; padding: 0 1rem;
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
+    backdrop-filter: saturate(1.4) blur(8px);
+    border-bottom: 1px solid var(--rule);
+    font-family: var(--sans);
+  }
+  .menu-btn {
+    display: inline-flex; align-items: center; gap: .45rem;
+    border: 1px solid var(--rule); background: var(--bg); color: var(--ink);
+    border-radius: 999px; padding: .4rem .8rem; font: inherit; font-size: .85rem; cursor: pointer;
+  }
+  .menu-btn svg { width: 1rem; height: 1rem; }
+  .brand {
+    font-family: var(--serif); font-size: 1rem; color: var(--ink); text-decoration: none;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;
+  }
+  .brand em { color: var(--ink-soft); }
+  .theme {
+    display: inline-flex; border: 1px solid var(--rule); border-radius: 999px; padding: 2px; background: var(--bg);
+  }
+  .theme button {
+    border: 0; background: transparent; color: var(--ink-soft); font: inherit; font-size: .78rem;
+    padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+  }
+  .theme button[aria-pressed="true"] { background: var(--accent); color: var(--bg); }
+  .progress { position: absolute; left: 0; bottom: -1px; height: 2px; width: 0; background: var(--accent); }
+
+  /* ---------- menú lateral ---------- */
+  .sidebar {
+    position: fixed; z-index: 40; top: 0; bottom: 0; left: 0; width: min(var(--side), 86vw);
+    background: var(--bg-soft); border-right: 1px solid var(--rule);
+    overflow-y: auto; padding: 1.25rem 1rem 3rem;
+    transform: translateX(-100%); transition: transform .25s ease;
+    font-family: var(--sans); font-size: .9rem;
+  }
+  .sidebar.open { transform: none; box-shadow: var(--shadow); }
+  .sidebar h2 {
+    font-family: var(--serif); font-weight: normal; font-size: 1.3rem; margin: .25rem .5rem 1rem;
+  }
+  .sidebar ul { list-style: none; margin: 0; padding: 0; }
+  .sidebar a {
+    display: flex; gap: .55rem; color: var(--ink); text-decoration: none;
+    padding: .4rem .5rem; border-radius: .4rem; line-height: 1.3;
+  }
+  .sidebar a:hover { background: var(--accent-soft); }
+  .sidebar a.active { color: var(--accent); font-weight: 600; }
+  .sidebar .num {
+    flex: none; width: 1.4rem; height: 1.4rem; border-radius: 50%;
+    display: inline-grid; place-items: center; font-size: .72rem;
+    border: 1px solid var(--rule); color: var(--ink-soft);
+  }
+  .sidebar a.active .num { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+  .sidebar .subs { margin: 0 0 .4rem 2.4rem; display: none; border-left: 1px solid var(--rule); }
+  .sidebar .toc-item.current .subs { display: block; }
+  .sidebar .subs a { font-size: .82rem; color: var(--ink-soft); padding: .25rem .6rem; border-radius: 0 .4rem .4rem 0; }
+  .scrim {
+    position: fixed; inset: 0; z-index: 35; background: rgba(0,0,0,.35);
+    opacity: 0; pointer-events: none; transition: opacity .2s;
+  }
+  .scrim.show { opacity: 1; pointer-events: auto; }
+
+  @media (min-width: 1100px) {
+    .sidebar { transform: none; top: 3.5rem; z-index: 20; box-shadow: none; }
+    .menu-btn, .scrim { display: none; }
+    main { margin-left: var(--side); }
+  }
+
+  /* ---------- contenido ---------- */
+  main { padding: 2.5rem 1.25rem 5rem; }
+  .chapter, .cover-page { max-width: var(--measure); margin: 0 auto; }
+  .chapter-head { margin: 1rem 0 2.5rem; }
+  .kicker {
+    font-family: var(--sans); font-size: .75rem; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--accent); font-weight: 700; margin: 0 0 .6rem;
+  }
+  .chapter-head h2 {
+    font-weight: normal; font-size: clamp(2rem, 5vw, 2.6rem); line-height: 1.12; margin: 0;
+    letter-spacing: -.01em;
+  }
+  .chapter-head::after { content: ""; display: block; width: 3rem; height: 2px; background: var(--accent); margin-top: 1.25rem; }
+  .chapter h3 { font-size: 1.3rem; line-height: 1.3; margin: 2.6rem 0 .8rem; }
+  .chapter h4 { font-size: 1.05rem; margin: 1.6rem 0 .5rem; }
+  .chapter p { margin: 0 0 1.05rem; hyphens: auto; }
+  .chapter blockquote {
+    margin: 1.4rem 0; padding: 0 0 0 1.1rem; border-left: 2px solid var(--rule);
+    color: var(--ink-soft); font-size: 1rem;
+  }
+  .chapter ol, .chapter ul { padding-left: 1.4rem; }
+  .chapter ul.traits { list-style: none; padding: 0; }
+  .chapter ul.traits > li { margin: 1.4rem 0 0; font-weight: bold; color: var(--accent); }
+  .chapter ul.traits > li::before { content: "— "; }
+  .chapter ul.traits blockquote { font-weight: normal; margin-top: .5rem; }
+
+  .idea {
+    margin: 2rem 0; padding: 1.1rem 1.25rem .3rem; background: var(--accent-soft);
+    border-left: 3px solid var(--accent); border-radius: 0 .5rem .5rem 0;
+  }
+  .idea-label {
+    font-family: var(--sans); font-size: .72rem; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--accent); font-weight: 700; margin: 0 0 .25rem !important;
+  }
+  .idea h4 { margin: 0 0 .7rem; font-size: 1.12rem; }
+  .idea p { font-size: 1rem; }
+  .idea .fig { margin: 1rem 0; }
+
+  .fig { margin: 2rem 0; text-align: center; }
+  .fig img { margin: 0 auto; border-radius: .35rem; background: var(--fig-bg); max-height: 70vh; width: auto; }
+  .fig.small img { max-width: 12rem; }
+  .fig figcaption { font-size: .85rem; font-style: italic; color: var(--ink-soft); margin-top: .5rem; }
+
+  .chapter p.bib { padding-left: 1.5rem; text-indent: -1.5rem; font-size: 1rem; }
+  .chapter p.kbd-line { margin-bottom: .35rem; font-size: 1rem; }
+  .chapter p.kbd-line strong {
+    font-family: var(--sans); font-size: .82rem; font-weight: 600;
+    background: var(--bg-soft); border: 1px solid var(--rule); border-bottom-width: 2px;
+    border-radius: .3rem; padding: .05rem .4rem;
+  }
+  sup.fnref a { text-decoration: none; font-family: var(--sans); font-size: .7em; padding: 0 .15em; }
+  .notes { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--rule); font-size: .9rem; color: var(--ink-soft); }
+  .notes h4 { font-family: var(--sans); font-size: .75rem; letter-spacing: .16em; text-transform: uppercase; margin: 0 0 .5rem; }
+  .notes .back { text-decoration: none; }
+
+  /* navegación entre capítulos */
+  .pager {
+    max-width: var(--measure); margin: 4rem auto 0; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+    font-family: var(--sans);
+  }
+  .pager a {
+    display: block; padding: .9rem 1rem; border: 1px solid var(--rule); border-radius: .6rem;
+    text-decoration: none; color: var(--ink); line-height: 1.3;
+  }
+  .pager a:hover { border-color: var(--accent); }
+  .pager small { display: block; color: var(--ink-soft); font-size: .75rem; margin-bottom: .2rem; }
+  .pager .next { text-align: right; grid-column: 2; }
+
+  /* ---------- portada ---------- */
+  .cover-page { max-width: 46rem; }
+  .cover-grid { display: grid; gap: 2.5rem; align-items: center; }
+  @media (min-width: 760px) { .cover-grid { grid-template-columns: 1fr 1fr; } }
+  .cover-art { position: relative; max-width: 22rem; margin: 0 auto; }
+  .cover-art img { border-radius: .3rem; box-shadow: var(--shadow); }
+  .badge {
+    position: absolute; right: -0.9rem; bottom: 8%; width: 6rem; height: 6rem; border-radius: 50%;
+    background: var(--badge); color: var(--badge-ink); display: grid; place-content: center; text-align: center;
+    transform: rotate(12deg); box-shadow: 0 4px 12px rgba(0,0,0,.25);
+    outline: 2px solid #fff; outline-offset: -7px; line-height: 1;
+  }
+  .badge b { font-size: 1.9rem; }
+  .badge i { font-size: .9rem; font-weight: 600; }
+  .cover-text h1 { font-weight: normal; font-size: clamp(2.2rem, 6vw, 3rem); line-height: 1.05; margin: 0 0 .4rem; }
+  .cover-text .sub { font-style: italic; font-size: 1.35rem; color: var(--ink-soft); margin: 0 0 1.5rem; }
+  .cover-text .author { font-family: var(--sans); letter-spacing: .2em; text-transform: uppercase; font-size: .8rem; margin: 0 0 .3rem; }
+  .cover-text .ed { color: var(--accent); font-style: italic; margin: 0 0 2rem; }
+  .start {
+    display: inline-block; font-family: var(--sans); font-size: .95rem; text-decoration: none;
+    background: var(--accent); color: var(--bg); padding: .7rem 1.2rem; border-radius: 999px;
+  }
+  .author-art { max-width: 15rem; margin: 3.5rem auto 0; background: var(--fig-bg); border-radius: .5rem; }
+
+  @media (max-width: 520px) {
+    body { font-size: 1.06rem; }
+    .brand em { display: none; }
+    .theme button { padding: .3rem .5rem; }
+  }
+  @media print {
+    .topbar, .sidebar, .scrim, .pager { display: none !important; }
+    main { margin: 0 !important; }
+    .chapter, .cover-page { display: block !important; }
+    .chapter { break-before: page; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <button class="menu-btn" id="menuBtn" aria-controls="sidebar" aria-expanded="false">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    Índice
+  </button>
+  <a class="brand" href="#portada">Distancia cercana <em>en clases de inglés</em></a>
+  <div class="theme" role="group" aria-label="Tema">
+    <button type="button" data-theme-set="auto">Auto</button>
+    <button type="button" data-theme-set="light">Claro</button>
+    <button type="button" data-theme-set="dark">Oscuro</button>
+  </div>
+  <div class="progress" id="progress"></div>
+</header>
+
+<nav class="sidebar" id="sidebar" aria-label="Índice">
+  <h2>Índice</h2>
+  <ul>
+<li><a href="#portada" data-sec="portada">Portada</a></li>
+<li class="toc-item"><a href="#introduccion" data-sec="introduccion" class="toc-main"><span>Introducción</span></a></li>
+<li class="toc-item"><a href="#cap-1" data-sec="cap-1" class="toc-main"><span class="num">1</span><span>El profesor que no se acordaba de los nombres</span></a><ul class="subs"><li><a href="#cap-1--cursos-intensivos-cerca-de-2005" data-sec="cap-1">Cursos intensivos, cerca de 2005</a></li><li><a href="#cap-1--suelten-al-kraken" data-sec="cap-1">Suelten al Kraken</a></li><li><a href="#cap-1--la-moral-de-pixar" data-sec="cap-1">La moral de PIXAR</a></li><li><a href="#cap-1--una-aproximacion-historico-caricaturesca" data-sec="cap-1">Una aproximación histórico-caricaturesca</a></li><li><a href="#cap-1--ppp-contra-el-mundo" data-sec="cap-1">PPP contra el mundo</a></li><li><a href="#cap-1--una-buena-pregunta" data-sec="cap-1">Una buena pregunta</a></li></ul></li>
+<li class="toc-item"><a href="#cap-2" data-sec="cap-2" class="toc-main"><span class="num">2</span><span>Frases sueltas de un doctorado</span></a><ul class="subs"><li><a href="#cap-2--el-secreto-de-claudio-urbano" data-sec="cap-2">El secreto de Claudio Urbano</a></li><li><a href="#cap-2--por-que-tan-serios" data-sec="cap-2">¿Por qué tan serios?</a></li><li><a href="#cap-2--emojis-de-llanto-descontrolado" data-sec="cap-2">Emojis de llanto descontrolado</a></li><li><a href="#cap-2--por-que-no-estudiar-sobre-educacion" data-sec="cap-2">Por qué NO estudiar sobre educación</a></li><li><a href="#cap-2--primera-idea-interesarse-por-que-el-alumno-apren" data-sec="cap-2">Primera idea: interesarse por que el alumno aprenda</a></li><li><a href="#cap-2--segunda-idea-dejar-que-se-quiebre-el-plan" data-sec="cap-2">Segunda idea: dejar que se quiebre el plan</a></li><li><a href="#cap-2--los-docentes-que-dejan-huella" data-sec="cap-2">Los docentes que dejan huella</a></li></ul></li>
+<li class="toc-item"><a href="#cap-3" data-sec="cap-3" class="toc-main"><span class="num">3</span><span>La charla y el iPhone</span></a><ul class="subs"><li><a href="#cap-3--serres-conocimiento-objetivado-y-la-charla" data-sec="cap-3">Serres: conocimiento objetivado y la charla</a></li><li><a href="#cap-3--baricco-y-la-revolucion-mental" data-sec="cap-3">Baricco y la revolución mental</a></li><li><a href="#cap-3--premio-arriba" data-sec="cap-3">Premio arriba</a></li><li><a href="#cap-3--la-salida-segun-serres" data-sec="cap-3">La salida según Serres</a></li></ul></li>
+<li class="toc-item"><a href="#cap-4" data-sec="cap-4" class="toc-main"><span class="num">4</span><span>Inventar (y fallar)</span></a><ul class="subs"><li><a href="#cap-4--maggio-y-la-creatividad" data-sec="cap-4">Maggio y la creatividad</a></li><li><a href="#cap-4--para-inventar-hay-que-poder-fallar" data-sec="cap-4">Para inventar hay que poder fallar</a></li><li><a href="#cap-4--2020-invente" data-sec="cap-4">2020: inventé</a></li><li><a href="#cap-4--lo-contrario-de-un-video-curso" data-sec="cap-4">Lo contrario de un video curso</a></li><li><a href="#cap-4--el-video-de-minecraft" data-sec="cap-4">El video de Minecraft</a></li></ul></li>
+<li class="toc-item"><a href="#cap-5" data-sec="cap-5" class="toc-main"><span class="num">5</span><span>Si no se puede inventar: alternar</span></a><ul class="subs"><li><a href="#cap-5--de-la-invencion-a-la-alternancia" data-sec="cap-5">De la invención a la alternancia</a></li><li><a href="#cap-5--sorpresa" data-sec="cap-5">Sorpresa</a></li><li><a href="#cap-5--lo-digital-y-lo-analogico" data-sec="cap-5">Lo digital y lo analógico</a></li></ul></li>
+<li class="toc-item"><a href="#cap-6" data-sec="cap-6" class="toc-main"><span class="num">6</span><span>Entonces, ¿soy o me hago?</span></a><ul class="subs"><li><a href="#cap-6--me-hago" data-sec="cap-6">Me hago</a></li><li><a href="#cap-6--como-se-que-funciona" data-sec="cap-6">¿Cómo sé que funciona?</a></li><li><a href="#cap-6--quiero-ser" data-sec="cap-6">Quiero ser</a></li></ul></li>
+<li class="toc-item"><a href="#apendice-1-hardware" data-sec="apendice-1-hardware" class="toc-main"><span>Apéndice 1: Hardware</span></a></li>
+<li class="toc-item"><a href="#apendice-2-software" data-sec="apendice-2-software" class="toc-main"><span>Apéndice 2: Software</span></a></li>
+<li class="toc-item"><a href="#bibliografia" data-sec="bibliografia" class="toc-main"><span>Bibliografía</span></a></li>
+  </ul>
+</nav>
+<div class="scrim" id="scrim"></div>
+
+<main id="main">
+  <section class="cover-page" id="portada" data-title="Portada" hidden>
+    <div class="cover-grid">
+      <div class="cover-art">
+        <img src="images/img01_p1.jpeg" alt="Tapa de Distancia cercana en clases de inglés: ilustración en acuarela de una grilla de videollamada">
+        <div class="badge" aria-label="Segunda edición"><b>2da</b><i>edición</i></div>
+      </div>
+      <div class="cover-text">
+        <h1>Distancia cercana</h1>
+        <p class="sub">en clases de inglés</p>
+        <p class="author">Jerónimo Visñovezky</p>
+        <p class="ed">2da edición</p>
+        <a class="start" href="#introduccion">Empezar a leer →</a>
+      </div>
+    </div>
+    <img class="author-art" src="images/img02_p2.png" alt="Dibujo de Jerónimo Visñovezky, profesor de inglés" loading="lazy">
+  </section>
+
+<section class="chapter" id="introduccion" data-title="Introducción" hidden><header class="chapter-head"><h2>Introducción</h2></header><p>¿Qué haría yo si fuese un buen profesor de inglés a distancia? ¿Cómo podría lograr que mis alumnos se interesen por mis clases de Zoom? Estas páginas me encuentran tratando de responder a esas preguntas, algunas veces apoyándome en mi forma de ser y otras veces cambiando mi comportamiento al punto de preguntarme ¿Soy o me hago?</p>
+<p>Yo no soy un experto en nada. Encuentro inspiración e ideas para repensar mis modos de ser en la clase en autores que no se ocupan de las clases de inglés a distancia para adultos profesionales. Cuando presté atención noté que casi todos me los recomendó Mariana Maggio, o su libro “Reinventar la clase en la universidad” (Maggio, 2018). La mayoría habla puntualmente de la universidad y, cuando lo hace, cuestiona a la didáctica clásica: el procedimiento áulico con la explicación en el centro, el depósito <em>bancario</em> de conocimiento. Todos tienen conceptos que no termino de masticar, o no logro imaginar cómo es una clase de inglés con esa idea en el centro. Maggio, por ejemplo, sugiere el ejercicio de quitar la explicación de la clase para ver qué queda y, en sus palabras, <em>“(…) poner una bomba en el corazón de la didáctica clásica.”</em> ¿Cómo es dar una clase de inglés sin explicaciones? No lo sé, pero en esa nebulosa de ideas nuevas que exponen Serres, Maggio, Porta y Baricco yo encuentro la inspiración del ignorante, del que no sabe qué cosas son imposibles y no deberían intentarse.</p>
+<p>Cuenta la leyenda que Apple contrató al ingeniero Tony Fadell como consultor externo para crear el iPod. Tony quería poner un disco de computadora en un dispositivo que cupiese en un bolsillo y necesitaba que cambiara rápidamente de funciones según estuviese conectado a una computadora o reproduciendo canciones. Llamó al experto en tecnologías de disco de Apple y le explicó lo que quería hacer. El experto fue tajante: <em>“Eso es imposible.”</em> Tras lo que Fadell señaló dos rectángulos en una mesa diciendo <em>“Yo tengo dos prototipos funcionando.”</em></p>
+<p>Muchas veces el rol del experto es el de decir lo que <em>no</em> se puede hacer. Es saber los límites de las propias capacidades. Esta didáctica alternativa de Edith Litwin, Mariana Maggio y Luis Porta que reniega de la explicación, y que yo tomo prestada aquí, tiene -para mí- el fuego de lo incierto, de lo confuso, de lo nuevo. Es campo fértil, lo contrario de estructura.</p>
+<p>Aviso de paso que las señales de seriedad académica son más estéticas que rigurosas. Uno puede saber de lo que habla o parecer que sabe. En mi caso, respecto de la educación, es lo segundo. Claramente estoy explorando y, aunque quiero ser serio, de a ratos siento que estoy tratando de esquiar en el Cerro Uritorco. La altura es perfecta, el paisaje es lindo, pero yo tengo los esquís puestos y no hay nieve.</p>
+<p>Sin embargo, yo, que trabajo de explicar y de aplicar un procedimiento que viene ya programado en los libros que uso para dar clases, y que en el mejor de los casos tengo un entendimiento borroso de lo que dice la gente que cito, me doy permiso para tomar prestado, para el uso oblicuo de sus conceptos, porque me ayudan a contestar mejor las dos preguntas del comienzo. Durante todo este texto voy a aludir a ideas que reniegan de la explicación y de la aplicación mientras sigo explicando y aplicando. Conviene recordar que estos autores hablan de la educación universitaria y nosotros damos clases en otros contextos, a veces sin controlar el currículum y con otros límites de tiempo. Lo digo una vez acá, con todas las letras, para no tener que pedir perdón en cada capítulo.</p>
+<p>Queda la tercera pregunta: ¿Soy o me hago? Me pidieron un taller sobre el manejo del aula a distancia porque mis alumnos, algunos, dicen estar cómodos en mis clases. Si soy, si me hago, o si razono torcido, me senté a escribir lo que me pasa ahora por la cabeza y cómo es que pienso las clases a distancia, como un acto reflexivo que espera romper el hielo y abrir la charla sobre el tema. ¿Cómo nos plantamos como profes ante el aula y ante el mundo? ¿Qué pensamos de cómo aprenden nuestros alumnos? ¿Qué recursos didácticos, tecnológicos, lúdicos usamos? Empiezo yo.</p>
+<figure class="fig"><img src="images/img03_p8.jpeg" alt="foto “¿Soy o me hago?”" loading="lazy"></figure></section>
+<section class="chapter" id="cap-1" data-title="El profesor que no se acordaba de los nombres" hidden><header class="chapter-head"><p class="kicker">Capítulo 1</p><h2>El profesor que no se acordaba de los nombres</h2></header><h3 id="cap-1--cursos-intensivos-cerca-de-2005">Cursos intensivos, cerca de 2005</h3>
+<p>De los primeros grupos de los cursos intensivos de la Facultad de Lenguas que dicté cerca de 2005 no recuerdo el nombre de ningún alumno. Ni uno. Con ellos tenía una relación "profesional". Yo creía que era malo con los nombres.</p>
+<p>Haciendo memoria, al inicio de mi práctica docente me importaba más el contenido que los alumnos. Tanto es así que no tengo recuerdos de alumnos que no participaran en la clase o que conversaran mientras yo explicaba algo. ¿Será que las clases en las que pienso se dictaban antes de que existiera el iPhone y los teléfonos modernos? ¿Será que mis alumnos eran adultos? ¿O será que había alumnos distraídos, pero yo, concentrado en lo que quería decir, no los veía?</p>
+<h3 id="cap-1--suelten-al-kraken">Suelten al Kraken</h3>
+<p>Cuando una década y media más tarde retomé la carrera docente y tuve que darles clases a adolescentes y niños en el contexto de la educación pública obligatoria, noté que algunos de mis alumnos hubiesen preferido hacer gárgaras con lava antes que seguir presenciando cualquiera de mis clases.</p>
+<p>Mantener a un grupo de niños o adolescentes callados y atendiendo era una danza que seguía un tempo, un ritmo colmado de fotos, sonidos, actividades, preguntas, y si en algún momento perdía un beat, si me distraía por un segundo, si osaba permitir un silencio… Caos, pandemonio, charla y griterío. Llamen a la directora, suelten al Kraken.</p>
+<h3 id="cap-1--la-moral-de-pixar">La moral de PIXAR</h3>
+<p>Así como los juguetes de Toy Story quieren jugar y los autos de Cars quieren ganar carreras, así, frente a un aula con alumnos, yo quiero dar clases de inglés. Con una obsesión que roza el autismo, termino siempre tratando de cubrir los temas del currículum antes de “los exámenes”, aunque los alumnos -sobre todo los adolescentes- tengan otros planes.</p>
+<p>Me pasó de ser suplente y que los alumnos me invitaran a descansar: <em>“Hoy no hagamos nada, profe.”</em> Incluso aludían a la conducta de docentes anteriores: <em>“Con la otra profe veíamos pelis nomás.”</em> Y yo los escucho, pero en dos semanas es la prueba final y no pueden pasar de curso sin saber voz pasiva.</p>
+<h3 id="cap-1--una-aproximacion-historico-caricaturesca">Una aproximación histórico-caricaturesca</h3>
+<p>Simplificando bastante, recordemos las inspiraciones militares de los sistemas educativos que emergieron con el surgimiento de los Estados Nación. La formación, el silencio, los saludos, la obligatoriedad de la asistencia, el uso del examen como mecanismo de control o incluso de castigo -“¡Saquen una hoja!”-, atado a una concepción tradicional del docente como fuente de conocimiento y del a-lumno, el falto de luz, como tabula rasa, como receptor pasivo en quien el conocimiento habría de ser depositado.</p>
+<p>Una buena pregunta para hacernos en el mundo post pandemia es ¿Explicar es construir conocimiento? ¿Se puede construir explicando y aplicando? ¿Las referencias al conocimiento previo, a lo personal, a lo conocido ayudan a una construcción verdadera si -al fin de cuentas- le voy a decir al alumno lo que creo que tiene que saber? Tal vez no nos gusten las respuestas.</p>
+<h3 id="cap-1--ppp-contra-el-mundo">PPP contra el mundo</h3>
+<p>Reniego de los procedimientos inflexibles. No creo que enseñar sea repetir contenidos o secuencias, pero sea lo que sea que haga hoy en clase, me guste o no, es una variante del PPP<sup class="fnref"><a href="#nota-2" id="ref-2">2</a></sup>. El círculo de Byrne (1986) o el Engage-Study-Activate de Harmer (2007) son intentos de flexibilizar las ideas del PPP usando el juicio de los participantes respecto del punto de entrada y el orden de la secuencia (Harmer, 2007).</p>
+<p>Lo que todas estas variantes -y mis propias clases- mantienen es la naturaleza del PPP: la explicación en el centro y la aplicación y comprobación como parte de la práctica. Maggio y Porta -en persona o en sus textos- califican a la enseñanza con explicaciones con el “bancaria” que Freire usa para la educación que trata de “depositar” conocimientos. Porta cita a Rancière para decir que el maestro explicador ejerce “una forma perfeccionada del atontamiento” (Branda &amp; Porta, 2012).</p>
+<p>Las críticas al PPP, que no captura la complejidad de la lengua y la divide en pastillas fáciles de masticar, se convierten en su fortaleza en una clase de 40 minutos. Cuanto más corta la clase, más rítmica, más dinámica, más activa y, tal vez solo por eso, menos aburrida.</p>
+<h3 id="cap-1--una-buena-pregunta">Una buena pregunta</h3>
+<p>Ese era yo: el de los nombres olvidados, el del Kraken, el del PPP. Y sin embargo alguien quiso que cuente cómo son mis clases. A juzgar por los párrafos que siguen, mis clases son maravillosas experiencias de perpetua diversión y cambio constante, tan impredecibles como divertidas. En realidad, no sería extraño encontrar a un alumno mío bostezando mientras seguimos la secuencia del libro con el entusiasmo de quien compara números en Excel.</p>
+<p>Si, en cambio, mis alumnos se interesasen por las cosas que hacemos en clase, no ha de ser porque yo encarne un experto manejador de reuniones a distancia. Una buena pregunta sería ¿Por qué se interesan algunos alumnos en mis clases?</p>
+<section class="notes"><h4>Notas</h4><ol start="2"><li id="nota-2">Presentación, práctica y producción. <a class="back" href="#ref-2" aria-label="Volver al texto">↩</a></li></ol></section></section>
+<section class="chapter" id="cap-2" data-title="Frases sueltas de un doctorado" hidden><header class="chapter-head"><p class="kicker">Capítulo 2</p><h2>Frases sueltas de un doctorado</h2></header><h3 id="cap-2--el-secreto-de-claudio-urbano">El secreto de Claudio Urbano</h3>
+<p>En un momento de mi vida tuve tiempo y un amigo me entusiasmó con un doctorado en educación. Ahí escuché frases, comentarios como al pasar, que transformaron mi forma no solo de enseñar sino de relacionarme con mis alumnos.</p>
+<p>El primer día que fui llegué tarde y Claudio Urbano<sup class="fnref"><a href="#nota-1" id="ref-1">1</a></sup> estaba diciendo que entre el alumno y el docente había una relación personal -estoy parafraseando- y ese pequeño detalle, que para tanta gente es una obviedad, a mí me cambió para siempre. Hasta entonces, me parece, yo había puesto siempre un límite entre yo y mis alumnos. ¿Se acuerdan de los nombres que no recordaba? Yo creía que era malo con los nombres. No, era distante con mis alumnos.</p>
+<p>Hoy pienso que si un alumno no reniega de mis clases es por dos motivos:</p>
+<ol>
+<li>los aspectos, digamos, "humorístico-teatrales" de mi personalidad y</li>
+<li>el hecho de que ya no me pongo la careta "profesional" antes de cada clase.</li>
+</ol>
+<p>Mis clases son yo tirando puentes de interés y experiencia en tono de comedia, con el PPP peleando por un primer plano que a veces no tiene.</p>
+<p>En el contexto del doctorado escuché otras frases sueltas que me parecieron importantes y que voy a ir contando, tratando de volver sobre libros y ponencias de sus autores para encontrar -algunas veces sin suerte- la cita, la página, la fecha precisa. En el caso de Urbano ni siquiera lo intenté.</p>
+<h3 id="cap-2--por-que-tan-serios">¿Por qué tan serios?</h3>
+<p>Mucho de lo que hago en el aula tiene que ver con mi personalidad. Si han visto cualquier personaje de Marvel, me conocen. Paso mi tiempo tratando de hacer chistes en medio de situaciones serias. Algunas veces, casi nunca, pasa algo tan gracioso que nos toma un minuto dejar de llorar de la risa. Casi siempre, la respuesta es una risita tenue que se disipa en lo que estamos haciendo por la lección del día. El humor es mi interfaz con el mundo y las risas son siempre parte de mis clases. (Para los efectos de sonido, ver Jingle Palette en el Apéndice 2.)</p>
+<h3 id="cap-2--emojis-de-llanto-descontrolado">Emojis de llanto descontrolado</h3>
+<p>Volvamos a la obsesión de juguete de Pixar. Un poco exagerando esa predisposición natural, evito mostrar actitudes que contradigan estos valores. ¿Por falso? Puede ser; pero también porque, si he de cultivar una relación personal y genuina con mis alumnos, ¿qué harían ellos si les digo que descorcho un champagne cuando faltan todos y se cancela la clase?</p>
+<aside class="idea"><p class="idea-label">Obviedad #1</p><h4>Darles importancia a nuestras clases</h4>
+<p>Si el alumno es nuevo: emoji de entusiasmo.</p>
+<p>Si un alumno avisa que falta: emoji de tristeza.</p>
+<p>Si la clase se cancela: emoji de llanto descontrolado.</p>
+<p>Jamás me entristeció una clase cancelada, pero me parece que como docentes tenemos que comunicar valores que le den importancia a la educación en general y a nuestras clases en particular. Si no lo hacemos nosotros, ¿quién lo va a hacer?</p>
+<figure class="fig"><img src="images/img04_p15.jpeg" alt="mensajes con emojis" loading="lazy"></figure>
+<p>Parte de esto se conecta también con la idea del “docente memorable” que aparece más adelante, donde los alumnos hablan de un docente <em>“disponible”</em> y <em>“predispuesto”</em>.</p>
+</aside>
+<aside class="idea"><p class="idea-label">Idea #1</p><h4>Mandar un video de bienvenida a cursos o alumnos nuevos</h4>
+<p>Desde que trabajaba en el Departamento de Educación a Distancia de la Facultad de Lenguas, allá por 2007, pienso que tenemos dispositivos que pueden hacer del video un medio más cotidiano.</p>
+<p>Hoy las capacidades de grabación de video mejoraron muchísimo, pero insistimos en mensajes de texto al punto de que un video sigue siendo algo fuera de lo común. Para ocasiones importantes está bueno que los alumnos nos vean la cara y nos escuchen el tono de voz. Es una conexión más cercana, más personal, y está bueno practicarla desde la primera vez que el alumno se entera de que va a tener clases con nosotros.</p>
+<figure class="fig"><img src="images/img05_p16.jpeg" alt="video de bienvenida" loading="lazy"></figure>
+</aside>
+<h3 id="cap-2--por-que-no-estudiar-sobre-educacion">Por qué NO estudiar sobre educación</h3>
+<p>No sé qué les pasa por la cabeza a los otros docentes, pero yo siempre quise ser un buen profesor. Siempre me pregunté qué actitud frente al aula era la más efectiva, qué era lo mejor para el alumno. Dando una clase, ¿cómo me daba cuenta de si los alumnos estaban aprendiendo? ¿Tenía que ser exigente y estricto? ¿Tenía que redondear las notas hacia abajo o hacia arriba? ¿Las notas que yo ponía eran parecidas a las que hubiesen puesto mis colegas? Si un alumno entendía menos que el resto del grupo, ¿qué tenía que hacer yo? Resulta que Luis Porta se dedica a investigar algo parecido. Expertos en educación alrededor del mundo notaron que los buenos docentes existen y fueron encontrando formas de saber quiénes son, cómo son y qué hacen en el aula.</p>
+<p>Recuerdo dos ideas sueltas de una clase en la que Porta intentaba enseñarme el método de investigación biográfico-narrativa para conocer e investigar buenas prácticas docentes, mientras yo quería que me dijese la lista de características de los buenos docentes. ¿Serían fáciles o difíciles de emular? Así como uno usa el análisis de las características de los textos científicos para escribir textos que “suenan” científicos, así, pensaba yo, podía usar las características de un buen profesor para portarme como uno.</p>
+<p>Ahí me di cuenta de que, como el que se anota en la carrera de Psicología para indagar la propia psiquis, yo me había anotado en un doctorado en educación para “arreglar” mis prácticas en el aula. No iba a hacer falta cursar dos años e idear una investigación que generara conocimiento nuevo. Solo tenía que levantar la mano y preguntar.</p>
+<h3 id="cap-2--primera-idea-interesarse-por-que-el-alumno-apren">Primera idea: interesarse por que el alumno aprenda</h3>
+<p>Lo primero que mencionó como característica de estos docentes que dejan huella -y parafraseo- fue que los alumnos sienten que se interesan genuinamente por su aprendizaje. Se aseguran de que <em>“se entienda”</em> de lo que se está hablando. Un dato que agrego porque me parece interesante: unos meses más tarde, José Yuni, director del doctorado en educación de la UNSE, comentando sobre la idea del “buen docente”, citó una encuesta en donde la mayoría de los estudiantes habían consignado como característica de una buena enseñanza <em>“que se entienda lo que el docente dice”</em>. Yuni hablaba, creo, de una claridad fonética, de articulación de la lengua.</p>
+<p>En el libro <em>Pasiones, Cecilia Colombani</em> (Porta et al., 2018), como corolario de una investigación que había comenzado en 2008, Porta cita lo que los alumnos dicen de esta docente a quien consideran memorable:</p>
+<blockquote class="testimony"><em>“La profesora posee entusiasmo y humor. Está abierta a evacuar dudas e inspira confianza”, otro: “La docente es clara en todos los conceptos que transmite y los desarrolla con una pasión admirable” … otro: “La profesora hace que sus clases tengan un carisma particular donde le pone gracia a esto y es muy bueno aprender así”. Otro: “La profesora a través del diálogo acepta comprensivamente los aportes de los alumnos y los alienta a participar”.</em></blockquote>
+<p>Claridad, humor, confianza, entusiasmo, pasión, invitación a participar. Ojalá mis clases tuviesen todo eso.</p>
+<h3 id="cap-2--segunda-idea-dejar-que-se-quiebre-el-plan">Segunda idea: dejar que se quiebre el plan</h3>
+<p>No recuerdo si fue Porta, un compañero o yo mismo quien relacionó lo que se dijo con “Tres aspectos de la filosofía de la investigación en la enseñanza” (Fenstermacher, 1989), donde el autor señala que la relación entre enseñanza y aprendizaje es como la relación entre correr una carrera y ganar. Que haya alguien enseñando no quiere decir que haya alguien aprendiendo, del mismo modo que correr una carrera no significa que se vaya a ganar. Porta estaba hablando de cómo uno de los docentes investigados dictaba la clase y dijo algo así como: es cuando los alumnos intervienen, cuando los alumnos rompen el plan, que hay más posibilidades de que se dé el aprendizaje.</p>
+<p>Yo interpreté eso que escuché como la interrupción del plan de una clase: el docente suspendiendo el plan de ese día para tomar en cuenta al alumno, para responder a su inquietud. ¿Cuándo ese alumno ha de prestarnos más atención que cuando nos hace una consulta?<sup class="fnref"><a href="#nota-3" id="ref-3">3</a></sup></p>
+<p>Antes, yo contestaba las preguntas de mis alumnos. Ahora, cuando un alumno pregunta algo en mis clases: detengo el mundo. Su inquietud es mi oportunidad de que se quede con algo que le interesa conocer, revisar, saber. Nunca me gustó la casilla del plan, ni siquiera cuando el plan era mío. Doble razón para estar contento cuando la inquietud de un alumno pone en peligro la secuencia bancaria, el tedio de enseñar para que, tal vez, nadie aprenda.</p>
+<aside class="idea"><p class="idea-label">Obviedad #2</p><h4>Lo que el alumno menciona es importante</h4>
+<p>Antes de la pandemia, en una clase física, para escuchar una canción o ver un video se tenían que alinear los planetas. ¿Hay televisor en el aula? ¿Acepta el televisor la forma que yo tengo de llevar el video? ¿Funcionan los aparatos, los conectores y los cables que tienen que funcionar?</p>
+<p>Hoy reaccionar en tiempo real a algo que dice un alumno es tan simple como pausar lo que se está haciendo y abrir YouTube, Spotify o Google Images. Siempre es un buen momento para ver un minuto del tráiler o escuchar 30 segundos de la canción que un alumno acaba de mencionar.</p>
+</aside>
+<h3 id="cap-2--los-docentes-que-dejan-huella">Los docentes que dejan huella</h3>
+<p>Un buen lugar para comenzar es <em>Lo que hacen los mejores profesores de universidad</em> (Bain, 2007). Porta resume a los docentes de Bain diciendo que son docentes que creen que la enseñanza importa y que los estudiantes pueden aprender, y remata: <em>“Lo que hace grande a un profesor, en la mirada de Bain, no es tanto lo que hace sino lo que comprende.”</em> Pero nadie mejor que el mismo Bain para decirlo en 15 minutos en un video.</p>
+<figure class="fig"><img src="images/img13_p31.jpeg" alt="video de Ken Bain" loading="lazy"></figure>
+<p>En cuanto a su propia línea de investigación, Porta comienza hablando de “buena enseñanza” (2007) y de “docentes memorables” (Branda &amp; Porta, 2012), referidos también como “docentes que dejan huella” en 2018 (Córdoba, s. f.). Con una entrevista de la Universidad Católica de Córdoba y extractos de <em>Pasiones</em> se puede caracterizar a “los docentes de Porta”:</p>
+<blockquote><em>“Los profesores memorables rompen las estructuras lineales y apuestan por las emociones”.</em></blockquote>
+<p>Se caracterizan por:</p>
+<ul class="traits">
+<li>Dominar el contenido<blockquote class='testimony'><em>“La profesora tiene sólida formación intelectual. Apela al humor como disruptor de lo solemne en la clase, pero con enseñanza seria”. [EE.IF. 51, 2015] Alumno entrevistado.</em></blockquote></li>
+<li>Llevarse mal con las instituciones<blockquote class='testimony'><em>“Les doy una bienvenida que empieza siendo afectiva más que académica. Las instituciones suelen ser dispositivos bastante perversos en lo que es el vínculo con los sujetos, las universidades no escapan a esto. Por lo tanto, el primer mimo es una cuestión afectiva, lo académico viene después. [...]” [RC1, 2015] Docente entrevistado.</em></blockquote></li>
+<li>Apostar por una dimensión afectiva y emocional<blockquote class='testimony'><em>“[…] la clase que “vale la pena vivir”, se traduce en el cuerpo y gestualmente en una sonrisa o, cuanto menos, en una mueca. Ese gesto del estudiante que, sin reponer palabras, admite que algo ha cambiado. ¿Ruptura? ¿Disonancia cognitiva? así lo llama el discurso pedagógico legitimado; “Eureka” la tradición científica. […]” [EMV19, 2018] Docente entrevistada.</em></blockquote></li>
+<li>Romper con la linealidad del aula<blockquote class='testimony'><em>“Las clases son entretenidas por cómo la docente desestructura la concepción de clase magistral donde sólo se escucha al profesor, además, sin dejar de ser profesional muestra los contenidos desde una manera coloquial, cuando es necesario para la mayor aprehensión de los contenidos.” [EE.IF. 40, 2015] Alumno entrevistado.</em></blockquote></li>
+<li>Cruzar campos disciplinares<blockquote class='testimony'><em>"Por ejemplo, el profesor de diseño arquitectónico que enseña a diseñar a partir de la poesía y de la música; la profesora de literatura que explica teoría literaria a partir del psicoanálisis; la profesora de filosofía que enseña filosofía antigua a partir de una perspectiva foucaultiana. Se animan a tomar objetos complejos para su enseñanza y los transforman, como si fuera la metáfora del viaje. Tienen esta condición de hacer que sus clases sean un viaje."</em></blockquote></li>
+</ul>
+<p>Nadie mejor que él mismo para resumirlo en 9 minutos en un video de YouTube.</p>
+<figure class="fig"><img src="images/img15_p35.jpeg" alt="video de Luis Porta" loading="lazy"></figure>
+<p>¿Puede uno leer la lista de características y convertirse en el mejor docente de la comarca? Tal vez no, pero creo que podemos ver, de entre las cosas que caracterizan a un buen docente, a la buena enseñanza o al docente memorable, cuáles ya son parte de nuestras prácticas, de nuestra forma de ser, de nuestra esencia como personas, y poner ahí el acento. Yo siempre respondí las inquietudes de mis alumnos. Nunca fue más importante un plan que una pregunta. Solo que ahora tengo un marco teórico para justificar lo que siempre hice y acaso permiso para hacerlo más seguido.</p>
+<section class="notes"><h4>Notas</h4><ol start="1"><li id="nota-1">Claudio Ariel Urbano es Doctor en Ciencias Humanas (Mención Educación), Licenciado en Psicología, docente universitario, investigador y autor de más de una docena de libros sobre investigación y psicología, entre otras categorías. <a class="back" href="#ref-1" aria-label="Volver al texto">↩</a></li><li id="nota-3">Consultado sobre esta idea del alumno que interviene / interrumpe el plan, Marcelo Alegre, Especialista en Gestión y Docencia en Educación Superior, dice: "Por lo contrario, yo como didacta, considero relevante que la enseñanza se debe planificar. Porque se entiende que toda enseñanza educativa sea intencional. Ese es el objeto de estudio de la didáctica. Si bien la planificación de una clase es hipotética y flexible, siempre se debe planificar. Caer en la "espontaneidad" de una clase no genera ningún aprendizaje." <a class="back" href="#ref-3" aria-label="Volver al texto">↩</a></li></ol></section></section>
+<section class="chapter" id="cap-3" data-title="La charla y el iPhone" hidden><header class="chapter-head"><p class="kicker">Capítulo 3</p><h2>La charla y el iPhone</h2></header><h3 id="cap-3--serres-conocimiento-objetivado-y-la-charla">Serres: conocimiento objetivado y la charla</h3>
+<p>Años después de aquellas clases del Kraken, imagínense mi sorpresa cuando, leyendo <em>Pulgarcita</em> (2013), del filósofo francés Michel Serres, me doy con el siguiente pasaje:</p>
+<blockquote class="testimony"><em>“Hasta esta misma mañana, un docente, en su aula o en el anfiteatro, entregaba un saber que, en parte yacía en los libros. Oralizaba lo escrito (...) Para esa emisión oral pedía silencio. Ya no lo obtiene.</em></blockquote>
+<blockquote class="testimony"><em>Desde la infancia, en el primer y segundo ciclo, comienza a formarse la ola de lo que se llama la charla, se levanta como un tsunami en el secundario y ahora acaba de alcanzar la educación superior, donde anfiteatros, desbordados por ella, están colmados, por primera vez en la historia, de un murmullo permanente que vuelve penosa toda escucha o vuelve inaudible la vieja voz del libro.”</em></blockquote>
+<p>No era yo. O no era solo yo. Ya no podemos, según Serres, pararnos frente a un aula a recitar un conocimiento <em>“porque ese saber anunciado ya lo tiene todo el mundo. Íntegro. A disposición. Al alcance de la mano. Accesible por la web, Wikipedia, el celular (...) Explicado, documentado, ilustrado, sin más errores que las mejores enciclopedias.”</em></p>
+<h3 id="cap-3--baricco-y-la-revolucion-mental">Baricco y la revolución mental</h3>
+<p>Baricco comienza su libro <em>The Game</em> (2019) hablando sobre la obsesión de algunos por caracterizar los actos de los niños -dispersos y pegados a dispositivos- como una involución, una degradación, un apocalipsis cultural. Estas quejas son formas de defender el pasado, mientras que el modo de actuar de los jóvenes es el cambio hacia una nueva civilización, la nueva forma de inventar el futuro. Lo que estamos viviendo es una revolución tecnológica que, en vez de ser un factor que afecta conductas, fue en realidad precedida por una revolución mental. Esa revolución mental permitió primero la invención de las computadoras, las redes y toda la infraestructura de la revolución tecnológica, que entonces no es la causa de los cambios mentales sino su resultado.</p>
+<figure class="fig"><img src="images/img20_p49.png" alt="diagrama revolución mental → revolución tecnológica" loading="lazy"></figure>
+<p>Yo tomo esta parte de Baricco para recordar que las actitudes de mis alumnos hacia las redes no son un problema, una decadencia a corregir, sino una nueva forma de interactuar con el mundo. El futuro.</p>
+<h3 id="cap-3--premio-arriba">Premio arriba</h3>
+<p>Según Baricco, la figura mental que dominó la cultura del siglo XX era una pirámide invertida o un iceberg invertido. En la superficie: caos, percepciones superficiales. Con tiempo, trabajo y paciencia uno podía ir acercándose al verdadero sentido de las cosas. Escondido bajo sacrificios, esfuerzos o sufrimientos. Al final se encontraba la síntesis, "lo sencillo dentro de lo complejo."</p>
+<figure class="fig"><img src="images/img21_p50.png" alt="pirámide invertida: percepciones superficiales → síntesis" loading="lazy"></figure>
+<p>El iPhone da vuelta la pirámide y pone el premio arriba. La matemática en lo profundo y los resultados simples que se leen en la superficie. <em>"El premio arriba, el esfuerzo abajo."</em> iPhone, Google, Amazon, Instagram, YouTube, WhatsApp: todos tienen esa lógica. <em>"Con instrumentos como esos la insurrección digital golpeaba de lleno el corazón de la cultura del Siglo XX, desintegrando su principio fundamental: que el núcleo de la experiencia estaba sepultado en profundidad que era accesible solo con esfuerzo."</em></p>
+<figure class="fig"><img src="images/img22_p51.png" alt="pirámide: premio instantáneo arriba, matemática en lo profundo" loading="lazy"></figure>
+<p>Yo usé estas ideas para pensar en la velocidad de entrega del contenido en mis clases. Pensé en cómo el PPP expresa un poco estas ideas simplificando las complejidades de la lengua. Pensé en cómo Moodle pone el contenido a menos clics que e-ducativa. En mis clases ya no pospongo lo interesante: lo digo primero. Ya no espero para responder una pregunta: la contesto por completo en ese momento. ¿Querés saber algo ahora mismo? Acá está, antes, en la superficie, ahora.</p>
+<aside class="idea"><p class="idea-label">Idea #2</p><h4>Canciones sin tema gramatical</h4>
+<p>En el profesorado me dijeron que las canciones en la clase de inglés debían tener una intención didáctica: usar un vocabulario, ejemplificar un tema gramatical. Yo hago un poco de eso, pero principalmente uso las canciones como recreo, como pausa lúdica. Uso lyricstraining.com siempre en fácil, principiante, y en seleccionar en vez de tipear. Aun si mis estudiantes son avanzados, les pido que escuchen el tema y me vayan dictando a los gritos la palabra que falta. El motivo principal es pasar cinco minutos escuchando música. La actividad es el premio.</p>
+<figure class="fig"><img src="images/img23_p52.jpeg" alt="lyricstraining.com" loading="lazy"></figure>
+</aside>
+<h3 id="cap-3--la-salida-segun-serres">La salida según Serres</h3>
+<p>Entonces, ¿cómo capturamos la atención de estos alumnos nacidos con el conocimiento disponible en el celular, acostumbrados al premio arriba? Serres nos da la solución: <em>“Ya nadie necesita a los portavoces de antaño, salvo si uno, original y raro,</em> <strong><em>inventa.”</em></strong></p>
+<p>Y si hay alguien que sabe de inventar es Mariana Maggio.</p></section>
+<section class="chapter" id="cap-4" data-title="Inventar (y fallar)" hidden><header class="chapter-head"><p class="kicker">Capítulo 4</p><h2>Inventar (y fallar)</h2></header><h3 id="cap-4--maggio-y-la-creatividad">Maggio y la creatividad</h3>
+<p>Mariana Maggio es una genia de toda genialidad y en <em>Reinventar la clase en la universidad</em> (2018) pregunta <em>“¿Ya dimos una clase idéntica? ¿Casi igual? ¿Similar?”</em> Si la respuesta es afirmativa, nos propone hacerla de otra manera. <em>“¿Qué es lo que podemos inventar? Lo primero es la propia clase. Me educó Edith Litwin que inventaba clases en sus cuadernitos. Así aprendí que todo se inventaba: se construía una estructura original para la clase (...)”</em></p>
+<p>Entre los rasgos de lo que ella llama <em>Enseñanza Poderosa</em> (Maggio, 2016) hay uno que me quedó dando vueltas: <em>“Ofrece un diseño que en sí es original y que no es el de la tradición heredada ni el de la técnica, por más sofisticada que esta sea. Ese diseño está formulado en tiempo presente (...): no viene del pasado, ni lejano ni cercano.”</em> Mariana misma lo explica en 3 minutos en este video.</p>
+<figure class="fig"><img src="images/img14_p33.jpeg" alt="video de Mariana Maggio" loading="lazy"></figure>
+<p>Para una de sus clases, Maggio organizó de un día para el otro un mini congreso. Cuando los alumnos llegaron a cursar el lunes se encontraron con que la clase era un congreso, con disertantes importantes que la profesora había convencido de participar.</p>
+<p>Lo que me pregunto yo es, si tengo que ser creativo, si las clases deben ser diferentes, ¿en qué momento invento las nueve clases que tengo que dar por día? ¿Cómo hago?</p>
+<h3 id="cap-4--para-inventar-hay-que-poder-fallar">Para inventar hay que poder fallar</h3>
+<p>La creatividad -digo yo, no Maggio- florece en contextos en los que se puede fallar. Si no puedo intentar cosas nuevas, no puedo ser creativo. Las prescripciones sobre cómo dar clases y el micromanejo son, creo, enemigos de la creatividad, elemento esencial de una clase que no se percibe como monótona o repetitiva.</p>
+<p>Tengo la anécdota de mi cuadernito de hojas para acuarelas que compré hace unos años. Quería aprender a pintar y las hojas comunes se doblaban por el agua. Fui y pagué lo que para mí era una fortuna por un cuaderno con doce hojas gruesas. Solamente doce. El problema es que no quería desperdiciar esas doce hojas caras, así que por años el cuadernito siguió sin uso, vacío, limpio. Yo seguí también igual de inútil con las acuarelas.</p>
+<p>El aburrimiento y el desacierto no pueden ser tabú en la educación. Para innovar hay que poder intentar algo que falle, dar una clase imperfecta, probar una actividad que los alumnos no encuentren atractiva.</p>
+<p>Lo contrario, el intento de implementar “buenas prácticas”, es decir, de copiar lo que funcionó para otro profesor, para otro grupo, en otro momento, puede terminar de acartonar una experiencia de la misma forma -casi exactamente la misma- que uno puede calcar un dibujo y se nota a lo lejos que fue calcado. Creo que los alumnos prefieren las clases desestructuradas, a mano alzada.</p>
+<figure class="fig"><img src="images/img16_p40.png" alt="dibujo calcado" loading="lazy"><figcaption>Dibujo calcado.</figcaption></figure>
+<figure class="fig"><img src="images/img17_p41.jpeg" alt="dibujo a mano alzada" loading="lazy"><figcaption>Dibujo a mano alzada.</figcaption></figure>
+<p>Estas páginas, interpretadas como instrucciones a seguir, no harán más que acartonar. Tomadas como ideas para inspirar la creatividad, tal vez ayuden a cambiar estructuras y a soltar la muñeca para trazar líneas propias.</p>
+<h3 id="cap-4--2020-invente">2020: inventé</h3>
+<p>Un día, tal vez marcado por la apatía de algunos alumnos adolescentes, imaginé que en esa secuencia entre los "buenos profesores" de Bain y los "docentes memorables" de Porta podría existir una categoría de "docentes fascinantes", capaces de captar la atención de cualquier alumno. Mientras pensaba en dedicar mi tiempo a investigar si esos docentes existían, se me ocurrió que Serres y Maggio ya me habían dado la llave de la atención: la inventiva.</p>
+<p>Entonces, a principios de la pandemia, en pleno 2020, inventé. Inventé clases, inventé funciones de los encuentros, inventé formas de repartir los contenidos en la semana. Algunas de esas invenciones se quedaron para siempre.</p>
+<h3 id="cap-4--lo-contrario-de-un-video-curso">Lo contrario de un video curso</h3>
+<p>Profundas o superficiales, en mis clases a distancia me gusta marcar diferencias con el modelo del alumno escuchante, de brazos cruzados, que lucha por no dormirse.</p>
+<p>Lo primero que hago con alumnos nuevos es enseñarles a usar las herramientas de anotación en pantalla. Hay que tener en cuenta que no todos los programas de reuniones permiten que los alumnos hagan esto. Anotar, rayar, escribir es hacer algo. Es estar activo. Es participar. ¿Puede hacerse en un libro impreso? Sí, pero cada alumno ve solamente su libro. A distancia, ¿no es mejor colaborar en la pantalla?</p>
+<figure class="fig"><img src="images/img06_p18.jpeg" alt="anotaciones en pantalla" loading="lazy"></figure>
+<p>Un alumno individual, respondiendo a mi pregunta sobre qué le gustaba de mis clases, dijo que <em>“Lo contrario sería un video curso.”</em> Si un video curso tiene que ser consumido pasivamente, viendo sin hacer, entonces es bueno ser <em>“lo contrario”</em>.</p>
+<p>Sobre esta idea de “lo contrario”, en otro plano, trato de alejarme de los usos policíacos del control de asistencia y de las concepciones punitivas de los exámenes. Intento fomentar la presencia desde el interés y el compromiso, co-diseñando y co-organizando los objetivos y los tiempos de los exámenes cuando es posible. El profesor al frente, en oposición a los alumnos, el profesor controlador, puede representar una relación adversaria. En mis clases de inglés para adultos a distancia tenemos todos el mismo objetivo: que el aprendizaje ocurra. Nada sucede “en contra” de nadie.</p>
+<aside class="idea"><p class="idea-label">Idea #3</p><h4>Practicar con anotaciones en la pantalla</h4>
+<p>Trato de que todas las actividades de mis clases impliquen acción: dibujar, escribir, tachar en pantalla usando las herramientas de anotación.</p>
+<figure class="fig"><img src="images/img07_p19.jpeg" alt="ejercicio con anotaciones" loading="lazy"></figure>
+</aside>
+<aside class="idea"><p class="idea-label">Idea #4</p><h4>Usar WhatsApp para producción escrita</h4>
+<p>Si hay que escribir frases u oraciones, uso WhatsApp como pizarrón. Los mensajes quedan en el grupo de alumnos y no se borran tras la clase. El feedback es público y lo ven los alumnos que están en clase y los que no. (Para mandar al grupo una captura de lo que hicimos en pantalla, ver Imprimir pantalla en el Apéndice 2.)</p>
+<figure class="fig"><img src="images/img08_p20.png" alt="WhatsApp como pizarrón" loading="lazy"></figure>
+</aside>
+<h3 id="cap-4--el-video-de-minecraft">El video de Minecraft</h3>
+<p>Y siempre inventar funcionó. Tomando la respuesta a las actividades, viendo el porcentaje de alumnos que hacía la tarea, los cambios funcionaban por un tiempo. Luego el interés caía otra vez.</p>
+<p>Volviendo de las vacaciones de julio, para una clase de alumnos de entre 15 y 16 años, grabé un video de Minecraft en el que, además de mostrar "mi mundo" usando el vocabulario que habíamos visto, daba tres consignas. Creí que la estaba rompiendo, que era un baluarte del constructivismo, me imaginaba aceptando el Nobel de profesor de inglés.</p>
+<p>La precisión de los datos de reproducción de YouTube, sin embargo, contaba otra historia. Ni siquiera todos los alumnos abrieron el link; creo que faltaba un 30%. De los que lo abrieron, casi nadie lo vio entero. La gráfica de reproducción mostraba claramente que quienes habían visto el video saltaron a las secciones donde se veían las actividades.</p>
+<figure class="fig"><img src="images/img18_p43.jpeg" alt="gráfica de retención de YouTube" loading="lazy"></figure>
+<p>Comparado con cualquier video de Minecraft de YouTube, el mío era largo y aburrido. Pero yo no sabía que estaba compitiendo con PewDiePie, MrBeast o Luisito Comunica. Yo creía que repasar más o menos vocabulario mientras el profe mostraba un mundo de Minecraft iba a ser suficiente para captar la atención de mis alumnos.</p>
+<p>La invención me llevaba tiempo, aunque mucho más tiempo me llevaba armar e implementar ideas que, tras horas y horas de trabajo, se consumían en minutos y algunas veces, pocas, parecían ni siquiera funcionar. No importaba, porque en 2020 si hay algo que tenía era tiempo.</p></section>
+<section class="chapter" id="cap-5" data-title="Si no se puede inventar: alternar" hidden><header class="chapter-head"><p class="kicker">Capítulo 5</p><h2>Si no se puede inventar: alternar</h2></header><h3 id="cap-5--de-la-invencion-a-la-alternancia">De la invención a la alternancia</h3>
+<p>Pero a medida que me fui quedando sin horas libres, mientras iba llegando al máximo de 200 horas reloj de clases por mes, fui cambiando inventiva por alternancia. Alternancia dentro de un procedimiento, que no es justamente lo que propugnan quienes usaba de inspiración. Alternando formas de presentar, practicar y producir para intentar mantener a los alumnos interesados. Pensando siempre que <strong><em>no</em></strong> es mi trabajo entretener, que los alumnos deben esperar una clase que algunas veces es inevitablemente aburrida, pero "poniéndole onda" y cambiando entre diferentes modos de todo lo que se me ocurra.</p>
+<h3 id="cap-5--sorpresa">Sorpresa</h3>
+<p>Sabiendo que la clave está en inventar -que yo interpreto como hacer algo nuevo o muy diferente- y sabiendo que me las arreglo para alternar, algunas veces me estiro un poco y alterno la clase entera. Doy una lección o un estudio de caso con juego de roles de un libro diferente. Sorpresa.</p>
+<figure class="fig"><img src="images/img19_p45.jpeg" alt="lección de un libro diferente" loading="lazy"></figure>
+<p>Siempre me acuerdo de Howard Stern, tal vez el presentador de radio más famoso de EE. UU. En un documental sobre su fama un entrevistado dijo: "Nunca sabías lo que iba a decir en la siguiente frase." Hay algo en la posibilidad de sorpresa como gancho de la atención. <em>¡Sorpresa! En esta clase tenemos que hacer una campaña de marketing para una empresa que quiere entrar en América Latina.</em> Me parece que los alumnos disfrutan de esos cambios momentáneos. Imagino que es por la misma razón que los alumnos de Maggio se interesan por las clases que ella inventa.</p>
+<p>Yo no creo poder sorprender a mis alumnos como ella con su congreso, organizando todo desde cero para cada clase del día, pero puedo apoyarme en otros libros, en material extra, en ideas que tuve antes, en cosas que acaban de funcionar con otro grupo, para ir condimentando la experiencia de mis alumnos con alternativas, variedad y, de vez en cuando, una sorpresa.</p>
+<aside class="idea"><p class="idea-label">Idea #5</p><h4>Mezclar invención con alternancia</h4>
+<p>Alternar entre lo digital (la pantalla) y lo analógico (un pedazo de papel).</p>
+<p>Alternar entre video y texto.</p>
+<p>Alternar entre Zoom y WhatsApp.</p>
+<p>Alternar entre simetría y asimetría de poder.</p>
+<p>Alternar entre lo lúdico y lo serio.</p>
+<p>Alternar entre lo fácil y lo difícil.</p>
+<p>Alternar el libro entero.</p>
+<p>En algunos grupos de conversación, por ejemplo, donde por lo general vemos un video que dispara la charla, un día preparo un tema sacado de un libro con textos para leer y espacios en blanco para rellenar. En un grupo que sigue un libro común de inglés puedo introducir una clase de un libro de negocios sobre un tema general. Por más que un video sea más entretenido que leer un texto, llega un punto en que los alumnos están saturados de un mismo rito o de un mismo libro, y el cambio viene bien simplemente porque es algo diferente a lo habitual.</p>
+<p>Este es mi consejo: si no se puede inventar, alternar.</p>
+</aside>
+<h3 id="cap-5--lo-digital-y-lo-analogico">Lo digital y lo analógico</h3>
+<p>Baricco narra la anécdota de haber filmado una película en 2007, en el límite del uso del celuloide como medio de grabación. Se filmaba en celuloide, se digitalizaba para editar y aplicar efectos, y se volvía a grabar en celuloide para distribuir el film entre los viejos cines. El advenimiento de lo digital simplificaría las cosas, pero dice Baricco: <em>"Los viejos de la profesión sabían que en lo digital se perdía una belleza, una magia, algo que incluso podía definirse como el alma del cine."</em></p>
+<p>Alessandro tuvo la idea de pedirle a su director de fotografía que proyectase una escena en celuloide primero y luego en digital. Prestó atención y no encontró diferencia hasta que el director de fotografía le indicó que mirase el borde de la pantalla. <em>"En ese momento la proyección era un celuloide: miré: el borde oscilaba. No mucho, pero oscilaba. Como una vibración. Luego puso la proyección digital. Mirá el borde, me dijo. Clavado (...) Con el celuloide la pantalla parece que respira, entendí. Con lo digital está clavada en la pared, y punto (...) Desde entonces sé que aquello cuya carencia sentimos, en cualquier objeto digital, y en definitiva en el mundo digital, es ese aliento, esa oscilación, esa irregularidad.”</em></p>
+<p>Yo uso estas palabras de Baricco para entender las diferencias que reconozco entre un dibujo digital y uno en papel. Las uso para variar, por ejemplo, jugando un ahorcado o un wordle digital y luego, en otra clase, uno dibujado a mano en una hoja. No es lo mismo.</p>
+<p>¿Será que eso que extrañamos de las clases presenciales tiene que ver con que lo analógico vibra, respira, tiene aliento? No lo sé.</p>
+<figure class="fig"><img src="images/img24_p54.jpeg" alt="wordle digital vs. wordle analógico" loading="lazy"><figcaption>Wordle digital vs. wordle analógico.</figcaption></figure>
+<aside class="idea"><p class="idea-label">Idea #6</p><h4>Analógico vs. digital</h4>
+<p>Tengo una tableta digitalizadora que me permite dibujar lo que yo quiera en la pantalla. Combinada con cualquier aplicación de pizarra, uno puede escribir o dibujar con colores infinitos. La pizarra no se ensucia, los colores nunca se acaban: el sueño de cualquier docente.</p>
+<p>Sin embargo, hace poco compré una segunda cámara web que apunta a una resma de papel en la que escribo y dibujo con marcadores de colores lo mismo que podría escribir en la pantalla. ¿Por qué lo hago? Para tener una opción distinta, para que mis alumnos no se aburran de las pizarras digitales y para hacerle caso a Alessandro Baricco.</p>
+<figure class="fig"><img src="images/img25_p55.jpeg" alt="cámara apuntando al papel" loading="lazy"></figure>
+<figure class="fig"><img src="images/img26_p55.jpeg" alt="pizarra en papel vista por Zoom" loading="lazy"></figure>
+</aside>
+<aside class="idea"><p class="idea-label">Idea #7</p><h4>Usar simetría y asimetría en la resolución de tareas de Zoom</h4>
+<p>Un aspecto poco conversado en esta era de Zoom es la falta de momentos en la clase en los que los alumnos interactúen entre ellos. En las clases presenciales siempre hay actividades en pares o en grupos que no incluyen al docente. En Zoom, en cambio, el docente está ahí siempre, y todas las interacciones pasan por él: lo que Foucault llamaría la asimetría de la autoridad.</p>
+<p>Para algunas actividades, por ejemplo aquellas en las que hay que completar más de diez espacios en blanco, unir muchas fotos con palabras o escribir muchas oraciones, yo apago la cámara y el micrófono y los dejo trabajar solos por dos minutos.</p>
+<p>Eso les permite un momento íntimo, entre compañeros, sin la figura docente. Cuando están terminando, prendo la cámara y chequeamos el ejercicio juntos.</p>
+<p>No me sorprendería que, dicho todo esto, algún alumno se queje de que todas mis clases son iguales. Suelten al Kraken.</p>
+</aside></section>
+<section class="chapter" id="cap-6" data-title="Entonces, ¿soy o me hago?" hidden><header class="chapter-head"><p class="kicker">Capítulo 6</p><h2>Entonces, ¿soy o me hago?</h2></header><h3 id="cap-6--me-hago">Me hago</h3>
+<p>Un tema a dejar muy en claro es que, con el método que fue puliendo durante años, Porta encuentra en los docentes memorables gente que rompe con la didáctica clásica, la desarma y hace algo mejor, con más sentido, -y estas son mis palabras- más real.</p>
+<p>Los libros de inglés suelen tener tatuada de fábrica una lección basada en una secuencia de acciones, ejercicios y explicaciones que el docente ha de llevar a cabo, y que según Porta pueden llegar a ser, más que enseñanza, una forma de atontamiento.</p>
+<p>Como quien usa los argumentos anarquistas de Noam Chomsky para justificar el estatismo totalitario, así nosotros intentamos emular características de docentes que dejan huella como revestimiento de un procedimiento áulico con la explicación en el centro.</p>
+<p>Avisé al principio que iba a hacer un mal uso de los textos que cito, y lo sostengo: siento que los estoy traicionando. Los estoy usando para recubrir superficialmente prácticas arraigadas en la didáctica clásica. Entonces, en cierto modo: <em>me hago</em>. Es una fachada, un disfraz, una máscara. Quiero emular, copiar, parecer un buen profesor, pero uso en mis clases un libro con el procedimiento áulico clavado en las páginas. Digo que hay que pensar en cada clase y no copiar lo que funcionó en otras, pero uso ese libro que fue creado lejos de todos mis alumnos<sup class="fnref"><a href="#nota-4" id="ref-4">4</a></sup>. ¿Por qué lo hago entonces? <em>Porque creo que funciona.</em> Creo que la cosa funciona mejor introduciendo ideas de esta otra canasta. Esa canasta en la que Litwin le enseña a Porta y a Maggio, y Maggio me manda a leer a Serres y a Baricco. Luego pasa que yo <strong>no</strong> veo en Baricco lo que ve ella; pero igual funciona. Chueco, oblicuo, mal hecho: funciona.</p>
+<h3 id="cap-6--como-se-que-funciona">¿Cómo sé que funciona?</h3>
+<p>Primero, intuyo que a mis alumnos les gustan mis clases porque les veo la cara. Los comentarios al pasar son positivos.</p>
+<p>Tratando de mejorar la puntería de este taller, pregunté a unos cuantos alumnos qué características de mis clases les agradaban -hermosa pregunta para pescar cumplidos- y casi todos mencionaron el <em>“comienzo desestructurado”</em>, que <em>“no arranca con el libro”</em> y que se da una <em>“conversación informal”</em> donde se pueden <em>“contar cosas personales”</em>, lo que <em>“no es común”</em> y les <em>“parece beneficioso”.</em></p>
+<p>Uno fue más lejos y dio un ejemplo (que traduzco): <em>"Otras profes dicen 'Qué tal chicos. ¿Cómo les fue en el finde?' Pero no quieren saber cómo me fue."</em> El ejemplo del alumno, para mi horror, recita palabra por palabra la pregunta que <strong>yo mismo</strong> les hago al comienzo de la primera clase de la semana. Es exactamente lo mismo que digo yo. Sin embargo, cuando soy yo el que lo dice, él interpreta que la pregunta es legítima. Y tiene razón.</p>
+<p>Así como nos damos cuenta de que ni el cajero del supermercado ni el agente de la mesa de ayuda de la empresa de celular es auténtico cuando nos desea un buen día, así nuestros alumnos detectan lo genuino de nuestras interacciones. Urbano tenía razón.</p>
+<p>Pero esos comentarios no valen del todo, porque la relación entre docentes y alumnos no es simétrica. Si mi peor profesor me preguntase qué me parecen sus clases, diría <em>“Geniales, profe”</em>, no vaya a ser cosa que me baje la nota.</p>
+<p>Por eso insistí en pedir -casi exigir- las devoluciones anónimas que mis alumnos habían dado a MoveOn Idiomas. Yo esperaba un número del tipo <em>“20 alumnos indicaron que les gustan tus clases”</em>. Pero me mandaron transcripciones.</p>
+<p>Eran unas 25 devoluciones y me avisaban que no copiaban todas porque las ideas se repetían: <em>“Lo más destacado que se repite: dinámica, buena onda y profesionalismo (…) también la predisposición de explicar mil veces (…) la flexibilidad.”</em></p>
+<p>La frase <em>“La dinámica de la clase”</em>, que en serio se repite bastante, ¿no estará hablando de la inventiva, la alternancia y probar hacer cosas iguales de distinto modo para que los alumnos no se cansen? Cerca pega <em>“El ritmo de la clase”</em> o <em>“Los recursos que se utilizan para cada tema”</em>, <em>“Me encanta cómo encara la clase”</em>.</p>
+<p><em>“Buena onda”</em>, <em>“Buena actitud”</em>, <em>“Sus clases son divertidas”</em> pasa por mi forma de ser, por no tomarme a mí mismo muy en serio en algunos contextos. Es la única característica que me parece que no traté de cultivar y que veo como parte de mi forma de ser. Hay varios <em>“profesionalismo”</em>, <em>“muy profesional”</em>, <em>“súper profesional”</em> que, me parece, responden a que trato de no llegar tarde y a que las fallas técnicas no interfieran con mi capacidad de dar clases.</p>
+<p>Eso de <em>“predisposición de explicar mil veces”</em>, <em>“se toma el tiempo de explicar cualquier duda”</em>, <em>“excelente predisposición para explicar cada tema”</em> es algo que hago sabiendo que es una característica docente que los alumnos valoran. Así, en este contexto de adultos a distancia, si un alumno me pide una revisión de TODOS LOS TIEMPOS VERBALES, se la doy. Es una clase larga, complicada, llena de preguntas, pero se conjugan varios aspectos del <em>buen profesor</em> (o del <em>docente memorable</em>) a la vez: 1) muestro interés por el aprendizaje del alumno; 2) respondo a un tema que le interesa, algo que le preocupa y quiere solucionar (si le digo eso que quiere saber, me va a prestar atención; se entiende después la devolución <em>“la adaptación del profesor a mis intereses personales”</em>); y 3) estoy, a la vez, mostrando que conozco mi disciplina. Así que no me sorprende el <em>“con sólidos conocimientos”</em>. Uno va más allá y dice <em>“Jero es un genio”</em>.</p>
+<p>¿Soy un genio más genio que mis colegas? Claro que no. ¿Qué devolución daría el alumno si, cuando me pide repasar los tiempos verbales, hiciese yo lo que hacía antes y tratase de esquivar el tema aludiendo a que lleva mucho tiempo? ¿Dirían mis alumnos que mi predisposición es excelente si, cuando me preguntasen algo, los mandase a fijarse en el libro o en un diccionario? ¿Dirían que soy profesional si llegase 2 minutos tarde a cada clase? Claro que tuve el tino de no pedir el feedback negativo, así puedo pasar meses escuchando solo las opiniones lindas sobre mi modo de dar clases. Y esas partes lindas parecen reflejar, hoy, en esta distancia post pandemia, justamente las reacciones que yo anhelaba generar en mis alumnos. Entonces, repito: mal entendidas, mal aplicadas, por lo menos en mis clases estas ideas funcionan.</p>
+<h3 id="cap-6--quiero-ser">Quiero ser</h3>
+<p>Quiero ser, entonces trato de estar disponible, de ser claro en todo sentido. Trato de promover actividades cortas, entretenidas, en las que fomento la interacción de los alumnos escribiendo, seleccionando, uniendo con flechas, tachando. Invento si puedo y, si no, varío, alterno, cambio. Aspiro a por lo menos evitar la monotonía adormecedora, pero no siempre lo logro.</p>
+<p>Quiero ser. Intento, trato, pienso, pruebo, me equivoco y alguien se decepciona. Pruebo de nuevo, busco en YouTube y en el último segundo agrego algo distinto. Quiero ser, entonces llego temprano, prendo un sahumerio y las luces del fondo, pruebo el micrófono que siempre funciona, conecto Zoom, Alt+U para la lista vacía de usuarios. Acomodo el mate y la botella de agua fría, me fijo si estoy peinado usando la cámara. Abro el calendario, el archivo de asistencia, el libro. Hay alguien en la sala de espera, admito, me acomodo en la silla, vuelvo a fijarme si estoy bien peinado, tres, dos, uno.</p>
+<figure class="fig"><img src="images/img27_p60.jpeg" alt="escena final, antes de la clase" loading="lazy"></figure>
+<section class="notes"><h4>Notas</h4><ol start="4"><li id="nota-4">Aunque yo creo que es una ventaja que los libros de inglés se creen en Inglaterra o Estados Unidos. <a class="back" href="#ref-4" aria-label="Volver al texto">↩</a></li></ol></section></section>
+<section class="chapter" id="apendice-1-hardware" data-title="Apéndice 1: Hardware" hidden><header class="chapter-head"><h2>Apéndice 1: Hardware</h2></header><h3 id="apendice-1-hardware--microfonos">Micrófonos</h3>
+<p>La claridad de la voz es un aspecto esencial, y algunas veces la combinación de la distancia del micrófono de una laptop y una habitación con paredes vacías que reflejan el sonido termina generando un eco que puede llegar a ser molesto.</p>
+<figure class="fig small"><img src="images/img28_p61.jpeg" alt="auriculares JBL110" loading="lazy"></figure>
+<h4>JBL110</h4>
+<p>La solución más barata es usar auriculares in ear con micrófono. Esto acerca el micrófono a la cara, lo que reduce el eco. Entre esto y el micrófono que sigue, un corbatero como el famoso y barato <strong>Boya BY-M1</strong>.</p>
+<h4>HyperX Solocast</h4>
+<figure class="fig small"><img src="images/img30_p62.jpeg" alt="micrófono HyperX Solocast" loading="lazy"></figure>
+<p>Lo que sigue es un micrófono USB. Ese conector suele indicar que el micrófono tiene incorporada una placa de sonido.</p>
+<p>Un aspecto a tener en cuenta en cualquier micrófono es el patrón polar. Cardioide (derecha) significa que el micrófono toma el sonido delante de su sensor, y omnidireccional (izquierda) significa que capta el sonido en todas direcciones. Para ambientes con mucho ruido, es mejor un micrófono cardioide.</p>
+<figure class="fig small"><img src="images/img29_p62.jpeg" alt="patrones polares omnidireccional y cardioide" loading="lazy"><figcaption>Omnidireccional vs. cardioide.</figcaption></figure>
+<h3 id="apendice-1-hardware--camaras">Cámaras</h3>
+<p><em>“Como te ven te tratan”</em>, dijo la filósofa argentina Mirtha Legrand sin pensar en las cámaras de las laptops. Si la imagen de la cámara de tu compu deja que desear, está el problema de la cantidad de marcas y modelos de cámaras. Una cámara china es mejor que nada, pero si lo que buscamos es mejorar la calidad hay un atajo: Logitech. Logitech tiene la que viene siendo el estándar en webcams: la C920. Esta cámara es full HD (1080p) y un poco costosa. Afortunadamente, para quienes tenemos un presupuesto ajustado, hay modelos de Logitech con menos resolución (720p) y una excelente calidad de imagen.</p>
+<h4>C270 y C505</h4>
+<figure class="fig small"><img src="images/img31_p63.jpeg" alt="cámaras Logitech C270 y C505" loading="lazy"></figure>
+<p>La C270 y la C505 son casi idénticas. Yo tengo las dos y no noto diferencia en la calidad de imagen.</p>
+<h4>C920</h4>
+<figure class="fig small"><img src="images/img32_p64.jpeg" alt="cámara Logitech C920" loading="lazy"></figure>
+<p>Si el dinero no es problema, hay cámaras muchísimo más caras, pero probablemente la C920 sea más que suficiente.</p>
+<h3 id="apendice-1-hardware--tabletas-digitalizadoras">Tabletas digitalizadoras</h3>
+<p>Una forma amena de interactuar con la pantalla son las tabletas digitalizadoras, que nos permiten corregir, marcar y dibujar si el software que usamos para conectarnos cuenta con esas funciones. Casi cualquier tableta será suficiente, aunque tal vez sea sensato no comprar las Genius.</p>
+<figure class="fig"><img src="images/img33_p65.jpeg" alt="ahorcado dibujado con tableta en Zoom" loading="lazy"></figure>
+<h4>XP-Pen Star G430S</h4>
+<figure class="fig small"><img src="images/img34_p65.jpeg" alt="tableta XP-Pen Star G430S" loading="lazy"></figure>
+<p>La opción barata con más prestaciones. Más niveles de presión y más resolución.</p>
+<h4>Huion 420</h4>
+<figure class="fig small"><img src="images/img35_p66.png" alt="tableta Huion 420" loading="lazy"></figure>
+<p>Tengo tabletas de todas las marcas y la Huion es la que más uso. Este modelo suele ser lo más barato que se puede encontrar.</p>
+<h4>Wacom One</h4>
+<figure class="fig small"><img src="images/img36_p66.jpeg" alt="tableta Wacom One" loading="lazy"></figure>
+<p>Es la marca estrella. Este es el modelo más económico de la marca y aun así suele ser 30% más caro que las otras tabletas listadas acá.</p></section>
+<section class="chapter" id="apendice-2-software" data-title="Apéndice 2: Software" hidden><header class="chapter-head"><h2>Apéndice 2: Software</h2></header><h3 id="apendice-2-software--sobre-la-capacidad-tecnica">Sobre la capacidad técnica</h3>
+<p>La capacidad técnica, en las clases a distancia, está antes que la capacidad pedagógica. Tiene, a mi modo de ver, el valor de lo motriz. Conocemos las diferencias entre la educación presencial y la educación a distancia, pero también sabemos de las semejanzas. Si no me sé conectar al software que usa una institución, no puedo estar presente. No saber entrar es no poder “estar”. No saber compartir una imagen, un audio, una pantalla es no poder mostrar, no poder plantear una pregunta. Un docente de inglés a distancia debería tener por lo menos la capacidad técnica de un niño de 10 años. Es gracioso porque es verdad.</p>
+<h3 id="apendice-2-software--herramientas-para-el-aula">Herramientas para el aula</h3>
+<h4>Imprimir pantalla lanza recorte y anotación</h4>
+<p>Otra forma de consolidar actividades es compartir una imagen de lo hecho en pantalla en un grupo de WhatsApp o por email. Se puede configurar recorte y anotación para que se ejecute cada vez que presionamos ImpPnt (Print Screen / Imprimir pantalla).</p>
+<figure class="fig"><img src="images/img09_p22.png" alt="configuración de recorte y anotación" loading="lazy"></figure>
+<h4>Jingle Palette</h4>
+<p>Jingle Palette se configura con tus propios sonidos y te permite reproducirlos haciendo clic en cualquiera de sus 30 botones. Podés bajar archivos mp3 o convertir videos de YouTube a mp3 y cortar audios cortos.</p>
+<figure class="fig"><img src="images/img10_p23.png" alt="Jingle Palette" loading="lazy"></figure>
+<h4>Bajar canciones de YouTube</h4>
+<p>Se pueden bajar archivos .mp3 desde YouTube con software como JDownloader o sitios como mp3y.download.</p>
+<figure class="fig"><img src="images/img11_p24.png" alt="descarga de mp3 desde YouTube" loading="lazy"></figure>
+<h4>Cortar audios con Audacity</h4>
+<p>Audacity te permite abrir gran cantidad de archivos de audio, editarlos y exportarlos a mp3.</p>
+<figure class="fig"><img src="images/img12_p24.png" alt="Audacity" loading="lazy"></figure>
+<h3 id="apendice-2-software--atajos-de-teclado-de-zoom">Atajos de teclado de Zoom</h3>
+<p class="kbd-line"><strong>Alt</strong>: activar/desactivar la opción Mostrar siempre los controles de reunión en la configuración General.</p>
+<p class="kbd-line"><strong>Alt+V</strong>: iniciar/detener video.</p>
+<p class="kbd-line"><strong>Alt+A</strong>: silenciar/reactivar audio.</p>
+<p class="kbd-line"><strong>Alt+M</strong>: silenciar/reactivar el audio para todos excepto el anfitrión. Nota: solo para el anfitrión de la reunión.</p>
+<p class="kbd-line"><strong>Alt+S</strong>: abrir la ventana de pantalla compartida y detener la pantalla compartida. Nota: solo funcionará cuando la barra de herramientas de control de la reunión esté en primer plano.</p>
+<figure class="fig"><img src="images/img37_p68.png" alt="ventana de compartir pantalla de Zoom" loading="lazy"></figure>
+<p class="kbd-line"><strong>Alt+T</strong>: pausar o reanudar la pantalla compartida. Nota: solo funcionará cuando la barra de herramientas de control de la reunión esté en primer plano.</p>
+<p class="kbd-line"><strong>Alt+R</strong>: iniciar/detener grabación local.</p>
+<p class="kbd-line"><strong>Alt+C</strong>: iniciar/detener grabación en la nube.</p>
+<p class="kbd-line"><strong>Alt+P</strong>: pausar o reanudar grabación.</p>
+<p class="kbd-line"><strong>Alt+N</strong>: cambiar cámara.</p>
+<p class="kbd-line"><strong>Alt+H</strong>: mostrar/ocultar panel de chat de la reunión.</p>
+<p class="kbd-line"><strong>Alt+U</strong>: mostrar/ocultar panel de participantes.</p>
+<p class="kbd-line"><strong>Alt+Y</strong>: levantar/bajar la mano.</p>
+<p class="kbd-line"><strong>Ctrl+Alt+Mayús+H</strong>: mostrar/ocultar los controles flotantes de la reunión.</p>
+<h3 id="apendice-2-software--atajos-de-teclado-de-google-meet">Atajos de teclado de Google Meet</h3>
+<p class="kbd-line"><strong>Ctrl+Alt+S</strong>: indicar quién está hablando en un momento concreto.</p>
+<p class="kbd-line"><strong>Ctrl+Alt+I</strong>: indicar la información actual sobre la sala.</p>
+<p class="kbd-line"><strong>C</strong>: mostrar u ocultar los subtítulos.</p>
+<p class="kbd-line"><strong>Ctrl+E</strong>: encender o apagar la cámara.</p>
+<p class="kbd-line"><strong>Ctrl+D</strong>: silenciar o activar el sonido del micrófono.</p>
+<p class="kbd-line"><strong>Ctrl+Alt+K</strong>: aumentar el número de recuadros de participantes.</p>
+<p class="kbd-line"><strong>Ctrl+Alt+J</strong>: reducir el número de recuadros de participantes.</p>
+<p class="kbd-line"><strong>Ctrl+Alt+C</strong>: mostrar u ocultar la ventana del chat de la reunión.</p>
+<p class="kbd-line"><strong>Ctrl+Alt+P</strong>: mostrar u ocultar participantes.</p>
+<p class="kbd-line"><strong>Ctrl+Alt+H</strong>: levantar o bajar la mano.</p>
+<p class="kbd-line"><strong>Ctrl+Alt+M</strong>: minimizar o ampliar tu video.</p>
+<p class="kbd-line"><strong>Barra espaciadora</strong>: pulsar para hablar.</p>
+<h3 id="apendice-2-software--atajos-de-teclado-de-microsoft-teams">Atajos de teclado de Microsoft Teams</h3>
+<p class="kbd-line"><strong>Ctrl+Mayús+C</strong>: iniciar llamada de audio.</p>
+<p class="kbd-line"><strong>Ctrl+Mayús+U</strong>: iniciar videollamada.</p>
+<p class="kbd-line"><strong>Ctrl+Mayús+H</strong>: finalizar llamada de audio.</p>
+<p class="kbd-line"><strong>Ctrl+Mayús+H</strong>: finalizar videollamada.</p>
+<p class="kbd-line"><strong>Ctrl+Mayús+M</strong>: activar o desactivar audio.</p>
+<p class="kbd-line"><strong>Ctrl+barra espaciadora</strong>: reactivar temporalmente el audio.</p>
+<p class="kbd-line"><strong>Ctrl+Mayús+L</strong>: anunciar las manos levantadas (lector de pantalla).</p>
+<p class="kbd-line"><strong>Ctrl+Mayús+K</strong>: levantar o bajar la mano.</p>
+<p class="kbd-line"><strong>Ctrl+Mayús+E</strong>: iniciar sesión de compartir pantalla.</p>
+<p class="kbd-line"><strong>Ctrl+Mayús+O</strong>: activar o desactivar video.</p>
+<p class="kbd-line"><strong>Ctrl+Mayús+D</strong>: rechazar el uso compartido de la pantalla.</p>
+<p class="kbd-line"><strong>Ctrl+Mayús+A</strong>: aceptar el uso compartido de la pantalla.</p>
+<p class="kbd-line"><strong>Ctrl+Mayús+Y</strong>: admitir personas de la notificación de sala de espera.</p>
+<h3 id="apendice-2-software--reproductores-de-audio-y-video">Reproductores de audio y video</h3>
+<p>Yo recomiendo tener siempre instalado VLC, porque reproduce todo, pero el mejor es WMC, porque reproduce secuencias de archivos presionando “siguiente”.</p>
+<h4>Windows Media Classic</h4>
+<figure class="fig"><img src="images/img38_p71.png" alt="Windows Media Classic" loading="lazy"></figure>
+<p>Este reproductor es liviano y, si está reproduciendo el audio 2.3.mp3, hacer clic en siguiente reproducirá el 2.4, luego el 2.5. No hace falta volver a la carpeta para cada archivo.</p>
+<h4>VLC</h4>
+<figure class="fig"><img src="images/img39_p72.jpeg" alt="VLC" loading="lazy"></figure>
+<p>Este reproductor lee hasta el diario del domingo. Hay pocos archivos que no pueda reproducir. No puede faltar entre el software de un docente que reproduce archivos multimedia. Pero tiene esa desventaja frente al WMC.</p></section>
+<section class="chapter" id="bibliografia" data-title="Bibliografía" hidden><header class="chapter-head"><h2>Bibliografía</h2></header><p class="bib">Bain, K. (2007). <em>Lo que hacen los mejores profesores de universidad</em>. Universitat de València.</p>
+<p class="bib">Baricco, A. (2019). <em>The Game</em>. Anagrama.</p>
+<p class="bib">Branda, S., &amp; Porta, L. (2012). Maestros que marcan. Biografía personal e identidad profesional en docentes memorables. <em>Revista currículum y formación del profesorado</em>, <em>16</em>(3).</p>
+<p class="bib">Córdoba, U. C. de. (s. f.). <em>Docentes que dejan huella. Universidad Católica de Córdoba | noticiasucc</em>. Recuperado 21 de noviembre de 2022, de <a href="http://www.ucc.edu.ar/noticiasucc/docentes-que-dejan-huella/" rel="noopener">http://www.ucc.edu.ar/noticiasucc/docentes-que-dejan-huella/</a></p>
+<p class="bib">Fenstermacher, G. D. (1989). <em>Tres aspectos de la filosofía de la investigación sobre la enseñanza</em>. 25.</p>
+<p class="bib">Harmer, J. (2007). <em>The practice of English language teaching</em> (4. ed., 2nd imp). Pearson/Longman.</p>
+<p class="bib">Maggio, M. (2016). <em>Enriquecer la enseñanza</em> (1era ed). Paidós.</p>
+<p class="bib">Maggio, M. (2018). <em>Reinventar la clase en la universidad</em>. Paidós.</p>
+<p class="bib">Porta, L. (2007). La buena enseñanza a partir de la narrativa de los alumnos. <em>Diálogos Pedagógicos</em>, <em>V</em>(10), 9-19.</p>
+<p class="bib">Porta, L., Álvarez, Z., &amp; Martinez, C. (2018). <em>Pasiones, Cecilia Colombani</em> (1.a ed.).</p>
+<p class="bib">Serres, M. (2013). <em>Pulgarcita: El mundo cambió tanto que los jóvenes deben reinventar todo: una manera de vivir juntos, instituciones, una manera de ser y de conocer</em>. Fondo de Cultura Económica.</p></section>
+
+  <nav class="pager" id="pager" aria-label="Capítulos"></nav>
+</main>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var sections = Array.prototype.slice.call(document.querySelectorAll("#portada, .chapter"));
+  var byId = {};
+  sections.forEach(function (s) { byId[s.id] = s; });
+  var links = document.querySelectorAll(".sidebar a");
+  var sidebar = document.getElementById("sidebar");
+  var scrim = document.getElementById("scrim");
+  var menuBtn = document.getElementById("menuBtn");
+  var pager = document.getElementById("pager");
+  var progress = document.getElementById("progress");
+  var current = null;
+
+  /* ---------- tema ---------- */
+  function setTheme(t) {
+    if (t === "light" || t === "dark") root.setAttribute("data-theme", t);
+    else root.removeAttribute("data-theme");
+    try { localStorage.setItem("dc-theme", t); } catch (e) {}
+    document.querySelectorAll("[data-theme-set]").forEach(function (b) {
+      b.setAttribute("aria-pressed", String(b.getAttribute("data-theme-set") === t));
+    });
+  }
+  var saved = "auto";
+  try { saved = localStorage.getItem("dc-theme") || "auto"; } catch (e) {}
+  setTheme(saved);
+  document.querySelectorAll("[data-theme-set]").forEach(function (b) {
+    b.addEventListener("click", function () { setTheme(b.getAttribute("data-theme-set")); });
+  });
+
+  /* ---------- menú ---------- */
+  function openMenu(open) {
+    sidebar.classList.toggle("open", open);
+    scrim.classList.toggle("show", open);
+    menuBtn.setAttribute("aria-expanded", String(open));
+  }
+  menuBtn.addEventListener("click", function () { openMenu(!sidebar.classList.contains("open")); });
+  scrim.addEventListener("click", function () { openMenu(false); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") openMenu(false);
+    if (e.target.closest && e.target.closest("input, textarea, select")) return;
+    var i = sections.indexOf(current);
+    if (e.key === "ArrowRight" && i < sections.length - 1) location.hash = sections[i + 1].id;
+    if (e.key === "ArrowLeft" && i > 0) location.hash = sections[i - 1].id;
+  });
+
+  /* ---------- navegación ---------- */
+  function titleOf(s) { return s.getAttribute("data-title"); }
+
+  function buildPager(i) {
+    var html = "";
+    if (i > 0) html += '<a class="prev" href="#' + sections[i - 1].id + '"><small>← Anterior</small>' + titleOf(sections[i - 1]) + "</a>";
+    if (i < sections.length - 1) html += '<a class="next" href="#' + sections[i + 1].id + '"><small>Siguiente →</small>' + titleOf(sections[i + 1]) + "</a>";
+    pager.innerHTML = html;
+  }
+
+  function sectionFor(hash) {
+    if (!hash) return { sec: byId.portada };
+    if (byId[hash]) return { sec: byId[hash] };
+    var el = document.getElementById(hash);
+    if (el) {
+      var sec = el.closest(".chapter, #portada");
+      if (sec) return { sec: sec, target: el };
+    }
+    return { sec: byId.portada };
+  }
+
+  function show() {
+    var hash = decodeURIComponent(location.hash.slice(1));
+    var r = sectionFor(hash);
+    if (current !== r.sec) {
+      sections.forEach(function (s) { s.hidden = s !== r.sec; });
+      current = r.sec;
+      var i = sections.indexOf(current);
+      buildPager(i);
+      document.title = (current.id === "portada" ? "" : titleOf(current) + " · ") + "Distancia cercana en clases de inglés";
+      links.forEach(function (a) {
+        var on = a.getAttribute("data-sec") === current.id && a.classList.contains("toc-main") || (current.id === "portada" && a.getAttribute("data-sec") === "portada");
+        a.classList.toggle("active", on);
+        var li = a.closest(".toc-item");
+        if (li && a.classList.contains("toc-main")) li.classList.toggle("current", a.getAttribute("data-sec") === current.id);
+      });
+    }
+    openMenu(false);
+    if (r.target) r.target.scrollIntoView({ block: "start" });
+    else window.scrollTo(0, 0);
+    onScroll();
+  }
+
+  function onScroll() {
+    var h = document.documentElement.scrollHeight - window.innerHeight;
+    progress.style.width = (h > 0 ? Math.min(100, (window.scrollY / h) * 100) : 0) + "%";
+  }
+
+  window.addEventListener("hashchange", show);
+  window.addEventListener("scroll", onScroll, { passive: true });
+  show();
+})();
+</script>
+</body>
+</html>
