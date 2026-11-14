@@ -118,6 +118,21 @@ table.conn-table td:first-child strong { font-size: .68rem; letter-spacing: .12e
 .home img { width: 100%; height: auto; border-radius: 6px; box-shadow: var(--shadow); }
 .cover-title { margin: 0; font-family: var(--serif); font-weight: 600; text-transform: uppercase; font-size: clamp(3rem, 11vw, 6.4rem);
   line-height: .92; letter-spacing: -.01em; color: var(--text); border-left: 6px solid var(--accent); padding: 6px 0 10px 22px; }
+.cover-block { position: relative; }
+.badge { position: absolute; top: -6px; right: 4px; display: flex; flex-direction: column; align-items: center; }
+.sticker { position: relative; width: clamp(88px, 19vw, 128px); aspect-ratio: 1; border-radius: 50%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+  background: var(--accent); color: var(--bg); transform: rotate(12deg);
+  box-shadow: 0 2px 0 color-mix(in srgb, var(--accent) 60%, #000), 0 6px 14px rgba(0,0,0,.22);
+  font-family: var(--serif); line-height: 1; user-select: none; }
+.sticker::before { content: ""; position: absolute; inset: 6px; border-radius: 50%; border: 1.5px dashed color-mix(in srgb, var(--bg) 70%, transparent); }
+.sticker::after { content: ""; position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
+  background: linear-gradient(135deg, rgba(255,255,255,.28) 0%, rgba(255,255,255,0) 45%); }
+.sticker .s-ring { position: absolute; inset: -20%; width: 140%; height: 140%; overflow: visible; pointer-events: none; }
+.sticker .s-ring text { fill: var(--accent); font-family: var(--serif); font-size: 8.5px; font-style: italic; font-weight: 600; letter-spacing: .04em; }
+.sticker .s-num { font-size: clamp(2rem, 4.6vw, 3rem); font-weight: 700; font-style: italic; letter-spacing: -.02em; }
+.sticker .s-num sup { font-size: .42em; font-style: normal; vertical-align: .9em; margin-left: 1px; }
+.sticker .s-label { margin-top: 4px; font-size: clamp(.55rem, 1.2vw, .7rem); font-weight: 700; letter-spacing: .2em; text-transform: uppercase; }
 .cover-tag { margin: 18px 0 2px; font-size: clamp(1.25rem, 2.6vw, 1.6rem); font-style: italic; font-weight: 400; color: var(--text); }
 .cover-extra { margin: 0 0 6px; font-size: .78rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--accent); }
 .home .author { color: var(--muted); font-size: .95rem; margin-top: 10px; }
@@ -234,8 +249,11 @@ table.conn-table td:first-child strong { font-size: .68rem; letter-spacing: .12e
     <div class="page">
       <article class="section" id="sec-home" data-id="home">
         <div class="home">
-          <div>
+          <div class="cover-block">
             <p class="cover-title" role="heading" aria-level="1">Essay<br>Writing<br>Ruined</p>
+            <div class="badge">
+              <div class="sticker" role="img" aria-label="Second edition: shorter and interactive"><span class="s-num" aria-hidden="true">2<sup>nd</sup></span><span class="s-label" aria-hidden="true">Edition</span><svg class="s-ring" viewBox="0 0 100 100" aria-hidden="true"><defs><path id="s-arc" d="M 4 50 A 46 46 0 0 0 96 50"/></defs><text><textPath href="#s-arc" startOffset="50%" text-anchor="middle">Shorter and interactive</textPath></text></svg></div>
+            </div>
             <p class="cover-tag">3 lessons on how to write a passing essay.</p>
             <p class="cover-extra">Includes an automatic self-writing conclusion</p>
             <p class="author">Jerónimo Visñovezky · <a href="https://jeronimov.org">jeronimov.org</a></p>
