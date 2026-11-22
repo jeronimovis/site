@@ -202,6 +202,14 @@ h1{font-family:var(--display);font-weight:400;font-size:clamp(2.3rem,6.5vw,4.2re
 .visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 footer{margin-top:48px;border-top:1px solid var(--rule);padding-top:12px;font:400 13px/1.5 var(--ui);color:var(--muted);max-width:80ch}
 
+.hint.ex{font-style:italic}
+.mini .hint{margin-top:6px}
+.name-hint{margin:-4px 0 0}
+.more{font:400 13px/1.45 var(--ui);color:var(--muted);margin:0;padding-left:12px;border-left:2px solid var(--rule)}
+.lead+.more{margin-top:14px}
+.sec+.lead.warn{margin:0;padding:16px 0;border-bottom:1px solid var(--rule)}
+[hidden]{display:none!important}
+
 @media (max-width:1080px){
   .sec{grid-template-columns:minmax(0,1fr)}
   .margin{padding-top:0;order:2}
@@ -228,6 +236,7 @@ footer{margin-top:48px;border-top:1px solid var(--rule);padding-top:12px;font:40
 <div class="dk-bar">
   <nav class="dk-crumbs" aria-label="Breadcrumb"><a href="index.html">← <span data-dk-t="home">Writing desk</span></a><span class="dk-sep">·</span><a href="name.html" id="crumbName">Nombres por generación</a></nav>
   <div class="dk-prefs">
+    <div class="dk-seg" role="group" id="modeSeg" aria-label="Version"><button type="button" data-mode="simple">Simple</button><button type="button" data-mode="full">Full</button></div>
     <div class="dk-seg" role="group" data-dk-aria="lang" aria-label="Language"><button type="button" data-dk-lang="auto">Auto</button><button type="button" data-dk-lang="en">EN</button><button type="button" data-dk-lang="es">ES</button></div>
     <div class="dk-seg" role="group" data-dk-aria="theme" aria-label="Theme"><button type="button" data-dk-theme="auto">Auto</button><button type="button" data-dk-theme="light">Light</button><button type="button" data-dk-theme="dark">Dark</button></div>
   </div>
@@ -282,26 +291,33 @@ const SCHEMA = [
             'Go to your strongest tendency and push it all the way. Out of all that silliness comes one sentence that hums differently, and you build from there.'],
         fields: [
           { k: 'estereotipo_partida', type: 'text', q: ['¿De qué estereotipo partís?', 'Which stereotype are you starting from?'],
+            i: ['El molde conocido del que sale el personaje, en pocas palabras. Es el punto de partida, no el resultado.', 'The familiar mould the character comes from, in a few words. It is the starting point, not the result.'],
             ph: ['El jefe tacaño, la princesa, el detective de 1940', 'The stingy boss, the princess, the 1940 detective'] },
           { k: 'ridiculo', type: 'big', q: ['Estereotipalo hasta el ridículo. Tirá información sin frenar.', 'Stereotype it to the point of ridicule. Pour out information without braking.'],
+            i: ['Escribí de corrido todo lo que se te ocurra sobre ese estereotipo, exagerado al máximo: gestos, frases, manías, escenas.', 'Write non-stop everything that comes to mind about that stereotype, exaggerated to the limit: gestures, lines, quirks, scenes.'],
             hint: ['Borrador tonto, feo y malo. Nadie lo corrige acá.', 'A dumb, ugly, bad draft. Nobody corrects it here.'] },
-          { k: 'vibra', type: 'area', q: ['¿Qué oración vibra distinto?', 'Which sentence hums differently?'] }
+          { k: 'vibra', type: 'area', q: ['¿Qué oración vibra distinto?', 'Which sentence hums differently?'],
+            i: ['Releé el borrador y copiá la oración que suena distinta, la que parece de una persona y no de un molde. Desde ahí se construye.', 'Reread the draft and copy the sentence that sounds different, the one that seems to belong to a person rather than a mould. You build from there.'] }
         ] },
       { id: 'frankenstein', t: ['De quién está hecho', 'Who they are made of'],
         p: ['Los personajes son un compuesto de gente que ya conocés: cómo hacía las cosas tu tía, el tono de un jefe, alguien de la tele.',
             'Characters are a composite of people you already know: the way your aunt did things, a boss’s tone, someone off the TV.'],
         fields: [
           { k: 'piezas', type: 'list', q: ['Piezas', 'Parts'], add: ['Agregar pieza', 'Add a part'],
+            i: ['Cada fila es un rasgo concreto y la persona real (o de ficción) de quien lo sacaste.', 'Each row is a concrete trait and the real (or fictional) person you took it from.'],
             cols: [['rasgo', ['Rasgo, gesto o tono', 'Trait, gesture or tone']], ['de', ['De quién lo tomaste', 'Who you took it from']]] },
           { k: 'propio', type: 'area', q: ['¿Qué fragmento tuyo lleva?', 'Which fragment of you do they carry?'],
+            i: ['Algo tuyo que le prestaste: una costumbre, un miedo, una herida, una manera de mirar.', 'Something of yours you lent them: a habit, a fear, a wound, a way of looking.'],
             hint: ['Para que tenga peso, algo de él lo tenés que conocer íntimamente.', 'For the character to have weight, you have to know something of them intimately.'] }
         ] },
       { id: 'disfrute', t: ['Antes de llamar al editor', 'Before calling the editor'],
         p: ['La pregunta de si funciona viene después. Primero: ¿la pasaste bien?', 'Whether it works is a question for later. First: did you have a good time?'],
         fields: [
           { k: 'chk_juego', type: 'checks', q: ['Marcá lo que sea cierto', 'Tick what is true'],
+            i: ['Marcá solo lo que sea verdad. Si no marcás nada, quizás convenga jugar un rato más antes de corregir.', 'Tick only what is true. If you tick nothing, it may be worth playing a while longer before editing.'],
             opts: [['divertido', ['Me divertí haciéndolo', 'I had fun making them']], ['sorpresa', ['Me sorprendió', 'They surprised me']]] },
-          { k: 'inesperado', type: 'area', q: ['¿Qué hizo que no esperabas?', 'What did they do that you did not expect?'] }
+          { k: 'inesperado', type: 'area', q: ['¿Qué hizo que no esperabas?', 'What did they do that you did not expect?'],
+            i: ['Una acción, una frase o una reacción que apareció sin que la planearas.', 'An action, a line or a reaction that showed up without you planning it.'] }
         ] }
     ] },
   { id: 'fuera', t: ['Por fuera', 'From outside'],
@@ -313,9 +329,12 @@ const SCHEMA = [
             'The line is how much information you give. A mechanical character is a prop: it has a shape for a second and is gone. An organic one, the plot follows.'],
         fields: [
           { k: 'tipo', type: 'choice', q: ['¿La trama lo usa o lo sigue?', 'Does the plot use them or follow them?'],
+            i: ['Mecánico: aparece para cumplir una función y se va (el mozo, el guardia). Orgánico: la historia depende de lo que hace y de lo que le pasa.', 'Mechanical: they appear to do a job and leave (the waiter, the guard). Organic: the story depends on what they do and what happens to them.'],
             opts: [['mecanico', ['Mecánico: la trama lo usa', 'Mechanical: the plot uses them']], ['organico', ['Orgánico: la trama lo sigue', 'Organic: the plot follows them']]] },
-          { k: 'necesita', type: 'area', q: ['¿Para qué lo necesita la historia?', 'What does the story need them for?'] },
+          { k: 'necesita', type: 'area', q: ['¿Para qué lo necesita la historia?', 'What does the story need them for?'],
+            i: ['Su función concreta en la trama: qué pasaría, o qué dejaría de pasar, si lo sacaras.', 'Their concrete job in the plot: what would happen, or stop happening, if you took them out.'] },
           { k: 'destello', type: 'text', when: ['tipo', 'mecanico'], q: ['Si es un destello, ¿qué forma tiene durante ese segundo?', 'If they are a flash, what shape do they have for that second?'],
+            i: ['Los dos o tres detalles que alcanzan para que el lector lo vea y le crea.', 'The two or three details that are enough for the reader to see them and believe them.'],
             hint: ['Al anunciador del rey le creemos por la ropa, el porte y las palabritas.', 'We believe the king’s herald because of the clothes, the bearing and the few words.'] }
         ] },
       { id: 'identidad', t: ['Identidad', 'Identity'],
@@ -323,48 +342,66 @@ const SCHEMA = [
             'The set of stable traits that repeat out of context. If you put a revolver in the first act, you have to use it.'],
         fields: [
           { k: 'rasgos', type: 'list', q: ['Rasgos que elegiste mostrar', 'Traits you chose to show'], add: ['Agregar rasgo', 'Add a trait'],
+            i: ['Cada rasgo que mostrás tiene que servir para algo. En la segunda columna anotá dónde se usa en la historia.', 'Every trait you show has to earn its place. In the second column, note where it gets used in the story.'],
             cols: [['rasgo', ['Rasgo', 'Trait']], ['sirve', ['¿De qué me sirve saberlo?', 'What use is it to know this?']]] },
-          { k: 'jungla', type: 'area', q: ['Ponelo en la jungla, en la tundra o en Hong Kong. ¿Por qué lo reconocés igual?', 'Put them in the jungle, the tundra or Hong Kong. Why do you still recognise them?'] },
+          { k: 'jungla', type: 'area', q: ['Ponelo en la jungla, en la tundra o en Hong Kong. ¿Por qué lo reconocés igual?', 'Put them in the jungle, the tundra or Hong Kong. Why do you still recognise them?'],
+            i: ['Lo que no cambia aunque cambies el escenario: eso es su identidad.', 'Whatever stays the same when you change the setting: that is their identity.'] },
           { k: 'grupo', type: 'area', q: ['¿En qué grupo lo deja entrar su identidad, y con cuál choca?', 'Which group does their identity let them into, and which does it clash with?'],
+            i: ['Los grupos donde encaja naturalmente y aquellos donde su identidad genera fricción.', 'The groups where they fit naturally and the ones where their identity creates friction.'],
             hint: ['Un punk entre vloggers ya es una situación.', 'A punk among vloggers is already a situation.'] },
-          { k: 'praxis', type: 'area', q: ['¿Qué hace para sostener lo que dice ser? ¿Qué pasa si deja de hacerlo?', 'What do they do to sustain what they say they are? What happens if they stop?'] },
-          { k: 'adjudicada', type: 'area', q: ['¿Qué dicen los demás que es, y qué dice ser?', 'What do others say they are, and what do they say they are?'] }
+          { k: 'praxis', type: 'area', q: ['¿Qué hace para sostener lo que dice ser? ¿Qué pasa si deja de hacerlo?', 'What do they do to sustain what they say they are? What happens if they stop?'],
+            i: ['La identidad se sostiene con acciones. Anotá qué hábitos o actos la mantienen y qué se derrumba si los abandona.', 'Identity is sustained by actions. Note which habits or acts keep it up and what collapses if they drop them.'] },
+          { k: 'adjudicada', type: 'area', q: ['¿Qué dicen los demás que es, y qué dice ser?', 'What do others say they are, and what do they say they are?'],
+            i: ['La diferencia entre cómo lo ven los otros y cómo se ve él. En esa distancia suele haber conflicto.', 'The gap between how others see them and how they see themselves. Conflict usually lives in that gap.'] }
         ] },
       { id: 'contexto', t: ['Contexto', 'Context'],
         p: ['El lienzo: una serie de decisiones sobre lo que es posible. Asimov escribió la Fundación sin aliens y sin robots.',
             'The canvas: a series of decisions about what is possible. Asimov wrote Foundation with no aliens and no robots.'],
         fields: [
-          { k: 'existe', type: 'area', q: ['¿Qué es posible en este mundo?', 'What is possible in this world?'] },
-          { k: 'noexiste', type: 'area', q: ['¿Qué decidiste que no existe?', 'What did you decide does not exist?'] }
+          { k: 'existe', type: 'area', q: ['¿Qué es posible en este mundo?', 'What is possible in this world?'],
+            i: ['Las reglas del mundo del cuento que afectan al personaje: época, lugar, tecnología, lo sobrenatural si lo hay.', 'The rules of the story’s world that affect the character: period, place, technology, the supernatural if any.'] },
+          { k: 'noexiste', type: 'area', q: ['¿Qué decidiste que no existe?', 'What did you decide does not exist?'],
+            i: ['Lo que dejaste afuera a propósito. Los límites del mundo también definen qué puede hacer el personaje.', 'What you left out on purpose. The world’s limits also define what the character can do.'] }
         ] },
       { id: 'motivo', t: ['Conducta y motivo', 'Behaviour and motive'],
         p: ['Toda conducta satisface una necesidad. No hace falta explicar el motivo, pero tiene que poder inferirse. Si no lo tenés claro, el personaje va a vagar.',
             'Every behaviour satisfies a need. You don’t have to explain the motive, but it has to be inferable. If it isn’t clear to you, the character will wander.'],
         fields: [
-          { k: 'necesidad', type: 'area', q: ['¿Qué necesidad busca satisfacer con lo que hace en esta historia?', 'What need are they trying to satisfy with what they do in this story?'] },
+          { k: 'necesidad', type: 'area', q: ['¿Qué necesidad busca satisfacer con lo que hace en esta historia?', 'What need are they trying to satisfy with what they do in this story?'],
+            i: ['Lo que busca, dicho como necesidad: seguridad, reconocimiento, perdón, venganza, que lo dejen en paz. Puede que él no lo sepa.', 'What they are after, put as a need: safety, recognition, forgiveness, revenge, to be left alone. They may not know it themselves.'] },
           { k: 'gran', type: 'choice', q: ['¿Lo mueve un gran motivo?', 'Is a great motive driving them?'],
+            i: ['Elegí si lo arrastra un motivo enorme o si se mueve por algo cotidiano. Si no sabés, dejalo sin marcar.', 'Choose whether a huge motive drags them along or they move for something everyday. If you don’t know, leave it blank.'],
             opts: [['obsesion', ['Obsesión', 'Obsession']], ['destino', ['Destino', 'Destiny']], ['sencillo', ['Un motivo sencillo', 'A simple motive']]] },
-          { k: 'obsesion', type: 'area', when: ['gran', 'obsesion'], q: ['¿Qué tiene que resolver para poder estar tranquilo?', 'What do they have to solve before they can be at peace?'] },
-          { k: 'destino', type: 'area', when: ['gran', 'destino'], q: ['¿Qué misión le impone el contexto, y qué depende de él?', 'What mission does the context impose on them, and what depends on them?'] },
+          { k: 'obsesion', type: 'area', when: ['gran', 'obsesion'], q: ['¿Qué tiene que resolver para poder estar tranquilo?', 'What do they have to solve before they can be at peace?'],
+            i: ['La cuenta pendiente que no lo deja en paz y que, según él, una vez resuelta lo calmaría.', 'The unfinished business that gives them no peace and that, once settled, they believe would calm them.'] },
+          { k: 'destino', type: 'area', when: ['gran', 'destino'], q: ['¿Qué misión le impone el contexto, y qué depende de él?', 'What mission does the context impose on them, and what depends on them?'],
+            i: ['La tarea que el mundo le pone encima aunque no la haya elegido, y lo que se pierde si falla.', 'The task the world puts on them even though they did not choose it, and what is lost if they fail.'] },
           { k: 'rompe', type: 'area', q: ['¿Qué acción suya rompería el verosímil?', 'Which action of theirs would break plausibility?'],
+            i: ['Lo que este personaje nunca haría. Si lo hiciera, el lector dejaría de creerle. Conocer ese borde te dice cómo es.', 'What this character would never do. If they did it, the reader would stop believing them. Knowing that edge tells you who they are.'],
             hint: ['Batman diciendo que le da fiaca salvar a alguien.', 'Batman saying he can’t be bothered to save someone.'] }
         ] },
       { id: 'personalidad', t: ['Personalidad', 'Personality'],
         p: ['La parte más predecible de una persona. Es tendencia, no ley. El arte es saber bajo qué condiciones desafía las expectativas.',
             'The most predictable part of a person. It is a tendency, not a law. The art is knowing under which conditions they defy expectations.'],
         fields: [
-          { k: 'adjetivos', type: 'text', q: ['¿Qué adjetivos le pondría quien lo conoce?', 'Which adjectives would someone who knows them use?'] },
-          { k: 'repite', type: 'area', q: ['¿Qué acciones repetidas lo muestran así?', 'Which repeated actions show it?'] },
+          { k: 'adjetivos', type: 'text', q: ['¿Qué adjetivos le pondría quien lo conoce?', 'Which adjectives would someone who knows them use?'],
+            i: ['Tres o cuatro palabras que usaría alguien cercano para describirlo, separadas por comas.', 'Three or four words someone close would use to describe them, separated by commas.'] },
+          { k: 'repite', type: 'area', q: ['¿Qué acciones repetidas lo muestran así?', 'Which repeated actions show it?'],
+            i: ['Conductas concretas que repite y que demuestran esos adjetivos sin que el narrador tenga que decirlos.', 'Concrete behaviours they repeat that prove those adjectives without the narrator having to state them.'] },
           { k: 'desafia', type: 'area', q: ['¿Bajo qué condiciones rompe el molde?', 'Under which conditions do they break the mould?'],
+            i: ['La situación puntual en que hace lo contrario de lo esperable. Ahí suele estar la escena interesante.', 'The specific situation in which they do the opposite of what is expected. That is usually where the interesting scene is.'],
             hint: ['Cuando el obsesivo se descontrola. Cuando el narcisista se muestra compasivo.', 'When the obsessive loses control. When the narcissist shows compassion.'] }
         ] },
       { id: 'estereotipo', t: ['Estereotipo y arquetipo', 'Stereotype and archetype'],
         p: ['El estereotipo ahorra tiempo: el lector ya le asume un montón de atributos. Si te quedás ahí, aburre.',
             'The stereotype saves time: the reader already assumes a pile of attributes. Stay there and it gets boring.'],
         fields: [
-          { k: 'ahorra', type: 'area', q: ['¿Qué da por sabido el lector gracias al estereotipo?', 'What does the reader take for granted thanks to the stereotype?'] },
-          { k: 'quiebre', type: 'area', q: ['¿Dónde lo quebrás?', 'Where do you break it?'] },
+          { k: 'ahorra', type: 'area', q: ['¿Qué da por sabido el lector gracias al estereotipo?', 'What does the reader take for granted thanks to the stereotype?'],
+            i: ['Lo que el lector asume con solo reconocer el molde, sin que tengas que explicarlo.', 'What the reader assumes just by recognising the mould, without you having to explain it.'] },
+          { k: 'quiebre', type: 'area', q: ['¿Dónde lo quebrás?', 'Where do you break it?'],
+            i: ['El momento, el rasgo o la acción en que el personaje se aparta del molde y deja de ser previsible.', 'The moment, trait or action where the character departs from the mould and stops being predictable.'] },
           { k: 'arquetipo', type: 'text', q: ['¿Encarna algún arquetipo?', 'Do they embody an archetype?'],
+            i: ['Un papel universal que cumple en el relato, si es que cumple alguno. Si no encaja en ninguno, dejalo vacío.', 'A universal role they play in the story, if any. If none fits, leave it empty.'],
             ph: ['El héroe, la tirana, la sombra, el mentor, la sabia', 'The hero, the tyrant, the shadow, the mentor, the sage'] }
         ] }
     ] },
@@ -376,8 +413,10 @@ const SCHEMA = [
             'There are no contradictions: there are beliefs operating at different levels. Everything is possible. The only thing missing is a good explanation.'],
         fields: [
           { k: 'nudos', type: 'list', stacked: true, q: ['Conductas que parecen contradecirse', 'Behaviours that seem to contradict each other'], add: ['Agregar otro nudo', 'Add another knot'],
+            i: ['Dos conductas del personaje que parecen incompatibles y la explicación de fondo que las une. Mirá el ejemplo del jefe tacaño.', 'Two behaviours of the character that seem incompatible, and the underlying explanation that joins them. See the stingy boss example.'],
             cols: [['a', ['Hace esto', 'They do this']], ['b', ['Y también esto, que parece lo opuesto', 'And also this, which looks like the opposite']], ['raiz', ['¿En qué raíz se unen?', 'At what root do the two meet?']]] },
           { k: 'creencias', type: 'list', stacked: true, q: ['Lo que cree sobre cómo funciona el mundo', 'What they believe about how the world works'], add: ['Agregar creencia', 'Add a belief'],
+            i: ['Cada bloque es una regla que el personaje cree sobre el mundo («nadie da nada gratis»): de dónde la sacó, cuándo flaquea y qué le hace hacer.', 'Each block is a rule the character believes about the world (“nobody gives anything for free”): where it came from, when it wavers and what it makes them do.'],
             cols: [['cree', ['Cree que…', 'They believe that…']],
                    ['evidencia', ['¿Qué vio para creerlo? ¿La heredó o la armó?', 'What did they see that made them believe it? Inherited or built?']],
                    ['contra', ['Su contracara: ¿cuándo duda?', 'Its flip side: when do they doubt?']],
@@ -388,45 +427,67 @@ const SCHEMA = [
             'A thought is the news ticker: text that shows up on its own, comments on what they see, comes out of a belief and is tinted by the emotion of the moment.'],
         fields: [
           { k: 'zocalo', type: 'list', zocalo: true, q: ['Líneas que le aparecen en la cabeza', 'Lines that show up in their head'], add: ['Agregar línea', 'Add a line'],
+            i: ['Frases cortas que le pasan por la cabeza sin que las busque, escritas como él las pensaría, y la creencia de la que salen.', 'Short lines that cross their mind unbidden, worded as they would think them, and the belief they come from.'],
             cols: [['p', ['Pensamiento', 'Thought']], ['creencia', ['¿De qué creencia sale?', 'Which belief does it come from?']]] },
-          { k: 'choque', type: 'area', q: ['Emocionado, ¿qué piensa que va contra lo que cree? ¿Qué gana, la emoción o la creencia?', 'When emotional, what do they think that goes against what they believe? Which wins, the emotion or the belief?'] }
+          { k: 'choque', type: 'area', q: ['Emocionado, ¿qué piensa que va contra lo que cree? ¿Qué gana, la emoción o la creencia?', 'When emotional, what do they think that goes against what they believe? Which wins, the emotion or the belief?'],
+            i: ['Un momento en que la emoción le hace pensar algo contrario a lo que cree, y cuál de las dos se impone.', 'A moment when emotion makes them think something against what they believe, and which of the two prevails.'] }
         ] },
       { id: 'siente', t: ['Cómo siente', 'How they feel'],
         p: ['La emoción es un chupito: potente, breve, secuestra la mente. El sentimiento es esa emoción diluida en agua: dura años y conserva la identidad.',
             'An emotion is a shot: strong, brief, it hijacks the mind. A feeling is that emotion diluted in water: it lasts for years and keeps identity intact.'],
         fields: [
-          { k: 'tristeza', type: 'text', q: ['Tristeza: ¿qué cosa querida le falta?', 'Sadness: which loved thing is missing?'] },
-          { k: 'enojo', type: 'text', q: ['Enojo: ¿qué límite siente invadido?', 'Anger: which boundary do they feel invaded?'] },
-          { k: 'aburrimiento', type: 'text', q: ['Aburrimiento: ¿de qué tarea está desconectado?', 'Boredom: which task are they disconnected from?'] },
-          { k: 'verguenza', type: 'text', q: ['Vergüenza: ¿qué quedaría revelado?', 'Shame: what would be revealed?'] },
-          { k: 'alegria', type: 'text', q: ['Alegría: ¿qué lo deja pleno?', 'Joy: what leaves them fulfilled?'] },
-          { k: 'borracho', type: 'area', q: ['Borracho de emoción, ¿qué hace que en calma no haría?', 'Drunk on emotion, what do they do that they would not do when calm?'] },
-          { k: 'sentimiento', type: 'area', q: ['¿Qué sentimiento lo empuja durante años, y hacia qué?', 'Which feeling pushes them for years, and towards what?'] }
+          { k: 'tristeza', type: 'text', q: ['Tristeza: ¿qué cosa querida le falta?', 'Sadness: which loved thing is missing?'],
+            i: ['Lo que perdió o no tiene y extraña. Si no aplica, dejalo vacío.', 'What they lost or lack and miss. If it does not apply, leave it empty.'] },
+          { k: 'enojo', type: 'text', q: ['Enojo: ¿qué límite siente invadido?', 'Anger: which boundary do they feel invaded?'],
+            i: ['Qué siente que se mete en lo suyo: su espacio, su tiempo, su orgullo.', 'What they feel is intruding on what is theirs: their space, their time, their pride.'] },
+          { k: 'aburrimiento', type: 'text', q: ['Aburrimiento: ¿de qué tarea está desconectado?', 'Boredom: which task are they disconnected from?'],
+            i: ['La obligación o la rutina que hace sin ganas y sin sentido para él.', 'The obligation or routine they carry out without will or meaning.'] },
+          { k: 'verguenza', type: 'text', q: ['Vergüenza: ¿qué quedaría revelado?', 'Shame: what would be revealed?'],
+            i: ['Lo que no soportaría que los otros supieran o vieran de él.', 'What they could not bear others knowing or seeing about them.'] },
+          { k: 'alegria', type: 'text', q: ['Alegría: ¿qué lo deja pleno?', 'Joy: what leaves them fulfilled?'],
+            i: ['Lo que lo hace sentir completo, aunque sea por un rato.', 'What makes them feel whole, even if only for a while.'] },
+          { k: 'borracho', type: 'area', q: ['Borracho de emoción, ¿qué hace que en calma no haría?', 'Drunk on emotion, what do they do that they would not do when calm?'],
+            i: ['La conducta extrema que aparece cuando una emoción lo desborda: un exabrupto, una huida, un gesto que después lamenta.', 'The extreme behaviour that shows up when an emotion overwhelms them: an outburst, a flight, a gesture they later regret.'] },
+          { k: 'sentimiento', type: 'area', q: ['¿Qué sentimiento lo empuja durante años, y hacia qué?', 'Which feeling pushes them for years, and towards what?'],
+            i: ['La emoción que se volvió estable (rencor, culpa, ternura) y la dirección en que lo mueve.', 'The emotion that became stable (a grudge, guilt, tenderness) and the direction it moves them in.'] }
         ] },
       { id: 'cambio', t: ['Cataclismo y conversión', 'Cataclysm and conversion'],
         p: ['El cataclismo viene de afuera; la conversión es algo que ve por primera vez. El hecho puede ser chico. Lo que importa es el resultado íntimo.',
             'A cataclysm comes from outside; a conversion is something they see for the first time. The event can be small. What matters is the intimate result.'],
         fields: [
           { k: 'clase', type: 'choice', q: ['¿Cómo cambia?', 'How do they change?'],
+            i: ['Cataclismo: algo de afuera lo sacude. Conversión: se da cuenta de algo que siempre estuvo ahí. También puede resistirse.', 'Cataclysm: something from outside shakes them. Conversion: they realise something that was always there. They can also resist.'],
             opts: [['cataclismo', ['Cataclismo', 'Cataclysm']], ['conversion', ['Conversión', 'Conversion']], ['ambos', ['Los dos', 'Both']], ['resiste', ['Se resiste a cambiar', 'They resist change']]] },
-          { k: 'hecho', type: 'area', q: ['¿Qué le pasa, o qué ve?', 'What happens to them, or what do they see?'] },
-          { k: 'intimo', type: 'area', q: ['¿Qué queda afectado en su cuerpo, su mente o su espíritu?', 'What is affected in their body, mind or spirit?'] },
-          { k: 'rituales', type: 'area', q: ['¿A qué rituales se aferra para que el mundo siga idéntico?', 'Which rituals do they cling to so the world stays identical?'] },
+          { k: 'hecho', type: 'area', q: ['¿Qué le pasa, o qué ve?', 'What happens to them, or what do they see?'],
+            i: ['El acontecimiento o la revelación concreta que dispara el cambio en el cuento. Puede ser pequeño.', 'The concrete event or realisation that triggers the change in the story. It can be small.'] },
+          { k: 'intimo', type: 'area', q: ['¿Qué queda afectado en su cuerpo, su mente o su espíritu?', 'What is affected in their body, mind or spirit?'],
+            i: ['Qué cambia dentro de él a partir de ese hecho: una costumbre, una creencia, su manera de ver a alguien.', 'What changes inside them because of it: a habit, a belief, the way they see someone.'] },
+          { k: 'rituales', type: 'area', q: ['¿A qué rituales se aferra para que el mundo siga idéntico?', 'Which rituals do they cling to so the world stays identical?'],
+            i: ['Las costumbres que repite para sentir que nada cambió.', 'The habits they repeat to feel that nothing has changed.'] },
           { k: 'senales', type: 'list', plain: true, q: ['Señales minuciosas de que el ritual ya no funciona', 'Minute signs that the ritual no longer works'], add: ['Agregar señal', 'Add a sign'],
+            i: ['Detalles chicos y físicos que muestran que la rutina se resquebraja. Uno por fila.', 'Small physical details that show the routine cracking. One per row.'],
             cols: [['s', ['La pava que se cae. El café en lugar del té.', 'The kettle that falls. Coffee instead of tea.']]] },
           { k: 'quiebre_c', type: 'area', q: ['En el punto de quiebre, ¿se hunde o flota?', 'At the breaking point, do they sink or float?'],
+            i: ['Cuando ya no puede seguir igual: si sale transformado o si se derrumba.', 'When they can no longer go on as before: whether they come out transformed or collapse.'],
             hint: ['Puede crecer, o encontrar rituales nuevos para quedarse en el molde.', 'They can grow, or find new rituals to stay in the mould.'] }
         ] },
       { id: 'voz', t: ['Cómo habla', 'How they speak'],
         p: ['Hablar es un comportamiento. Los latiguillos y modismos dicen quién es y a qué colectivo representa. El que escucha también se representa.',
             'Speaking is a behaviour. Catchphrases and idioms say who they are and which group they represent. The one who listens also represents themselves.'],
         fields: [
-          { k: 'latiguillos', type: 'text', q: ['Latiguillos y modismos', 'Catchphrases and idioms'], ph: ['viste, vistes, che, alto', 'you know, innit, y’all, mate'] },
-          { k: 'colectivo', type: 'area', q: ['¿A qué colectivo representa su forma de hablar?', 'Which group does their way of speaking represent?'] },
-          { k: 'conoce', type: 'choice', q: ['¿Conocés de cerca cómo habla esa gente?', 'Do you know closely how those people speak?'], opts: [['si', ['Sí', 'Yes']], ['no', ['No', 'No']]] },
+          { k: 'latiguillos', type: 'text', q: ['Latiguillos y modismos', 'Catchphrases and idioms'],
+            i: ['Palabras y muletillas que repite al hablar, separadas por comas.', 'Words and verbal tics they repeat when speaking, separated by commas.'],
+            ph: ['viste, vistes, che, alto', 'you know, innit, y’all, mate'] },
+          { k: 'colectivo', type: 'area', q: ['¿A qué colectivo representa su forma de hablar?', 'Which group does their way of speaking represent?'],
+            i: ['El grupo social, regional, generacional o profesional que se escucha en su manera de hablar.', 'The social, regional, generational or professional group you can hear in the way they speak.'] },
+          { k: 'conoce', type: 'choice', q: ['¿Conocés de cerca cómo habla esa gente?', 'Do you know closely how those people speak?'],
+            i: ['Si no conocés de cerca esa forma de hablar, el diálogo puede sonar falso.', 'If you don’t know that way of speaking closely, the dialogue may ring false.'],
+            opts: [['si', ['Sí', 'Yes']], ['no', ['No', 'No']]] },
           { k: 'escucha', type: 'area', q: ['Cuando escucha a otro, ¿cómo se representa a sí mismo?', 'When they listen to someone else, how do they represent themselves?'],
+            i: ['Cómo reacciona cuando el otro habla: interrumpe, se ríe, cambia de tema, da consejos.', 'How they react when the other person speaks: interrupt, laugh, change the subject, give advice.'],
             hint: ['Si solo dice «contame más», es un terapeuta barato.', 'If all they say is “tell me more”, they are a cheap therapist.'] },
           { k: 'choque_l', type: 'area', q: ['¿Con qué otra forma de hablar choca?', 'Which other way of speaking do they clash with?'],
+            i: ['Otro personaje cuya manera de hablar contrasta con la suya, y qué revela ese contraste.', 'Another character whose way of speaking contrasts with theirs, and what the contrast reveals.'],
             hint: ['«Fui a la esquina» frente a «he ido a tal lugar».', 'One character says “y’all”, another says “you lot”: two worlds already.'] }
         ] },
       { id: 'sueno', t: ['Cómo sueña', 'How they dream'],
@@ -434,31 +495,48 @@ const SCHEMA = [
             'In fiction a dream is a symbolic micro-story, and it serves the reader. It reveals a hidden truth, foreshadows, or explains something past.'],
         fields: [
           { k: 'funcion_s', type: 'choice', q: ['¿Para qué está el sueño?', 'What is the dream for?'],
+            i: ['Qué trabajo hace el sueño para el lector. Si el personaje no sueña en el cuento, salteá esta sección.', 'What job the dream does for the reader. If the character does not dream in the story, skip this section.'],
             opts: [['flashback', ['Flashback', 'Flashback']], ['trauma', ['Entrever un trauma', 'Glimpse a trauma']], ['anticipo', ['Anticipar', 'Foreshadow']], ['secreto', ['Revelar un secreto', 'Reveal a secret']]] },
-          { k: 'atmosfera', type: 'text', q: ['¿Qué atmósfera emocional tiene?', 'What emotional atmosphere does it have?'] },
-          { k: 'simbolos', type: 'area', q: ['¿Qué personas, lugares y símbolos aparecen, y qué significan para él?', 'Which people, places and symbols appear, and what do they mean to the character?'] },
-          { k: 'raro', type: 'text', q: ['¿Qué elemento no debería estar ahí?', 'Which element should not be there?'], hint: ['Una oveja en medio de la ciudad.', 'A sheep in the middle of the city.'] },
-          { k: 'revela', type: 'area', q: ['¿Qué le revela al lector que el personaje no entiende?', 'What does it reveal to the reader that the character does not understand?'] }
+          { k: 'atmosfera', type: 'text', q: ['¿Qué atmósfera emocional tiene?', 'What emotional atmosphere does it have?'],
+            i: ['La emoción que tiñe todo el sueño, en una o dos palabras: angustia, euforia, una calma rara.', 'The emotion that tints the whole dream, in a word or two: anguish, euphoria, an odd calm.'] },
+          { k: 'simbolos', type: 'area', q: ['¿Qué personas, lugares y símbolos aparecen, y qué significan para él?', 'Which people, places and symbols appear, and what do they mean to the character?'],
+            i: ['Las figuras del sueño y lo que representan para el personaje, aunque él no lo sepa.', 'The figures in the dream and what they stand for to the character, even if they don’t know it.'] },
+          { k: 'raro', type: 'text', q: ['¿Qué elemento no debería estar ahí?', 'Which element should not be there?'],
+            i: ['El detalle fuera de lugar que delata que es un sueño y funciona como pista.', 'The out-of-place detail that gives the dream away and works as a clue.'],
+            hint: ['Una oveja en medio de la ciudad.', 'A sheep in the middle of the city.'] },
+          { k: 'revela', type: 'area', q: ['¿Qué le revela al lector que el personaje no entiende?', 'What does it reveal to the reader that the character does not understand?'],
+            i: ['La información que el lector capta a través del sueño y que el personaje todavía no.', 'The information the reader picks up through the dream that the character has not yet grasped.'] }
         ] },
       { id: 'sombra', t: ['La sombra', 'The shadow'],
         p: ['El personaje siempre oculta algo y siempre se justifica. Conocerlo es saber qué oculta y cómo hace para ocultarlo.',
             'The character always hides something and always justifies themselves. Knowing them means knowing what they hide and how they manage to hide it.'],
         fields: [
-          { k: 'secree', type: 'text', q: ['¿Qué se considera a sí mismo?', 'What do they consider themselves to be?'] },
-          { k: 'oculta', type: 'area', q: ['¿Qué oculta?', 'What do they hide?'] },
-          { k: 'justifica', type: 'area', q: ['¿Con qué frase se justifica?', 'With which phrase do they justify themselves?'], hint: ['«Lo hago por mi familia.»', '“I do it for my family.”'] },
-          { k: 'gimnasia', type: 'area', q: ['¿Qué gimnasia mental hace para no ver?', 'What mental gymnastics do they do in order not to see?'] },
-          { k: 'rinde', type: 'area', q: ['Si un día se rindiera, ¿qué admitiría?', 'If one day they gave in, what would they admit?'] }
+          { k: 'secree', type: 'text', q: ['¿Qué se considera a sí mismo?', 'What do they consider themselves to be?'],
+            i: ['La imagen que tiene de sí mismo, en pocas palabras: buen padre, persona justa, víctima.', 'Their self-image, in a few words: good father, fair person, victim.'] },
+          { k: 'oculta', type: 'area', q: ['¿Qué oculta?', 'What do they hide?'],
+            i: ['Lo que esconde a los demás o a sí mismo: un acto, un deseo, un rasgo que contradice su imagen.', 'What they hide from others or from themselves: an act, a desire, a trait that contradicts their self-image.'] },
+          { k: 'justifica', type: 'area', q: ['¿Con qué frase se justifica?', 'With which phrase do they justify themselves?'],
+            i: ['La frase que se repite para seguir creyéndose bueno.', 'The sentence they tell themselves to keep believing they are good.'],
+            hint: ['«Lo hago por mi familia.»', '“I do it for my family.”'] },
+          { k: 'gimnasia', type: 'area', q: ['¿Qué gimnasia mental hace para no ver?', 'What mental gymnastics do they do in order not to see?'],
+            i: ['Los razonamientos, olvidos o distracciones que usa para no enfrentar lo que oculta.', 'The reasoning, forgetting or distractions they use to avoid facing what they hide.'] },
+          { k: 'rinde', type: 'area', q: ['Si un día se rindiera, ¿qué admitiría?', 'If one day they gave in, what would they admit?'],
+            i: ['La confesión que haría si dejara de defenderse.', 'The confession they would make if they stopped defending themselves.'] }
         ] },
       { id: 'narra', t: ['En sus palabras', 'In their own words'],
         p: ['El personaje miente dos veces: a nosotros, pretendiendo que es real, y a sí mismo, pretendiendo que es bueno. Si narra, narra sin dudar.',
             'The character lies twice: to us, pretending to be real, and to themselves, pretending to be good. If they narrate, they narrate without doubting.'],
         fields: [
-          { k: 'narra', type: 'choice', q: ['¿Narra él?', 'Do they narrate?'], opts: [['si', ['Narra', 'They narrate']], ['no', ['No narra', 'They don’t']]] },
+          { k: 'narra', type: 'choice', q: ['¿Narra él?', 'Do they narrate?'],
+            i: ['Marcá si el cuento está contado en primera persona por este personaje.', 'Mark whether the story is told in the first person by this character.'],
+            opts: [['si', ['Narra', 'They narrate']], ['no', ['No narra', 'They don’t']]] },
           { k: 'confianza', type: 'area', when: ['narra', 'si'], q: ['¿Por qué le creemos?', 'Why do we believe them?'],
+            i: ['Qué hace que el lector acepte su versión de los hechos.', 'What makes the reader accept their version of events.'],
             hint: ['Cuanto más se parecen sus conclusiones a las nuestras, más le creemos.', 'The closer their conclusions are to ours, the more we believe them.'] },
-          { k: 'deforma', type: 'area', when: ['narra', 'si'], q: ['¿Qué deforma o calla, y qué tiene que descubrir el lector?', 'What do they distort or leave out, and what does the reader have to work out?'] },
+          { k: 'deforma', type: 'area', when: ['narra', 'si'], q: ['¿Qué deforma o calla, y qué tiene que descubrir el lector?', 'What do they distort or leave out, and what does the reader have to work out?'],
+            i: ['Lo que su versión distorsiona u omite, y que el lector tiene que reconstruir.', 'What their version distorts or leaves out, which the reader has to reconstruct.'] },
           { k: 'muestra', type: 'hedge', when: ['narra', 'si'], q: ['Pegá un párrafo narrado por él', 'Paste a paragraph narrated by them'],
+            i: ['Pegá un fragmento del cuento en su voz. La herramienta subraya las expresiones de duda para que veas si duda él o dudás vos.', 'Paste a passage of the story in their voice. The tool underlines hedging expressions so you can see whether they are doubting or you are.'],
             hint: ['Se subrayan los «tal vez», «podría ser», «como si». No se toca el texto.', 'Every “maybe”, “could be”, “as if” gets underlined. The text is not touched.'] }
         ] }
     ] },
@@ -471,11 +549,14 @@ const SCHEMA = [
             'You know it is made up and it moves you anyway. Stay long enough and what looked ridiculous becomes obvious.'],
         fields: [
           { k: 'chk_vivo', type: 'checks', q: ['Marcá lo que sea cierto', 'Tick what is true'],
+            i: ['Marcá solo lo que sea verdad hoy. Es un termómetro, no una nota.', 'Tick only what is true today. It is a thermometer, not a grade.'],
             opts: [['persona', ['Hablo de él como de una persona real', 'I talk about them as if they were a real person']],
                    ['conmueve', ['Me conmueve, o lo detesto', 'They move me, or I detest them']],
                    ['quedarme', ['Quiero quedarme a ver qué le pasa', 'I want to stay and see what happens to them']]] },
-          { k: 'empatia', type: 'area', q: ['¿Qué sentís por él ahora, y qué querés que sienta el lector al final?', 'What do you feel for them now, and what do you want the reader to feel at the end?'] },
-          { k: 'obvio', type: 'area', q: ['¿Qué parece ridículo de él y, quedándote lo suficiente, se vuelve obvio?', 'What looks ridiculous about them and, if you stay long enough, becomes obvious?'] }
+          { k: 'empatia', type: 'area', q: ['¿Qué sentís por él ahora, y qué querés que sienta el lector al final?', 'What do you feel for them now, and what do you want the reader to feel at the end?'],
+            i: ['Tu reacción actual ante el personaje y la que buscás provocar en el lector al terminar el cuento.', 'Your current reaction to the character and the one you want to provoke in the reader at the end of the story.'] },
+          { k: 'obvio', type: 'area', q: ['¿Qué parece ridículo de él y, quedándote lo suficiente, se vuelve obvio?', 'What looks ridiculous about them and, if you stay long enough, becomes obvious?'],
+            i: ['Un rasgo o una conducta que al principio parecía forzada y ahora te resulta natural.', 'A trait or behaviour that seemed forced at first and now feels natural to you.'] }
         ] }
     ] }
 ];
@@ -494,7 +575,16 @@ const UI = {
     roster: 'Personajes', nw: 'Nuevo', dup: 'Duplicar', del: 'Borrar', delAsk: n => '¿Borrar «' + n + '»? Tocá de nuevo',
     unnamed: 'Sin nombre', mec: 'Mecánico', org: 'Orgánico', undef: 'Sin definir', marks: n => pl(n, 'marca', 'marcas'),
     example: 'Ejemplo: un jefe tacaño. Editalo o borralo.',
-    nameLbl: 'Nombre del personaje', namePh: 'Nombre o apodo provisorio', project: 'Cuento o proyecto', line: 'En una línea',
+    nameLbl: 'Nombre del personaje', namePh: 'Nombre o apodo provisorio', project: 'Cuento o proyecto', line: 'El personaje en una oración',
+    nameInfo: 'Puede ser provisorio. Es el que aparece en la lista de personajes y en el nombre del archivo que descargues.',
+    projectInfo: 'El título del cuento donde aparece, aunque sea provisorio. Sirve para no mezclar personajes si trabajás en varios.',
+    lineInfo: 'Una sola oración sobre el personaje, no sobre el cuento: quién es y qué quiere o qué esconde.',
+    linePh: 'Ej.: Un ferretero que esconde que está quebrado para que su hijo no se entere',
+    version: 'Versión', simple: 'Simple', full: 'Completa',
+    simpleLead: 'Versión simple: siete preguntas para que el personaje se sostenga en el cuento. Empezá por la 01 sin corregir nada; las demás son para después.',
+    simpleMec: 'Lo marcaste mecánico: para utilería alcanza con lo de arriba. Lo que sigue es opcional.',
+    more: n => pl(n, 'respuesta más', 'respuestas más') + ' en esta sección. Se ven en la versión completa.',
+    moreSecs: n => 'Este personaje tiene ' + pl(n, 'respuesta', 'respuestas') + ' en secciones que solo aparecen en la versión completa. No se pierden y salen en la ficha descargada.',
     flash: 'Destello', info: n => 'Información dada: ' + pl(n, 'dato', 'datos'),
     reportTab: "Lectura del editor", mecWarn: 'Lo marcaste mecánico. Para utilería alcanza con muy poco de esta pestaña.',
     editor: 'Editor', notesOf: 'Notas del editor: ', remove: 'Quitar', removeRow: 'Quitar fila ', now: 'Ahora',
@@ -516,7 +606,16 @@ const UI = {
     roster: 'Characters', nw: 'New', dup: 'Duplicate', del: 'Delete', delAsk: n => 'Delete “' + n + '”? Click again',
     unnamed: 'Unnamed', mec: 'Mechanical', org: 'Organic', undef: 'Undefined', marks: n => pl(n, 'mark', 'marks'),
     example: 'Example: a stingy boss. Edit it or delete it.',
-    nameLbl: 'Character name', namePh: 'Name or working nickname', project: 'Story or project', line: 'In one line',
+    nameLbl: 'Character name', namePh: 'Name or working nickname', project: 'Story or project', line: 'The character in one sentence',
+    nameInfo: 'It can be provisional. It is the name shown in the character list and in the name of the file you download.',
+    projectInfo: 'The title of the story they appear in, even a working one. It keeps characters apart if you work on several stories.',
+    lineInfo: 'A single sentence about the character, not the story: who they are and what they want or hide.',
+    linePh: 'E.g. A hardware-shop owner who hides that he is broke so his son won’t find out',
+    version: 'Version', simple: 'Simple', full: 'Full',
+    simpleLead: 'Simple version: seven questions so the character holds up in the story. Start with 01 and correct nothing; the rest are for later.',
+    simpleMec: 'You marked them mechanical: for a prop, what is above is enough. What follows is optional.',
+    more: n => pl(n, 'more answer', 'more answers') + ' in this section. They show in the full version.',
+    moreSecs: n => 'This character has ' + pl(n, 'answer', 'answers') + ' in sections that only appear in the full version. They are not lost and they are included in the downloaded sheet.',
     flash: 'Flash', info: n => 'Information given: ' + pl(n, 'detail', 'details'),
     reportTab: 'Editor’s reading', mecWarn: 'You marked them mechanical. A prop needs very little from this tab.',
     editor: 'Editor', notesOf: 'Editor’s notes: ', remove: 'Remove', removeRow: 'Remove row ', now: 'Live',
@@ -538,6 +637,7 @@ const u = () => UI[lang];
 const MSG = {
   es: {
     rid_empty: 'Ya hay respuestas en las pestañas del editor y el borrador está vacío. ¿Lo dejaste jugar primero?',
+    rid_empty_s: 'Ya hay respuestas más abajo y el borrador está vacío. ¿Lo dejaste jugar primero?',
     rid_vibra: 'Hay material. ¿Cuál es la oración que vibra distinto?',
     frank: '¿Qué parte tuya lleva? Sin algo que conozcas íntimamente, no tiene peso.',
     fun_tipo: '¿La trama lo usa o lo sigue? De eso depende cuánta información merece.',
@@ -586,6 +686,7 @@ const MSG = {
   },
   en: {
     rid_empty: 'There are answers in the editor’s tabs and the draft is empty. Did you let them play first?',
+    rid_empty_s: 'There are answers further down and the draft is empty. Did you let them play first?',
     rid_vibra: 'There is material here. Which sentence hums differently?',
     frank: 'Which part of you do they carry? Without something you know intimately, they have no weight.',
     fun_tipo: 'Does the plot use them or follow them? That decides how much information they deserve.',
@@ -638,6 +739,17 @@ function m(key, ...args) { const v = MSG[lang][key]; return typeof v === 'functi
 /* ---------- state ---------- */
 const KEY = 'fichero-verni-v1';
 let state = { chars: [], current: null, tab: 'juego' };
+
+/* ---------- version: simple shows the questions that build the causal chain; full shows everything ---------- */
+const MODE_KEY = 'character-mode';
+let mode = (() => { try { return localStorage.getItem(MODE_KEY) === 'full' ? 'full' : 'simple'; } catch (e) { return 'simple'; } })();
+const simple = () => mode === 'simple';
+const SIMPLE = new Set(['estereotipo_partida', 'ridiculo', 'vibra', 'tipo', 'necesita', 'destello', 'necesidad', 'rompe',
+  'quiebre', 'nudos', 'hecho', 'intimo', 'oculta', 'justifica']);
+/* In simple mode only the rules about visible fields speak, so no note points at a hidden section. */
+const SIMPLE_RULES = new Set(['rid_empty_s', 'rid_vibra', 'fun_tipo', 'fun_destello', 'mot_none', 'mot_rompe', 'est',
+  'nudo_raiz', 'nudo_half', 'cr_none', 'cam_int', 'som_oc', 'som_just']);
+const shown = f => !simple() || SIMPLE.has(f.k);
 
 const uid = () => Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-4);
 
@@ -711,12 +823,20 @@ function toast(msg) {
 const NO_SIZING = !(window.CSS && CSS.supports && CSS.supports('field-sizing', 'content'));
 function grow(t) { if (!NO_SIZING) return; t.style.height = 'auto'; t.style.height = (t.scrollHeight + 2) + 'px'; }
 
+function filled(c, f) {
+  const v = c.d[f.k];
+  if (f.type === 'list') return rowsOf(c, f.k).length > 0;
+  if (f.type === 'checks') return !!v && Object.values(v).some(Boolean);
+  return !!str(v);
+}
+
 /* ---------- amount of information (editor's tabs only) ---------- */
 function infoCount(c) {
   let n = 0;
   SCHEMA.forEach(g => {
     if (g.id === 'juego') return;
     g.secs.forEach(s => s.fields.forEach(f => {
+      if (!shown(f)) return;
       const v = c.d[f.k];
       if (f.type === 'list') rowsOf(c, f.k).forEach(r => { n += Object.values(r).filter(x => str(x)).length; });
       else if (f.type === 'checks') n += v ? Object.values(v).filter(Boolean).length : 0;
@@ -745,12 +865,12 @@ function paintHedges(box, countEl, text) {
 function diagnose(c) {
   const out = [];
   const v = k => str(c.d[k]);
-  const add = (sec, key, ...a) => out.push({ sec, text: m(key, ...a) });
+  const add = (sec, key, ...a) => { if (simple() && !SIMPLE_RULES.has(key)) return; out.push({ sec, text: m(key, ...a) }); };
   const tipo = v('tipo');
   const org = tipo === 'organico', mec = tipo === 'mecanico';
   const info = infoCount(c);
 
-  if (!v('ridiculo') && info >= 3) add('ridiculo', 'rid_empty');
+  if (!v('ridiculo') && info >= 3) add('ridiculo', simple() ? 'rid_empty_s' : 'rid_empty');
   if (v('ridiculo') && !v('vibra')) add('ridiculo', 'rid_vibra');
   if (org && !v('propio')) add('frankenstein', 'frank');
 
@@ -841,6 +961,11 @@ function renderStatic() {
   $('rosterH').textContent = t.roster; $('rosterNav').setAttribute('aria-label', t.roster);
   $('new').textContent = t.nw; $('dup').textContent = t.dup; $('del').textContent = t.del;
   $('foot').textContent = t.foot;
+  $('modeSeg').setAttribute('aria-label', t.version);
+  document.querySelectorAll('[data-mode]').forEach(b => {
+    b.setAttribute('aria-pressed', String(b.dataset.mode === mode));
+    b.textContent = t[b.dataset.mode];
+  });
 }
 const tipoLabel = c => str(c.d.tipo) === 'mecanico' ? u().mec : str(c.d.tipo) === 'organico' ? u().org : u().undef;
 
@@ -863,15 +988,18 @@ function renderHead() {
   box.append(
     el('div', { class: 'name-row' },
       el('label', { class: 'visually-hidden', for: 'c-nombre', text: t.nameLbl }),
-      el('input', { id: 'c-nombre', class: 'name', type: 'text', value: c.nombre || '', placeholder: t.namePh, oninput: bind('nombre') }),
+      el('input', { id: 'c-nombre', class: 'name', type: 'text', value: c.nombre || '', placeholder: t.namePh, 'aria-describedby': 'c-nombre-i', oninput: bind('nombre') }),
       el('a', { class: 'name-link', href: 'name.html', text: t.nameLink })),
+    el('p', { class: 'hint name-hint', id: 'c-nombre-i', text: t.nameInfo }),
     el('div', { class: 'head-row' },
       el('div', { class: 'mini' }, el('label', { for: 'c-proyecto', text: t.project }),
-        el('input', { id: 'c-proyecto', type: 'text', value: c.proyecto || '', oninput: bind('proyecto') })),
+        el('input', { id: 'c-proyecto', type: 'text', value: c.proyecto || '', 'aria-describedby': 'c-proyecto-i', oninput: bind('proyecto') }),
+        el('p', { class: 'hint', id: 'c-proyecto-i', text: t.projectInfo })),
       el('div', { class: 'mini' }, el('label', { for: 'c-linea', text: t.line }),
-        el('input', { id: 'c-linea', type: 'text', value: c.linea || '', oninput: bind('linea') }))
+        el('input', { id: 'c-linea', type: 'text', value: c.linea || '', placeholder: t.linePh, 'aria-describedby': 'c-linea-i', oninput: bind('linea') }),
+        el('p', { class: 'hint', id: 'c-linea-i', text: t.lineInfo }))
     ),
-    el('div', { class: 'meter', id: 'meter' })
+    ...(simple() ? [] : [el('div', { class: 'meter', id: 'meter' })])
   );
   renderMeter();
 }
@@ -886,6 +1014,8 @@ function renderMeter() {
 
 function renderTabs() {
   const box = $('tabs'); box.textContent = '';
+  box.hidden = simple();
+  if (simple()) return;
   const by = notesBySec(diagnose(cur()));
   let total = 0;
   SCHEMA.forEach(g => {
@@ -905,17 +1035,18 @@ function go(tab, secId) {
 function renderField(c, f) {
   if (f.when && str(c.d[f.when[0]]) !== f.when[1]) return null;
   const id = 'f-' + f.k, q = L(f.q);
-  const hint = f.hint ? el('p', { class: 'hint', text: L(f.hint) }) : null;
+  const info = f.i ? el('p', { class: 'hint', text: L(f.i) }) : null;
+  const hint = f.hint ? el('p', { class: 'hint ex', text: L(f.hint) }) : null;
   const onText = e => { c.d[f.k] = e.target.value; grow(e.target); changed(); };
 
   if (f.type === 'text') {
-    return el('div', { class: 'field' }, el('label', { for: id, text: q }), hint,
+    return el('div', { class: 'field' }, el('label', { for: id, text: q }), info, hint,
       el('input', { id, type: 'text', value: c.d[f.k] || '', placeholder: f.ph ? L(f.ph) : null, oninput: onText }));
   }
   if (f.type === 'area' || f.type === 'big') {
     const t = el('textarea', { id, class: f.type === 'big' ? 'big' : null, rows: f.type === 'big' ? 8 : 2, oninput: onText });
     t.value = c.d[f.k] || '';
-    return el('div', { class: 'field' }, el('label', { for: id, text: q }), hint, t);
+    return el('div', { class: 'field' }, el('label', { for: id, text: q }), info, hint, t);
   }
   if (f.type === 'hedge') {
     const box = el('div', { class: 'hedge-out', 'aria-label': u().hedgeBox });
@@ -923,10 +1054,10 @@ function renderField(c, f) {
     const t = el('textarea', { id, rows: 5, oninput: e => { c.d[f.k] = e.target.value; grow(e.target); paintHedges(box, count, e.target.value); changed(); } });
     t.value = c.d[f.k] || '';
     paintHedges(box, count, t.value);
-    return el('div', { class: 'field' }, el('label', { for: id, text: q }), hint, t, count, box);
+    return el('div', { class: 'field' }, el('label', { for: id, text: q }), info, hint, t, count, box);
   }
   if (f.type === 'choice') {
-    return el('fieldset', { class: 'field' }, el('legend', { text: q }), hint,
+    return el('fieldset', { class: 'field' }, el('legend', { text: q }), info, hint,
       el('div', { class: 'pills' }, f.opts.map(([val, label]) => {
         const inp = el('input', { type: 'radio', name: id, id: id + '-' + val, value: val,
           onclick: e => {
@@ -940,7 +1071,7 @@ function renderField(c, f) {
   }
   if (f.type === 'checks') {
     const cv = c.d[f.k] = c.d[f.k] || {};
-    return el('fieldset', { class: 'field' }, el('legend', { text: q }),
+    return el('fieldset', { class: 'field' }, el('legend', { text: q }), info,
       f.opts.map(([val, label]) => {
         const inp = el('input', { type: 'checkbox', id: id + '-' + val, onchange: e => { cv[val] = e.target.checked; changed(); } });
         inp.checked = !!cv[val];
@@ -968,26 +1099,48 @@ function renderField(c, f) {
     }));
     const addBtn = el('button', { type: 'button', class: 'btn quiet add',
       onclick: () => { list.push({}); save(); renderSheet(); const first = $(id + '-' + (list.length - 1) + '-' + f.cols[0][0]); if (first) first.focus(); } }, L(f.add));
-    return el('fieldset', { class: 'field' }, el('legend', { text: q }), hint, rows, addBtn, zoc);
+    return el('fieldset', { class: 'field' }, el('legend', { text: q }), info, hint, rows, addBtn, zoc);
   }
   return null;
 }
 
 function renderSheet() {
   const c = cur(), sheet = $('sheet'); sheet.textContent = '';
+  if (simple()) { renderSimple(sheet, c); return; }
   if (state.tab === 'informe') { renderReport(sheet, c); return; }
   const g = SCHEMA.find(x => x.id === state.tab) || SCHEMA[0];
   sheet.append(el('p', { class: 'lead', text: L(g.lead) }));
   if (g.id !== 'juego' && g.id !== 'fuera' && str(c.d.tipo) === 'mecanico') sheet.append(el('p', { class: 'lead warn', text: u().mecWarn }));
-  g.secs.forEach(s => {
-    sheet.append(el('section', { class: 'sec', id: 'sec-' + s.id, 'aria-labelledby': 'h-' + s.id },
-      el('div', { class: 'sec-main' },
-        el('h3', { id: 'h-' + s.id }, el('span', { text: String(SECS[s.id].n).padStart(2, '0') }), L(s.t)),
-        el('p', { class: 'principle', text: L(s.p) }),
-        s.fields.map(f => renderField(c, f))),
-      el('aside', { class: 'margin', id: 'm-' + s.id, 'aria-label': u().notesOf + L(s.t) })));
-  });
+  g.secs.forEach(s => sheet.append(renderSection(c, s, SECS[s.id].n)));
   paintMargins();
+  if (NO_SIZING) requestAnimationFrame(() => sheet.querySelectorAll('textarea').forEach(grow));
+}
+
+function renderSection(c, s, num) {
+  const more = simple() ? s.fields.filter(f => !shown(f) && filled(c, f)).length : 0;
+  return el('section', { class: 'sec', id: 'sec-' + s.id, 'aria-labelledby': 'h-' + s.id },
+    el('div', { class: 'sec-main' },
+      el('h3', { id: 'h-' + s.id }, el('span', { text: String(num).padStart(2, '0') }), L(s.t)),
+      el('p', { class: 'principle', text: L(s.p) }),
+      s.fields.filter(shown).map(f => renderField(c, f)),
+      more ? el('p', { class: 'more', text: u().more(more) }) : null),
+    el('aside', { class: 'margin', id: 'm-' + s.id, 'aria-label': u().notesOf + L(s.t) }));
+}
+
+/* Simple version: one page, no tabs, the take-away block at the end. */
+function renderSimple(sheet, c) {
+  sheet.append(el('p', { class: 'lead', text: u().simpleLead }));
+  let away = 0;
+  SCHEMA.forEach(g => g.secs.forEach(s => { if (!s.fields.some(shown)) away += s.fields.filter(f => filled(c, f)).length; }));
+  if (away) sheet.append(el('p', { class: 'more', text: u().moreSecs(away) }));
+  let n = 0;
+  SCHEMA.forEach(g => g.secs.forEach(s => {
+    if (!s.fields.some(shown)) return;
+    sheet.append(renderSection(c, s, ++n));
+    if (s.id === 'funcion' && str(c.d.tipo) === 'mecanico') sheet.append(el('p', { class: 'lead warn', text: u().simpleMec }));
+  }));
+  paintMargins();
+  sheet.append(takeBlock(c));
   if (NO_SIZING) requestAnimationFrame(() => sheet.querySelectorAll('textarea').forEach(grow));
 }
 
@@ -1050,8 +1203,12 @@ function renderReport(sheet, c) {
         el('button', { type: 'button', class: 'jump', onclick: () => go(SECS[id].group, id) }, String(SECS[id].n).padStart(2, '0') + ' · ' + L(SECS[id].t)),
         el('div', { class: 'rep-notes' }, by[id].map(x => el('p', { class: 'note', text: x })))))));
   }
+  sheet.append(wrap, takeBlock(c));
+}
+function takeBlock(c) {
+  const t = u();
   const fb = el('textarea', { id: 'fallback', readonly: true, hidden: true, 'aria-label': t.fallback });
-  wrap.append(el('div', {},
+  return el('div', { class: 'report' }, el('div', {},
     el('h3', { text: t.take }),
     el('p', { class: 'small', style: 'margin:8px 0 14px', text: t.storage }),
     el('div', { class: 'out-actions' },
@@ -1062,7 +1219,6 @@ function renderReport(sheet, c) {
       el('input', { id: 'import', type: 'file', accept: '.json,application/json', class: 'visually-hidden', onchange: importFile })
     ),
     fb));
-  sheet.append(wrap);
 }
 
 function slug(s) {
@@ -1156,6 +1312,13 @@ $('del').addEventListener('click', e => {
   state.chars = state.chars.filter(c => c.id !== state.current);
   if (!state.chars.length) state.chars.push(blank());
   state.current = state.chars[0].id; save(); renderAll(); toast(u().deleted);
+});
+
+$('modeSeg').addEventListener('click', e => {
+  const b = e.target.closest('[data-mode]'); if (!b || b.dataset.mode === mode) return;
+  mode = b.dataset.mode;
+  try { localStorage.setItem(MODE_KEY, mode); } catch (err) {}
+  renderAll();
 });
 
 /* ---------- language switch and start ---------- */
