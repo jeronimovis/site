@@ -343,12 +343,12 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.5rem
 
 <header class="masthead" id="masthead">
   <div class="wrap">
-    <a class="brand" href="#top" aria-label="Top of page">Jerónimo <em>V.</em></a>
+    <a data-umami-event="nav_brand" class="brand" href="#top" aria-label="Top of page">Jerónimo <em>V.</em></a>
     <nav class="nav" aria-label="Main">
-      <a href="#how">How it works</a>
-      <a href="#feedback">Reviews</a>
-      <a href="#books">Books</a>
-      <a href="#about">CV</a>
+      <a data-umami-event="nav_how" href="#how">How it works</a>
+      <a data-umami-event="nav_reviews" href="#feedback">Reviews</a>
+      <a data-umami-event="nav_books" href="#books">Books</a>
+      <a data-umami-event="nav_cv" href="#about">CV</a>
       <details class="drop" id="hobby">
         <summary>Hobby <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5"/></svg></summary>
         <div class="menu">
@@ -400,7 +400,7 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.5rem
   <div class="ticker" aria-label="Highlights">
     <div class="track">
       <ul>
-        <li><a href="#books" style="text-decoration:none">New: <b style="font-weight:500">Verbs in Real Speech</b>, a free workbook</a></li>
+        <li><a data-umami-event="ticker_verbs" href="#books" style="text-decoration:none">New: <b style="font-weight:500">Verbs in Real Speech</b>, a free workbook</a></li>
         <li>If you don't like the first class, you don't pay</li>
         <li>20+ years of experience</li>
         <li>One-to-one on Zoom®</li>
@@ -409,7 +409,7 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.5rem
         <li>Classes built around you</li>
       </ul>
       <ul aria-hidden="true">
-        <li><a tabindex="-1" href="#books" style="text-decoration:none">New: <b style="font-weight:500">Verbs in Real Speech</b>, a free workbook</a></li>
+        <li><a data-umami-event="ticker_verbs" tabindex="-1" href="#books" style="text-decoration:none">New: <b style="font-weight:500">Verbs in Real Speech</b>, a free workbook</a></li>
         <li>If you don't like the first class, you don't pay</li>
         <li>20+ years of experience</li>
         <li>One-to-one on Zoom®</li>
